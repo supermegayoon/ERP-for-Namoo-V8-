@@ -113,7 +113,7 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
       <div class="table-wrap"><table><thead><tr><th>Color</th><th>090(S)</th><th>095(M)</th><th>100(L)</th><th>105(XL)</th><th>110(XXL)</th><th>Total</th><th>삭제</th></tr></thead><tbody id="colorBody"></tbody></table></div>
     </div>
     <div id="tab-bom" class="tab-panel panel hidden">
-      <div class="head"><div><h2>BOM 정보</h2><p>Cons.와 Required Qty는 자동 계산됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
+      <div class="head"><div><h2>BOM 정보</h2><p>Excel의 모든 BOM 행을 자동 탐색하여 가져옵니다. Cons.와 Required Qty는 자동 계산됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
       <div class="table-wrap"><table class="wide"><thead><tr>
         <th>Style No.</th><th>Position</th><th>Sub Position</th><th>Garment Color</th><th>Garment Size</th><th>Item Description</th><th>Width / Size</th><th>Color</th><th>Qty</th><th>Net</th><th>Loss %</th><th>Cons.</th><th>Required Qty</th><th>Unit</th><th>Supplier</th><th>삭제</th>
       </tr></thead><tbody id="bomBody"></tbody></table></div>
@@ -187,9 +187,182 @@ document.getElementById('excelExport').onclick=()=>{
  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.bom),'BOM');
  XLSX.writeFile(wb,(styleNo.value||'Order')+'_ERP.xlsx');
 };
+function cleanText(v){
+ return String(v ?? '').replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim();
+}
+function norm(v){
+ return cleanText(v).toUpperCase().replace(/[^A-Z0-9가-힣#]/g,'');
+}
+function numberValue(v){
+ if(typeof v==='number') return v;
+ const x=Number(String(v ?? '').replace(/,/g,'').replace(/[^\d.-]/g,''));
+ return Number.isFinite(x)?x:0;
+}
+function findLabelValue(rows,labelNames){
+ const targets=labelNames.map(norm);
+ for(let r=0;r<Math.min(rows.length,25);r++){
+  for(let c=0;c<(rows[r]||[]).length;c++){
+   if(targets.includes(norm(rows[r][c]))){
+    for(let offset=1;offset<=3;offset++){
+     const value=cleanText(rows[r][c+offset]);
+     if(value) return value;
+    }
+   }
+  }
+ }
+ return '';
+}
+function findHeaderRow(rows,required){
+ for(let i=0;i<rows.length;i++){
+  const normalized=(rows[i]||[]).map(norm);
+  const matches=required.filter(x=>normalized.some(v=>v.includes(norm(x)))).length;
+  if(matches>=required.length) return i;
+ }
+ return -1;
+}
+function mapBomFromRows(rows,headerIndex){
+ const header=(rows[headerIndex]||[]).map(cleanText);
+ const findCol=(aliases,fallback)=>{
+  const norms=aliases.map(norm);
+  const idx=header.findIndex(h=>norms.some(a=>norm(h).includes(a)));
+  return idx>=0?idx:fallback;
+ };
+ const cols={
+  styleNo:findCol(['STYLE#','STYLE NO','STYLE'],0),
+  position:findCol(['POSITION'],1),
+  subPosition:2,
+  garmentColor:findCol(['G.COLOR','GARMENT COLOR'],3),
+  garmentSize:findCol(['G.SIZE','GARMENT SIZE'],4),
+  description:findCol(['ITEM DESCRIPTION','DESCRIPTION'],5),
+  widthSize:findCol(['WIDTH/SIZE','WIDTH SIZE'],6),
+  color:findCol(['COLOR'],7),
+  qty:findCol(["Q'TY",'QTY','QUANTITY'],8),
+  net:findCol(['NET'],9),
+  cons:findCol(['CONS'],10),
+  requiredQty:findCol(["ND Q'TY",'REQUIRED QTY','NEED QTY'],11),
+  unit:findCol(['UNIT'],12),
+  supplier:findCol(['SUPPLIER'],13)
+ };
+ const result=[];
+ for(let i=headerIndex+1;i<rows.length;i++){
+  const row=rows[i]||[];
+  const style=cleanText(row[cols.styleNo]);
+  const position=cleanText(row[cols.position]);
+  const description=cleanText(row[cols.description]);
+  const supplier=cleanText(row[cols.supplier]);
+  const meaningful=[style,position,description,supplier].some(Boolean);
+  if(!meaningful) continue;
+  if(norm(style)==='TOTAL'||norm(position)==='TOTAL') continue;
+  const net=numberValue(row[cols.net]);
+  const cons=numberValue(row[cols.cons]);
+  const qty=numberValue(row[cols.qty]);
+  const inferredLoss=net>0&&cons>0?Math.max(0,(cons/net-1)*100):3;
+  result.push({
+   styleNo:style||document.getElementById('styleNo').value||'',
+   position,
+   subPosition:cleanText(row[cols.subPosition]),
+   garmentColor:cleanText(row[cols.garmentColor]),
+   garmentSize:cleanText(row[cols.garmentSize]),
+   description,
+   widthSize:cleanText(row[cols.widthSize]),
+   color:cleanText(row[cols.color]),
+   qty,
+   net,
+   loss:Number(inferredLoss.toFixed(4)),
+   cons:cons||net*(1+inferredLoss/100),
+   requiredQty:numberValue(row[cols.requiredQty])||(cons||net*(1+inferredLoss/100))*qty,
+   unit:cleanText(row[cols.unit]),
+   supplier
+  });
+ }
+ return result;
+}
+function mapColorSize(rows,headerIndex){
+ const header=(rows[headerIndex]||[]).map(norm);
+ const idx=(aliases,fallback)=>{
+  const a=aliases.map(norm);
+  const found=header.findIndex(h=>a.some(x=>h.includes(x)));
+  return found>=0?found:fallback;
+ };
+ const colColor=idx(['S#','COLOR'],0);
+ const cs=[idx(['090S','90S'],1),idx(['095M','95M'],2),idx(['100L'],3),idx(['105XL'],4),idx(['110XXL'],5)];
+ const result=[];
+ for(let i=headerIndex+1;i<rows.length;i++){
+  const row=rows[i]||[];
+  const color=cleanText(row[colColor]);
+  if(!color||norm(color)==='TOTAL') continue;
+  const nums=cs.map(c=>numberValue(row[c]));
+  if(!color && nums.every(v=>v===0)) continue;
+  result.push({color,s:nums[0],m:nums[1],l:nums[2],xl:nums[3],xxl:nums[4]});
+ }
+ return result;
+}
+
 document.getElementById('excelImport').onchange=e=>{
- const f=e.target.files[0];if(!f)return;const reader=new FileReader();
- reader.onload=ev=>{const wb=XLSX.read(ev.target.result,{type:'array'});if(wb.Sheets.BOM)state.bom=XLSX.utils.sheet_to_json(wb.Sheets.BOM,{defval:''});if(wb.Sheets.ColorSize)state.colors=XLSX.utils.sheet_to_json(wb.Sheets.ColorSize,{defval:''});renderBom();renderColors();alert('Excel Import 완료');};
+ const f=e.target.files[0];if(!f)return;
+ const reader=new FileReader();
+ reader.onload=ev=>{
+  try{
+   const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
+   let importedBom=[];
+   let importedColors=[];
+   let masterRows=null;
+
+   wb.SheetNames.forEach(sheetName=>{
+    const ws=wb.Sheets[sheetName];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:true});
+
+    const bomHeader=findHeaderRow(rows,['STYLE','POSITION','ITEM DESCRIPTION']);
+    if(bomHeader>=0){
+     const rowsFound=mapBomFromRows(rows,bomHeader);
+     if(rowsFound.length>importedBom.length){
+      importedBom=rowsFound;
+      masterRows=rows;
+     }
+    }
+
+    const sizeHeader=findHeaderRow(rows,['090','095','100']);
+    if(sizeHeader>=0){
+     const sizeRows=mapColorSize(rows,sizeHeader);
+     if(sizeRows.length>importedColors.length) importedColors=sizeRows;
+    }
+   });
+
+   if(masterRows){
+    const buyerValue=findLabelValue(masterRows,['BUYER']);
+    const seasonValue=findLabelValue(masterRows,['SEASON']);
+    const itemValue=findLabelValue(masterRows,['ITEM']);
+    const qtyValue=findLabelValue(masterRows,['QUANTITY','QTY']);
+    const factoryValue=findLabelValue(masterRows,['FACTORY']);
+    const styleValue=findLabelValue(masterRows,['STYLE#','STYLE #','STYLE NO']);
+
+    if(buyerValue) document.getElementById('buyer').value=buyerValue;
+    if(seasonValue) document.getElementById('season').value=seasonValue;
+    if(itemValue) document.getElementById('item').value=itemValue;
+    if(qtyValue) document.getElementById('qty').value=numberValue(qtyValue);
+    if(factoryValue) document.getElementById('factory').value=factoryValue;
+    if(styleValue) document.getElementById('styleNo').value=styleValue;
+    else if(importedBom[0]?.styleNo) document.getElementById('styleNo').value=importedBom[0].styleNo;
+   }
+
+   if(importedBom.length) state.bom=importedBom;
+   if(importedColors.length) state.colors=importedColors;
+
+   renderBom();
+   renderColors();
+   localStorage.setItem(KEY,JSON.stringify(state));
+
+   alert(
+    'Excel Import 완료\n' +
+    'BOM: '+importedBom.length+'행\n' +
+    'Color/Size: '+importedColors.length+'행\n' +
+    'Workbook Sheets: '+wb.SheetNames.length+'개'
+   );
+  }catch(err){
+   console.error(err);
+   alert('Excel Import 중 오류가 발생했습니다.\n'+(err.message||err));
+  }
+ };
  reader.readAsArrayBuffer(f);
 };
 renderColors();renderBom();
