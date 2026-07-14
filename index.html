@@ -34,7 +34,23 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}.kpi span{color:var(--muted);font-size:11px}.kpi strong{display:block;font-size:20px;margin-top:6px}
 .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.flow-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}.flow-card span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
 .hidden{display:none}.positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
-@media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr}}
+
+.order-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.style-selector{display:flex;align-items:end;gap:8px;flex-wrap:wrap}.style-selector label{min-width:260px}
+.style-summary{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.style-summary span{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px}
+.btn.danger{background:#7f1d1d;border-color:#7f1d1d;color:#fff}
+.style-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.style-card{border:1px solid var(--line);border-radius:13px;background:var(--card2);overflow:hidden;cursor:pointer;transition:.2s}
+.style-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.style-card.active{outline:2px solid var(--accent)}
+.style-card-image{height:150px;background:var(--input);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:32px}
+.style-card-image img{width:100%;height:100%;object-fit:contain;background:#fff}
+.style-card-body{padding:12px}.style-card-body strong,.style-card-body span{display:block}.style-card-body span{color:var(--muted);font-size:11px;margin-top:5px}.style-card-meta{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-size:11px}
+.sketch-upload{position:relative;overflow:hidden;min-height:320px}.sketch-upload.dragover{border-color:var(--accent);background:var(--accent2)}
+.sketch-upload img{max-width:100%;max-height:230px;object-fit:contain;background:#fff;border-radius:8px}
+.sketch-icon{font-size:44px}.sketch-btn{margin-top:8px}.span2{grid-column:span 2}
+
+@media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr}.style-card-grid{grid-template-columns:1fr}.order-toolbar{align-items:stretch;flex-direction:column}.style-summary{justify-content:flex-start}}}
 </style>
 </head>
 <body>
@@ -95,23 +111,69 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
   </div>
 
   <div id="order" class="page">
-    <div class="tabs"><button class="tab active" data-tab="basic">기본정보</button><button class="tab" data-tab="qty">Color/Size Qty</button><button class="tab" data-tab="bom">BOM</button></div>
-    <div id="tab-basic" class="tab-panel panel order-grid">
-      <div class="sketch">🖼️<b>Sketch / Style Image</b><small>이미지 첨부</small><button class="btn">파일 선택</button></div>
+    <div class="order-toolbar panel">
+      <div class="style-selector">
+        <label>등록 스타일
+          <select id="styleSelector" onchange="selectStyle(this.value)"></select>
+        </label>
+        <button class="btn primary" onclick="newStyle()">+ 신규 스타일</button>
+        <button class="btn" onclick="duplicateStyle()">복사 등록</button>
+        <button class="btn danger" onclick="deleteStyle()">삭제</button>
+      </div>
+      <div class="style-summary" id="styleSummary"></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="registry">스타일 등록</button>
+      <button class="tab" data-tab="basic">기본정보</button>
+      <button class="tab" data-tab="qty">Color/Size Qty</button>
+      <button class="tab" data-tab="bom">BOM</button>
+    </div>
+
+    <div id="tab-registry" class="tab-panel panel">
+      <div class="head">
+        <div><h2>스타일 등록 현황</h2><p>등록된 Style을 선택하면 Sketch, 수량, BOM을 함께 불러옵니다.</p></div>
+        <button class="btn primary" onclick="newStyle()">+ 스타일 등록</button>
+      </div>
+      <div class="style-card-grid" id="styleCardGrid"></div>
+    </div>
+
+    <div id="tab-basic" class="tab-panel panel order-grid hidden">
+      <div class="sketch sketch-upload" id="sketchBox">
+        <img id="sketchPreview" class="hidden" alt="Sketch preview">
+        <div id="sketchPlaceholder">
+          <div class="sketch-icon">🖼️</div>
+          <b>Sketch / Style Image</b>
+          <small>JPG, PNG 파일을 선택하거나 이곳에 드래그하세요.</small>
+        </div>
+        <label class="btn sketch-btn">Sketch 업로드
+          <input id="sketchInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        </label>
+        <button class="btn hidden" id="removeSketchBtn" onclick="removeSketch()">이미지 삭제</button>
+      </div>
+
       <div class="form-grid">
-        <label>Buyer<input id="buyer" value="THE NORTH FACE"></label>
-        <label>Season<input id="season" value="F26"></label>
-        <label>Style No.<input id="styleNo" value="NJ5JS53JK"></label>
-        <label>Item<input id="item" value="COMFY TRAINING ZIP UP"></label>
-        <label>Quantity<input id="qty" type="number" value="4800"></label>
+        <label>Buyer<input id="buyer"></label>
+        <label>Season<input id="season"></label>
+        <label>Style No.<input id="styleNo"></label>
+        <label>Item<input id="item"></label>
+        <label>Quantity<input id="qty" type="number"></label>
         <label>Factory<input id="factory"></label>
-        <label>Status<select id="status"><option>수주등록</option><option>원가진행</option><option>생산확정</option></select></label>
+        <label>Brand<input id="brand"></label>
+        <label>Department<input id="department"></label>
+        <label>Status
+          <select id="status"><option>수주등록</option><option>원가진행</option><option>발주진행</option><option>생산확정</option></select>
+        </label>
+        <label>등록일<input id="createdDate" type="date"></label>
+        <label class="span2">Remark<input id="remark"></label>
       </div>
     </div>
+
     <div id="tab-qty" class="tab-panel panel hidden">
-      <div class="head"><div><h2>색상 · 사이즈별 수량</h2></div><button class="btn" onclick="addColorRow()">+ 색상 추가</button></div>
+      <div class="head"><div><h2>색상 · 사이즈별 수량</h2><p>현재 선택된 스타일에 저장됩니다.</p></div><button class="btn" onclick="addColorRow()">+ 색상 추가</button></div>
       <div class="table-wrap"><table><thead><tr><th>Color</th><th>090(S)</th><th>095(M)</th><th>100(L)</th><th>105(XL)</th><th>110(XXL)</th><th>Total</th><th>삭제</th></tr></thead><tbody id="colorBody"></tbody></table></div>
     </div>
+
     <div id="tab-bom" class="tab-panel panel hidden">
       <div class="head"><div><h2>BOM 정보</h2><p>Excel의 모든 BOM 행을 자동 탐색하여 가져옵니다. Cons.와 Required Qty는 자동 계산됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
       <div class="table-wrap"><table class="wide"><thead><tr>
@@ -136,34 +198,165 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
 </div>
 
 <script>
-const KEY='erp_namoo_html';
+const KEY='erp_namoo_html_v3';
+const legacy=JSON.parse(localStorage.getItem('erp_namoo_html')||'null');
 let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
- colors:[{color:'BLK(J)',s:240,m:800,l:950,xl:740,xxl:270},{color:'DSL(K)',s:140,m:470,l:580,xl:450,xxl:160}],
- bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]
+ currentStyleId:'STYLE-001',
+ styles:[{
+  id:'STYLE-001',
+  buyer:'THE NORTH FACE',
+  season:'F26',
+  styleNo:'NJ5JS53JK',
+  item:'COMFY TRAINING ZIP UP',
+  qty:4800,
+  factory:'',
+  brand:'THE NORTH FACE',
+  department:'OUTER',
+  status:'수주등록',
+  createdDate:new Date().toISOString().slice(0,10),
+  remark:'',
+  sketch:'',
+  colors:legacy?.colors||[{color:'BLK(J)',s:240,m:800,l:950,xl:740,xxl:270},{color:'DSL(K)',s:140,m:470,l:580,xl:450,xxl:160}],
+  bom:legacy?.bom||[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]
+ }]
 };
 
-function save(){ localStorage.setItem(KEY,JSON.stringify(state)); alert('저장되었습니다.'); }
-function renderColors(){
- const b=document.getElementById('colorBody');b.innerHTML='';
- state.colors.forEach((r,i)=>{
-  const total=['s','m','l','xl','xxl'].reduce((a,k)=>a+Number(r[k]||0),0);
-  b.insertAdjacentHTML('beforeend',`<tr>
-   ${['color','s','m','l','xl','xxl'].map(k=>`<td><input value="${r[k]??''}" onchange="state.colors[${i}].${k}=this.value;renderColors()"></td>`).join('')}
-   <td>${total.toLocaleString()}</td><td><button onclick="state.colors.splice(${i},1);renderColors()">×</button></td></tr>`);
+function currentStyle(){
+ return state.styles.find(s=>s.id===state.currentStyleId)||state.styles[0];
+}
+function persist(){
+ persist();
+}
+function emptyStyle(){
+ return {
+  id:'STYLE-'+Date.now(),
+  buyer:'',season:'',styleNo:'',item:'',qty:0,factory:'',brand:'',department:'',
+  status:'수주등록',createdDate:new Date().toISOString().slice(0,10),remark:'',sketch:'',
+  colors:[],bom:[]
+ };
+}
+function newStyle(){
+ const style=emptyStyle();
+ state.styles.unshift(style);
+ state.currentStyleId=style.id;
+ persist();renderAll();openTab('basic');
+}
+function duplicateStyle(){
+ const source=currentStyle();
+ const clone=JSON.parse(JSON.stringify(source));
+ clone.id='STYLE-'+Date.now();
+ clone.styleNo=clone.styleNo?clone.styleNo+'-COPY':'';
+ clone.createdDate=new Date().toISOString().slice(0,10);
+ state.styles.unshift(clone);state.currentStyleId=clone.id;persist();renderAll();openTab('basic');
+}
+function deleteStyle(){
+ if(state.styles.length===1) return alert('최소 한 개의 스타일은 남아 있어야 합니다.');
+ const s=currentStyle();
+ if(!confirm((s.styleNo||'신규 스타일')+'을 삭제하시겠습니까?')) return;
+ state.styles=state.styles.filter(x=>x.id!==s.id);
+ state.currentStyleId=state.styles[0].id;
+ persist();renderAll();
+}
+function selectStyle(id){
+ state.currentStyleId=id;persist();renderAll();openTab('basic');
+}
+function bindStyleInputs(){
+ const s=currentStyle();
+ ['buyer','season','styleNo','item','qty','factory','brand','department','status','createdDate','remark'].forEach(key=>{
+  const el=document.getElementById(key);
+  if(!el)return;
+  el.value=s[key]??'';
+  el.oninput=()=>{
+   s[key]=key==='qty'?Number(el.value||0):el.value;
+   if(key==='styleNo') s.bom.forEach(r=>{if(!r.styleNo||r.styleNo===el.defaultValue)r.styleNo=el.value});
+   persist();renderStyleSelector();renderStyleCards();renderStyleSummary();
+  };
  });
 }
-function addColorRow(){state.colors.push({color:'',s:0,m:0,l:0,xl:0,xxl:0});renderColors()}
+function renderStyleSelector(){
+ const sel=document.getElementById('styleSelector');if(!sel)return;
+ sel.innerHTML=state.styles.map(s=>`<option value="${s.id}" ${s.id===state.currentStyleId?'selected':''}>${s.styleNo||'신규 스타일'} · ${s.item||'품명 미정'}</option>`).join('');
+}
+function renderStyleSummary(){
+ const s=currentStyle();const el=document.getElementById('styleSummary');if(!el)return;
+ el.innerHTML=`<span>Buyer: ${s.buyer||'-'}</span><span>Season: ${s.season||'-'}</span><span>Qty: ${Number(s.qty||0).toLocaleString()}</span><span>BOM: ${s.bom.length}행</span>`;
+}
+function renderStyleCards(){
+ const wrap=document.getElementById('styleCardGrid');if(!wrap)return;
+ wrap.innerHTML=state.styles.map(s=>`
+  <div class="style-card ${s.id===state.currentStyleId?'active':''}" onclick="selectStyle('${s.id}')">
+   <div class="style-card-image">${s.sketch?`<img src="${s.sketch}" alt="">`:'🖼️'}</div>
+   <div class="style-card-body">
+    <strong>${s.styleNo||'신규 스타일'}</strong>
+    <span>${s.item||'품명 미정'}</span>
+    <div class="style-card-meta"><span>${s.buyer||'-'} · ${s.season||'-'}</span><span>${Number(s.qty||0).toLocaleString()} PCS</span></div>
+   </div>
+  </div>`).join('');
+}
+function renderSketch(){
+ const s=currentStyle();
+ const img=document.getElementById('sketchPreview');
+ const ph=document.getElementById('sketchPlaceholder');
+ const remove=document.getElementById('removeSketchBtn');
+ if(!img)return;
+ if(s.sketch){
+  img.src=s.sketch;img.classList.remove('hidden');ph.classList.add('hidden');remove.classList.remove('hidden');
+ }else{
+  img.removeAttribute('src');img.classList.add('hidden');ph.classList.remove('hidden');remove.classList.add('hidden');
+ }
+}
+function processSketchFile(file){
+ if(!file)return;
+ if(!file.type.startsWith('image/')) return alert('JPG, PNG 또는 WEBP 이미지만 업로드할 수 있습니다.');
+ if(file.size>3*1024*1024) return alert('이미지 크기는 3MB 이하로 올려주세요.');
+ const reader=new FileReader();
+ reader.onload=e=>{
+  currentStyle().sketch=e.target.result;
+  persist();renderSketch();renderStyleCards();
+ };
+ reader.readAsDataURL(file);
+}
+function removeSketch(){currentStyle().sketch='';persist();renderSketch();renderStyleCards()}
+function setupSketchUpload(){
+ const input=document.getElementById('sketchInput');
+ const box=document.getElementById('sketchBox');
+ if(input)input.onchange=e=>{processSketchFile(e.target.files[0]);e.target.value=''};
+ if(box){
+  box.ondragover=e=>{e.preventDefault();box.classList.add('dragover')};
+  box.ondragleave=()=>box.classList.remove('dragover');
+  box.ondrop=e=>{e.preventDefault();box.classList.remove('dragover');processSketchFile(e.dataTransfer.files[0])};
+ }
+}
+function openTab(name){
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+ document.querySelectorAll('.tab-panel').forEach(x=>x.classList.add('hidden'));
+ document.getElementById('tab-'+name)?.classList.remove('hidden');
+}
+function renderAll(){
+ renderStyleSelector();renderStyleSummary();renderStyleCards();bindStyleInputs();renderSketch();renderAll();setupSketchUpload();
+}
+function save(){ persist(); alert((currentStyle().styleNo||'신규 스타일')+'이 저장되었습니다.'); }
+function renderColors(){
+ const b=document.getElementById('colorBody');b.innerHTML='';
+ currentStyle().colors.forEach((r,i)=>{
+  const total=['s','m','l','xl','xxl'].reduce((a,k)=>a+Number(r[k]||0),0);
+  b.insertAdjacentHTML('beforeend',`<tr>
+   ${['color','s','m','l','xl','xxl'].map(k=>`<td><input value="${r[k]??''}" onchange="currentStyle().colors[${i}].${k}=this.value;renderColors()"></td>`).join('')}
+   <td>${total.toLocaleString()}</td><td><button onclick="currentStyle().colors.splice(${i},1);renderColors()">×</button></td></tr>`);
+ });
+}
+function addColorRow(){currentStyle().colors.push({color:'',s:0,m:0,l:0,xl:0,xxl:0});renderColors()}
 
 const bomCols=['styleNo','position','subPosition','garmentColor','garmentSize','description','widthSize','color','qty','net','loss','cons','requiredQty','unit','supplier'];
 function recalcBom(r){r.cons=Number(r.net||0)*(1+Number(r.loss||0)/100);r.requiredQty=Number(r.cons||0)*Number(r.qty||0)}
 function renderBom(){
  const b=document.getElementById('bomBody');b.innerHTML='';
- state.bom.forEach((r,i)=>{
+ currentStyle().bom.forEach((r,i)=>{
   recalcBom(r);
-  b.insertAdjacentHTML('beforeend',`<tr>${bomCols.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${r[k]??''}" onchange="state.bom[${i}].${k}=this.value;renderBom()"></td>`).join('')}<td><button onclick="state.bom.splice(${i},1);renderBom()">×</button></td></tr>`);
+  b.insertAdjacentHTML('beforeend',`<tr>${bomCols.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${r[k]??''}" onchange="currentStyle().bom[${i}].${k}=this.value;renderBom()"></td>`).join('')}<td><button onclick="currentStyle().bom.splice(${i},1);renderBom()">×</button></td></tr>`);
  });
 }
-function addBomRow(){state.bom.push(Object.fromEntries(bomCols.map(k=>[k,''])));renderBom()}
+function addBomRow(){currentStyle().bom.push(Object.fromEntries(bomCols.map(k=>[k,''])));renderBom()}
 
 document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
@@ -171,21 +364,18 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
  document.getElementById(btn.dataset.page).classList.remove('hidden');
  document.getElementById('pageTitle').textContent=btn.textContent.trim();
 });
-document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{
- document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
- document.querySelectorAll('.tab-panel').forEach(x=>x.classList.add('hidden'));
- document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
-});
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>openTab(btn.dataset.tab));
 document.getElementById('themeBtn').onclick=()=>{document.body.classList.toggle('light');const light=document.body.classList.contains('light');document.getElementById('themeIcon').textContent=light?'☀️':'🌙';document.getElementById('themeText').textContent=light?'라이트 모드':'다크 모드'};
 document.getElementById('saveBtn').onclick=save;
 
 document.getElementById('excelExport').onclick=()=>{
  const wb=XLSX.utils.book_new();
- const basic=[{Buyer:buyer.value,Season:season.value,StyleNo:styleNo.value,Item:item.value,Quantity:qty.value,Factory:factory.value,Status:status.value}];
+ const s=currentStyle();
+ const basic=[{Buyer:s.buyer,Season:s.season,StyleNo:s.styleNo,Item:s.item,Quantity:s.qty,Factory:s.factory,Brand:s.brand,Department:s.department,Status:s.status,CreatedDate:s.createdDate,Remark:s.remark}];
  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(basic),'BasicInfo');
- XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.colors),'ColorSize');
- XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.bom),'BOM');
- XLSX.writeFile(wb,(styleNo.value||'Order')+'_ERP.xlsx');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.colors),'ColorSize');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.bom),'BOM');
+ XLSX.writeFile(wb,(s.styleNo||'Order')+'_ERP.xlsx');
 };
 function cleanText(v){
  return String(v ?? '').replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim();
@@ -343,14 +533,22 @@ document.getElementById('excelImport').onchange=e=>{
     if(factoryValue) document.getElementById('factory').value=factoryValue;
     if(styleValue) document.getElementById('styleNo').value=styleValue;
     else if(importedBom[0]?.styleNo) document.getElementById('styleNo').value=importedBom[0].styleNo;
+
+    const s=currentStyle();
+    s.buyer=document.getElementById('buyer').value;
+    s.season=document.getElementById('season').value;
+    s.item=document.getElementById('item').value;
+    s.qty=numberValue(document.getElementById('qty').value);
+    s.factory=document.getElementById('factory').value;
+    s.styleNo=document.getElementById('styleNo').value;
    }
 
-   if(importedBom.length) state.bom=importedBom;
-   if(importedColors.length) state.colors=importedColors;
+   if(importedBom.length) currentStyle().bom=importedBom;
+   if(importedColors.length) currentStyle().colors=importedColors;
 
    renderBom();
    renderColors();
-   localStorage.setItem(KEY,JSON.stringify(state));
+   persist();
 
    alert(
     'Excel Import 완료\n' +
@@ -365,7 +563,7 @@ document.getElementById('excelImport').onchange=e=>{
  };
  reader.readAsArrayBuffer(f);
 };
-renderColors();renderBom();
+renderAll();
 </script>
 </body>
 </html>
