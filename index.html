@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ERP Namoo HTML</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0d1020;--side:#121526;--card:#15192b;--card2:#0f1324;--line:#282e43;--text:#f6f7fb;--muted:#8d97ab;--accent:#6d5dfc;--accent2:#2d2759;--green:#0f766e;--input:#0d1120}
+body.light{--bg:#f3f5f9;--side:#fff;--card:#fff;--card2:#f8fafc;--line:#dfe5ee;--text:#1f2937;--muted:#718096;--accent:#5b5bd6;--accent2:#ecebff;--green:#0f766e;--input:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Malgun Gothic",sans-serif}
+button,input,select{font:inherit}
+.app{display:grid;grid-template-columns:242px 1fr;min-height:100vh}
+.sidebar{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.brand{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px;padding:0 18px}
+.brand strong,.brand small{display:block}.brand small{color:var(--muted);margin-top:3px}
+.nav{padding:12px 10px;flex:1;overflow:auto}.nav-title{font-size:11px;color:var(--muted);padding:10px 9px 6px}
+.nav-item{width:100%;border:0;background:transparent;color:var(--text);padding:10px 11px;border-radius:9px;text-align:left;display:flex;gap:10px;align-items:center;cursor:pointer;margin-bottom:2px}
+.nav-item:hover,.nav-item.active{background:var(--accent2);font-weight:800}
+.sidebar-bottom{border-top:1px solid var(--line);padding:11px}.theme-btn{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--text);padding:9px;display:flex;justify-content:space-between;cursor:pointer}
+.user{display:flex;align-items:center;gap:9px;padding:11px 2px 2px}.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:900}
+.user strong,.user small{display:block}.user small{color:var(--muted)}
+.main{min-width:0}.topbar{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+.topbar h1{margin:0;font-size:22px}.topbar p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.content{padding:18px;display:grid;gap:14px}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}.head h2{margin:0}.head p{color:var(--muted);font-size:12px}
+.btn{height:39px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.tabs{display:flex;gap:7px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:8px 11px;border-radius:9px;cursor:pointer}.tab.active{background:var(--accent);color:#fff}
+.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.order-grid{display:grid;grid-template-columns:220px 1fr;gap:14px}
+label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:8px;background:var(--input);color:var(--text);padding:0 9px;height:36px}
+.sketch{border:1px dashed var(--line);border-radius:13px;background:var(--card2);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid var(--line);padding:8px;white-space:nowrap}th{background:var(--card2);color:var(--muted);font-size:11px;text-align:center}td input{height:29px;margin:0;min-width:70px}.wide{min-width:1700px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}.kpi span{color:var(--muted);font-size:11px}.kpi strong{display:block;font-size:20px;margin-top:6px}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.flow-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}.flow-card span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.hidden{display:none}.positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
+@media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div style="font-size:28px">👗</div><div><strong>Fashion ERP</strong><small>Namoo 통합 관리</small></div></div>
+  <nav class="nav">
+    <div class="nav-title">메인</div><button class="nav-item" data-page="dashboard">📊 대시보드</button>
+    <div class="nav-title">수주</div>
+    <button class="nav-item active" data-page="order">🧾 수주등록</button>
+    <button class="nav-item" data-page="cost">💰 원가관리</button>
+    <button class="nav-item" data-page="sales">📈 매출·수익</button>
+    <div class="nav-title">발주</div>
+    <button class="nav-item" data-page="fabric">🧵 원단 발주</button>
+    <button class="nav-item" data-page="trim">🪡 부자재 발주</button>
+    <button class="nav-item" data-page="cm">🏭 공임 발주</button>
+    <button class="nav-item" data-page="exchange">💱 환율 관리</button>
+    <div class="nav-title">물류</div>
+    <button class="nav-item" data-page="packing">📦 패킹리스트</button>
+    <button class="nav-item" data-page="shipping">🚚 출고·수입 현황</button>
+    <div class="nav-title">매입·결제</div>
+    <button class="nav-item" data-page="actual">🧾 실제 매입현황</button>
+    <button class="nav-item" data-page="payment">💳 월별 결제</button>
+    <div class="nav-title">정산</div>
+    <button class="nav-item" data-page="settlement">✅ 사후정산</button>
+  </nav>
+  <div class="sidebar-bottom">
+    <button class="theme-btn" id="themeBtn"><span id="themeIcon">🌙</span><span id="themeText">다크 모드</span><span>⇄</span></button>
+    <div class="user"><div class="avatar">Y</div><div><strong>Yoon</strong><small>관리자</small></div></div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div><h1 id="pageTitle">수주등록</h1><p>Style No. 기준으로 수주부터 정산까지 연결됩니다.</p></div>
+  <div class="actions">
+    <label class="btn green">Excel Import<input id="excelImport" type="file" accept=".xlsx,.xls,.csv" hidden></label>
+    <button class="btn" id="excelExport">Excel Export</button>
+    <button class="btn primary" id="saveBtn">저장</button>
+  </div>
+</header>
+
+<section class="content">
+  <div id="dashboard" class="page hidden">
+    <div class="kpis">
+      <div class="kpi"><span>수주 Style</span><strong id="kpiOrders">1</strong></div>
+      <div class="kpi"><span>발주 건수</span><strong>3</strong></div>
+      <div class="kpi"><span>패킹 건수</span><strong>2</strong></div>
+      <div class="kpi"><span>미정산</span><strong class="warning">1</strong></div>
+    </div>
+    <div class="panel"><div class="head"><div><h2>전체 흐름</h2></div></div><div class="flow">
+      <div class="flow-card"><b>1. 수주</b><span>Sketch / Qty / BOM</span></div>
+      <div class="flow-card"><b>2. 발주</b><span>원단 / 부자재 / 공임</span></div>
+      <div class="flow-card"><b>3. 물류</b><span>Packing / 출고 / 수입</span></div>
+      <div class="flow-card"><b>4. 매입</b><span>Invoice / 실제 환율</span></div>
+      <div class="flow-card"><b>5. 정산</b><span>예상 vs 실제</span></div>
+    </div></div>
+  </div>
+
+  <div id="order" class="page">
+    <div class="tabs"><button class="tab active" data-tab="basic">기본정보</button><button class="tab" data-tab="qty">Color/Size Qty</button><button class="tab" data-tab="bom">BOM</button></div>
+    <div id="tab-basic" class="tab-panel panel order-grid">
+      <div class="sketch">🖼️<b>Sketch / Style Image</b><small>이미지 첨부</small><button class="btn">파일 선택</button></div>
+      <div class="form-grid">
+        <label>Buyer<input id="buyer" value="THE NORTH FACE"></label>
+        <label>Season<input id="season" value="F26"></label>
+        <label>Style No.<input id="styleNo" value="NJ5JS53JK"></label>
+        <label>Item<input id="item" value="COMFY TRAINING ZIP UP"></label>
+        <label>Quantity<input id="qty" type="number" value="4800"></label>
+        <label>Factory<input id="factory"></label>
+        <label>Status<select id="status"><option>수주등록</option><option>원가진행</option><option>생산확정</option></select></label>
+      </div>
+    </div>
+    <div id="tab-qty" class="tab-panel panel hidden">
+      <div class="head"><div><h2>색상 · 사이즈별 수량</h2></div><button class="btn" onclick="addColorRow()">+ 색상 추가</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Color</th><th>090(S)</th><th>095(M)</th><th>100(L)</th><th>105(XL)</th><th>110(XXL)</th><th>Total</th><th>삭제</th></tr></thead><tbody id="colorBody"></tbody></table></div>
+    </div>
+    <div id="tab-bom" class="tab-panel panel hidden">
+      <div class="head"><div><h2>BOM 정보</h2><p>Cons.와 Required Qty는 자동 계산됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
+      <div class="table-wrap"><table class="wide"><thead><tr>
+        <th>Style No.</th><th>Position</th><th>Sub Position</th><th>Garment Color</th><th>Garment Size</th><th>Item Description</th><th>Width / Size</th><th>Color</th><th>Qty</th><th>Net</th><th>Loss %</th><th>Cons.</th><th>Required Qty</th><th>Unit</th><th>Supplier</th><th>삭제</th>
+      </tr></thead><tbody id="bomBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div id="cost" class="page hidden"><div class="panel"><h2>원가관리</h2><p>수주 BOM에서 원가 데이터를 연결합니다.</p></div></div>
+  <div id="sales" class="page hidden"><div class="panel"><h2>매출·수익</h2><p>Selling FOB와 제조원가를 연결해 Margin을 계산합니다.</p></div></div>
+  <div id="fabric" class="page hidden"><div class="panel"><h2>원단 발주</h2></div></div>
+  <div id="trim" class="page hidden"><div class="panel"><h2>부자재 발주</h2></div></div>
+  <div id="cm" class="page hidden"><div class="panel"><h2>공임 발주</h2></div></div>
+  <div id="exchange" class="page hidden"><div class="panel"><h2>환율 관리</h2><div class="form-grid"><label>USD→KRW<input id="usdKrw" type="number" value="1470"></label><label>USD→VND<input type="number" value="26200"></label><label>KRW→VND<input type="number" value="17.82"></label><label>적용일<input type="date" value="2026-07-14"></label></div></div></div>
+  <div id="packing" class="page hidden"><div class="panel"><h2>패킹리스트</h2><p>Namoo 표준 양식 Excel Import/Export</p></div></div>
+  <div id="shipping" class="page hidden"><div class="panel"><h2>출고·수입 현황</h2></div></div>
+  <div id="actual" class="page hidden"><div class="panel"><h2>실제 매입현황</h2></div></div>
+  <div id="payment" class="page hidden"><div class="panel"><h2>월별 결제</h2></div></div>
+  <div id="settlement" class="page hidden"><div class="panel"><h2>사후정산</h2><p>예상 발주액과 실제 매입액을 자동 비교합니다.</p></div></div>
+</section>
+</main>
+</div>
+
+<script>
+const KEY='erp_namoo_html';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ colors:[{color:'BLK(J)',s:240,m:800,l:950,xl:740,xxl:270},{color:'DSL(K)',s:140,m:470,l:580,xl:450,xxl:160}],
+ bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]
+};
+
+function save(){ localStorage.setItem(KEY,JSON.stringify(state)); alert('저장되었습니다.'); }
+function renderColors(){
+ const b=document.getElementById('colorBody');b.innerHTML='';
+ state.colors.forEach((r,i)=>{
+  const total=['s','m','l','xl','xxl'].reduce((a,k)=>a+Number(r[k]||0),0);
+  b.insertAdjacentHTML('beforeend',`<tr>
+   ${['color','s','m','l','xl','xxl'].map(k=>`<td><input value="${r[k]??''}" onchange="state.colors[${i}].${k}=this.value;renderColors()"></td>`).join('')}
+   <td>${total.toLocaleString()}</td><td><button onclick="state.colors.splice(${i},1);renderColors()">×</button></td></tr>`);
+ });
+}
+function addColorRow(){state.colors.push({color:'',s:0,m:0,l:0,xl:0,xxl:0});renderColors()}
+
+const bomCols=['styleNo','position','subPosition','garmentColor','garmentSize','description','widthSize','color','qty','net','loss','cons','requiredQty','unit','supplier'];
+function recalcBom(r){r.cons=Number(r.net||0)*(1+Number(r.loss||0)/100);r.requiredQty=Number(r.cons||0)*Number(r.qty||0)}
+function renderBom(){
+ const b=document.getElementById('bomBody');b.innerHTML='';
+ state.bom.forEach((r,i)=>{
+  recalcBom(r);
+  b.insertAdjacentHTML('beforeend',`<tr>${bomCols.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${r[k]??''}" onchange="state.bom[${i}].${k}=this.value;renderBom()"></td>`).join('')}<td><button onclick="state.bom.splice(${i},1);renderBom()">×</button></td></tr>`);
+ });
+}
+function addBomRow(){state.bom.push(Object.fromEntries(bomCols.map(k=>[k,''])));renderBom()}
+
+document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
+ document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+ document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+ document.getElementById(btn.dataset.page).classList.remove('hidden');
+ document.getElementById('pageTitle').textContent=btn.textContent.trim();
+});
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+ document.querySelectorAll('.tab-panel').forEach(x=>x.classList.add('hidden'));
+ document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
+});
+document.getElementById('themeBtn').onclick=()=>{document.body.classList.toggle('light');const light=document.body.classList.contains('light');document.getElementById('themeIcon').textContent=light?'☀️':'🌙';document.getElementById('themeText').textContent=light?'라이트 모드':'다크 모드'};
+document.getElementById('saveBtn').onclick=save;
+
+document.getElementById('excelExport').onclick=()=>{
+ const wb=XLSX.utils.book_new();
+ const basic=[{Buyer:buyer.value,Season:season.value,StyleNo:styleNo.value,Item:item.value,Quantity:qty.value,Factory:factory.value,Status:status.value}];
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(basic),'BasicInfo');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.colors),'ColorSize');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.bom),'BOM');
+ XLSX.writeFile(wb,(styleNo.value||'Order')+'_ERP.xlsx');
+};
+document.getElementById('excelImport').onchange=e=>{
+ const f=e.target.files[0];if(!f)return;const reader=new FileReader();
+ reader.onload=ev=>{const wb=XLSX.read(ev.target.result,{type:'array'});if(wb.Sheets.BOM)state.bom=XLSX.utils.sheet_to_json(wb.Sheets.BOM,{defval:''});if(wb.Sheets.ColorSize)state.colors=XLSX.utils.sheet_to_json(wb.Sheets.ColorSize,{defval:''});renderBom();renderColors();alert('Excel Import 완료');};
+ reader.readAsArrayBuffer(f);
+};
+renderColors();renderBom();
+</script>
+</body>
+</html>
