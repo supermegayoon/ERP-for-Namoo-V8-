@@ -359,7 +359,47 @@ function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e)
 function subscribeRealtime(){if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel);realtimeChannel=supabaseClient.channel('namoo-erp-state-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'erp_state',filter:'id=eq.main'},async payload=>{const incoming=payload.new;if(Number(incoming.version||0)<=erpVersion)return;applyingRemote=true;state=normalizeState(incoming.data);erpVersion=Number(incoming.version||erpVersion);localStorage.setItem(KEY,JSON.stringify(state));renderAll();await refreshAllSketchUrls();setDbStatus('connected','다른 사용자 변경 반영');applyingRemote=false;}).subscribe(status=>{if(status==='SUBSCRIBED')setDbStatus('connected','실시간 연결됨');});}
 async function migrateLocalDataOnce(){const oldRaw=localStorage.getItem(KEY);if(!oldRaw){alert('이 브라우저에 이전할 기존 데이터가 없습니다.');return;}let oldState;try{oldState=normalizeState(JSON.parse(oldRaw));}catch(e){alert('기존 데이터를 읽을 수 없습니다.');return;}const count=oldState.styles?.length||0;if(!confirm(`기존 Style ${count}개를 공용 DB로 이전할까요?\n현재 공용 데이터는 교체됩니다.`))return;state=oldState;setDbStatus('saving','기존 데이터 이전 중');for(const style of state.styles){if(style.sketch&&style.sketch.startsWith('data:image/')){try{const blob=await (await fetch(style.sketch)).blob();const ext=blob.type.includes('png')?'png':blob.type.includes('webp')?'webp':'jpg';const file=new File([blob],`${style.styleNo||style.id}.${ext}`,{type:blob.type});await uploadSketchFile(style,file,false);}catch(e){console.warn(e);}}}await saveToSupabase(false);renderAll();await refreshAllSketchUrls();setDbStatus('connected','기존 데이터 이전 완료');alert(`기존 Style ${count}개를 공용 DB로 이전했습니다.`);}
 async function initSupabaseApp(){state=normalizeState(JSON.parse(localStorage.getItem(KEY)||'null')||DEFAULT_STATE);renderAll();await loadFromSupabase();}
-function cs(){ return state.styles.find(s=>s.id===state.currentStyleId)||state.styles[0]; }
+function makeEmptyStyle(){
+  return {
+    id:uid('STYLE'),
+    buyer:'',
+    season:'',
+    styleNo:'',
+    item:'',
+    qty:0,
+    garmentPrice:0,
+    factory:'',
+    brand:'',
+    department:'',
+    status:'수주등록',
+    createdDate:TODAY,
+    remark:'',
+    sketch:'',
+    sketchPath:'',
+    colors:[],
+    bom:[]
+  };
+}
+
+function ensureCurrentStyle(){
+  if(!Array.isArray(state.styles))state.styles=[];
+
+  let current=state.styles.find(s=>s.id===state.currentStyleId);
+
+  if(!current){
+    current=state.styles[0];
+  }
+
+  if(!current){
+    current=makeEmptyStyle();
+    state.styles.push(current);
+  }
+
+  state.currentStyleId=current.id;
+  return current;
+}
+
+function cs(){ return ensureCurrentStyle(); }
 function n(v){ const x=Number(v); return Number.isFinite(x)?x:0; }
 function usd(v){ return '$'+n(v).toFixed(2); }
 function krwFmt(v){ return '₩'+Math.round(n(v)).toLocaleString(); }
@@ -389,8 +429,12 @@ document.getElementById('themeBtn').onclick=()=>{
 
 /* ── STYLE CRUD ── */
 function newStyle(){
-  const s={id:uid('STYLE'),buyer:'',season:'',styleNo:'',item:'',qty:0,garmentPrice:0,factory:'',brand:'',department:'',status:'수주등록',createdDate:TODAY,remark:'',sketch:'',colors:[],bom:[]};
-  state.styles.unshift(s); state.currentStyleId=s.id; persist(); renderAll(); openTab('basic');
+  const s=makeEmptyStyle();
+  state.styles.unshift(s);
+  state.currentStyleId=s.id;
+  persist();
+  renderAll();
+  openTab('basic');
 }
 function deleteStyle(){
   if(state.styles.length===1)return alert('최소 한 개의 스타일은 남아 있어야 합니다.');
@@ -681,17 +725,87 @@ function findLbl(rows,labels){const t=labels.map(nrm);for(let r=0;r<Math.min(row
 function findHdr(rows,req){for(let i=0;i<rows.length;i++){const norm=(rows[i]||[]).map(nrm);if(req.filter(x=>norm.some(v=>v.includes(nrm(x)))).length>=req.length)return i;}return -1;}
 function mapBom(rows,hi){
   const hdr=(rows[hi]||[]).map(cleanTxt);
-  const fc=(a,fb)=>{const nn=a.map(nrm);const idx=hdr.findIndex(h=>nn.some(x=>nrm(h).includes(x)));return idx>=0?idx:fb;};
-  const cols={styleNo:fc(['STYLE#','STYLE NO'],0),position:fc(['POSITION'],1),subPosition:2,garmentColor:fc(['G.COLOR','GARMENT COLOR'],3),garmentSize:fc(['G.SIZE','GARMENT SIZE'],4),description:fc(['ITEM DESCRIPTION','DESCRIPTION'],5),widthSize:fc(['WIDTH/SIZE','WIDTH SIZE'],6),color:fc(['COLOR'],7),qty:fc(["Q'TY",'QTY','QUANTITY'],8),net:fc(['NET'],9),cons:fc(['CONS'],10),requiredQty:fc(["ND Q'TY",'REQUIRED QTY'],11),unit:fc(['UNIT'],12),supplier:fc(['SUPPLIER'],13)};
-  const res=[];
+  const fc=(aliases,fallback)=>{
+    const normalizedAliases=aliases.map(nrm);
+    const idx=hdr.findIndex(h=>normalizedAliases.some(a=>nrm(h).includes(a)));
+    return idx>=0?idx:fallback;
+  };
+
+  const cols={
+    styleNo:fc(['STYLE#','STYLE NO','STYLE'],0),
+    position:fc(['POSITION'],1),
+    subPosition:2,
+    garmentColor:fc(['G.COLOR','GARMENT COLOR'],3),
+    garmentSize:fc(['G.SIZE','GARMENT SIZE'],4),
+    description:fc(['ITEM DESCRIPTION','DESCRIPTION'],5),
+    widthSize:fc(['WIDTH/SIZE','WIDTH SIZE'],6),
+    color:fc(['COLOR'],7),
+    qty:fc(["Q'TY",'QTY','QUANTITY'],8),
+    net:fc(['NET'],9),
+    cons:fc(['CONS'],10),
+    requiredQty:fc(["ND Q'TY",'REQUIRED QTY','NEED QTY'],11),
+    unit:fc(['UNIT'],12),
+    supplier:fc(['SUPPLIER'],13)
+  };
+
+  const result=[];
+  let emptyRun=0;
+
   for(let i=hi+1;i<rows.length;i++){
-    const row=rows[i]||[];const st=cleanTxt(row[cols.styleNo]);const pos=cleanTxt(row[cols.position]);const desc=cleanTxt(row[cols.description]);const sup=cleanTxt(row[cols.supplier]);
-    if(![st,pos,desc,sup].some(Boolean))continue;if(nrm(st)==='TOTAL'||nrm(pos)==='TOTAL')continue;
-    const net=numVal(row[cols.net]);const cons=numVal(row[cols.cons]);const qty=numVal(row[cols.qty]);
-    const loss=net>0&&cons>0?Math.max(0,(cons/net-1)*100):3;
-    res.push({styleNo:st||cs().styleNo||'',position:pos,subPosition:cleanTxt(row[cols.subPosition]),garmentColor:cleanTxt(row[cols.garmentColor]),garmentSize:cleanTxt(row[cols.garmentSize]),description:desc,widthSize:cleanTxt(row[cols.widthSize]),color:cleanTxt(row[cols.color]),qty,net,loss:Number(loss.toFixed(4)),cons:cons||net*(1+loss/100),requiredQty:numVal(row[cols.requiredQty])||(cons||net*(1+loss/100))*qty,unit:cleanTxt(row[cols.unit]),supplier:sup});
+    const row=rows[i]||[];
+
+    const styleNo=cleanTxt(row[cols.styleNo]);
+    const position=cleanTxt(row[cols.position]);
+    const description=cleanTxt(row[cols.description]);
+    const supplier=cleanTxt(row[cols.supplier]);
+    const qty=numVal(row[cols.qty]);
+    const net=numVal(row[cols.net]);
+
+    const meaningful=
+      Boolean(styleNo||position||description||supplier) &&
+      Boolean(position||description) &&
+      !['TOTAL','SUBTOTAL','합계'].includes(nrm(styleNo)) &&
+      !['TOTAL','SUBTOTAL','합계'].includes(nrm(position));
+
+    if(!meaningful){
+      emptyRun++;
+      if(emptyRun>=25&&result.length)break;
+      continue;
+    }
+
+    emptyRun=0;
+
+    // Style 행이 아니거나 주석/요약 행이면 제외
+    if(!styleNo && !position && !description)continue;
+
+    const cons=numVal(row[cols.cons]);
+    const inferredLoss=net>0&&cons>0
+      ? Math.max(0,(cons/net-1)*100)
+      : 3;
+
+    const calculatedCons=cons||net*(1+inferredLoss/100);
+    const required=numVal(row[cols.requiredQty])||calculatedCons*qty;
+
+    result.push({
+      styleNo,
+      position,
+      subPosition:cleanTxt(row[cols.subPosition]),
+      garmentColor:cleanTxt(row[cols.garmentColor]),
+      garmentSize:cleanTxt(row[cols.garmentSize]),
+      description,
+      widthSize:cleanTxt(row[cols.widthSize]),
+      color:cleanTxt(row[cols.color]),
+      qty,
+      net,
+      loss:Number(inferredLoss.toFixed(4)),
+      cons:Number(calculatedCons.toFixed(6)),
+      requiredQty:Number(required.toFixed(4)),
+      unit:cleanTxt(row[cols.unit]),
+      supplier
+    });
   }
-  return res;
+
+  return result;
 }
 function mapColors(rows,hi){
   const hdr=(rows[hi]||[]).map(nrm);
@@ -702,28 +816,129 @@ function mapColors(rows,hi){
   return res;
 }
 document.getElementById('excelImport').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
+  const f=e.target.files[0];
+  if(!f)return;
+
   const reader=new FileReader();
-  reader.onload=ev=>{
+
+  reader.onload=async ev=>{
     try{
-      const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
-      let bom=[],colors=[],master=null;
-      wb.SheetNames.forEach(sn=>{
-        const ws=wb.Sheets[sn];const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:true});
-        const bh=findHdr(rows,['STYLE','POSITION','ITEM DESCRIPTION']);if(bh>=0){const r=mapBom(rows,bh);if(r.length>bom.length){bom=r;master=rows;}}
-        const sh=findHdr(rows,['090','095','100']);if(sh>=0){const r=mapColors(rows,sh);if(r.length>colors.length)colors=r;}
+      setDbStatus('saving','Excel Import 중');
+
+      const wb=XLSX.read(ev.target.result,{
+        type:'array',
+        cellDates:true,
+        cellFormula:true
       });
-      if(master){
-        const vals={buyer:findLbl(master,['BUYER']),season:findLbl(master,['SEASON']),item:findLbl(master,['ITEM']),qty:findLbl(master,['QUANTITY','QTY']),garmentPrice:findLbl(master,['GARMENT PRICE','GARMENT COST','GARMENT FOB','FACTORY FOB']),factory:findLbl(master,['FACTORY']),styleNo:findLbl(master,['STYLE#','STYLE #','STYLE NO'])};
-        const s=cs();Object.entries(vals).forEach(([k,v])=>{if(v){s[k]=['qty','garmentPrice'].includes(k)?numVal(v):v;const el=document.getElementById(k);if(el)el.value=s[k];}});
-        if(!vals.styleNo&&bom[0]?.styleNo)s.styleNo=bom[0].styleNo;
+
+      let bom=[];
+      let colors=[];
+      let master=null;
+
+      wb.SheetNames.forEach(sn=>{
+        const ws=wb.Sheets[sn];
+        const rows=XLSX.utils.sheet_to_json(ws,{
+          header:1,
+          defval:'',
+          raw:false,
+          blankrows:true
+        });
+
+        const bh=findHdr(rows,['STYLE','POSITION','ITEM DESCRIPTION']);
+        if(bh>=0){
+          const imported=mapBom(rows,bh);
+          if(imported.length>bom.length){
+            bom=imported;
+            master=rows;
+          }
+        }
+
+        const sh=findHdr(rows,['090','095','100']);
+        if(sh>=0){
+          const imported=mapColors(rows,sh);
+          if(imported.length>colors.length)colors=imported;
+        }
+      });
+
+      if(!bom.length&&!colors.length){
+        throw new Error('BOM 또는 Color/Size 데이터 행을 찾지 못했습니다.');
       }
-      if(bom.length)cs().bom=bom;if(colors.length)cs().colors=colors;
-      renderAll();persist();
-      alert('Import 완료\nBOM:'+bom.length+'행 / Color:'+colors.length+'행');
-    }catch(err){alert('Import 오류: '+err.message);}
+
+      const s=ensureCurrentStyle();
+
+      if(master){
+        const vals={
+          buyer:findLbl(master,['BUYER']),
+          season:findLbl(master,['SEASON']),
+          item:findLbl(master,['ITEM']),
+          qty:findLbl(master,['QUANTITY','QTY']),
+          garmentPrice:findLbl(master,['GARMENT PRICE','GARMENT COST','GARMENT FOB','FACTORY FOB']),
+          factory:findLbl(master,['FACTORY']),
+          styleNo:findLbl(master,['STYLE#','STYLE #','STYLE NO'])
+        };
+
+        Object.entries(vals).forEach(([k,v])=>{
+          if(v!==''&&v!==null&&v!==undefined){
+            s[k]=['qty','garmentPrice'].includes(k)?numVal(v):cleanTxt(v);
+          }
+        });
+      }
+
+      // 상단 STYLE# 값이 비어 있으면 실제 BOM 첫 행의 대표 Style을 사용
+      if(!s.styleNo&&bom[0]?.styleNo){
+        s.styleNo=cleanTxt(bom[0].styleNo);
+      }
+
+      // 수량이 "4,800 PCS" 형태여도 숫자로 변환
+      if(!s.qty&&master){
+        s.qty=numVal(findLbl(master,['QUANTITY','QTY']));
+      }
+
+      if(bom.length){
+        bom.forEach(row=>{
+          row.styleNo=s.styleNo||row.styleNo||'';
+        });
+        s.bom=bom;
+      }
+
+      if(colors.length)s.colors=colors;
+
+      state.currentStyleId=s.id;
+
+      renderAll();
+      openTab('bom');
+
+      const saved=await saveToSupabase(false);
+      if(!saved){
+        throw new Error('Import는 되었지만 Supabase 공용 저장에 실패했습니다.');
+      }
+
+      setDbStatus('connected','Excel Import 저장 완료');
+
+      alert(
+        'Excel Import 완료
+
+'+
+        '대표 Style: '+(s.styleNo||'-')+'
+'+
+        'Buyer: '+(s.buyer||'-')+'
+'+
+        'BOM: '+bom.length+'행
+'+
+        'Color/Size: '+colors.length+'행
+'+
+        '공용 DB 저장: 완료'
+      );
+    }catch(err){
+      console.error(err);
+      setDbStatus('error','Excel Import 실패');
+      alert('Import 오류: '+(err.message||err));
+    }finally{
+      e.target.value='';
+    }
   };
-  reader.readAsArrayBuffer(f);e.target.value='';
+
+  reader.readAsArrayBuffer(f);
 };
 document.getElementById('excelExport').onclick=()=>{
   const s=cs();const wb=XLSX.utils.book_new();
@@ -793,6 +1008,7 @@ function updMsg(id,text){
 
 /* ── INIT ── */
 function renderAll(){
+  ensureCurrentStyle();
   bindInputs(); renderStyleCards(); renderSketch(); renderColors(); renderBom();
   document.getElementById('usdKrw').value=state.rates.usdKrw;
   document.getElementById('usdVnd').value=state.rates.usdVnd;
