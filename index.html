@@ -364,8 +364,7 @@ async function loadFromSupabase(){
     state=localState||normalizeState(DEFAULT_STATE);
     renderAll();
     setDbStatus('error','DB 연결 실패 · 기존 데이터 유지');
-    alert('Supabase DB를 불러오지 못했습니다. 기존 데이터는 유지됩니다.
-'+error.message);
+    alert('Supabase DB를 불러오지 못했습니다. 기존 데이터는 유지됩니다.\n'+error.message);
     return;
   }
   const remoteState=normalizeState(data?.data||{});
@@ -1006,20 +1005,13 @@ document.getElementById('excelImport').onchange=e=>{
 
       setDbStatus('connected','Excel Import 저장 완료');
 
-      alert(
-        'Excel Import 완료
+      alert(`Excel Import 완료
 
-'+
-        '대표 Style: '+(s.styleNo||'-')+'
-'+
-        'Buyer: '+(s.buyer||'-')+'
-'+
-        'BOM: '+bom.length+'행
-'+
-        'Color/Size: '+colors.length+'행
-'+
-        '공용 DB 저장: 완료'
-      );
+대표 Style: ${s.styleNo||'-'}
+Buyer: ${s.buyer||'-'}
+BOM: ${bom.length}행
+Color/Size: ${colors.length}행
+공용 DB 저장: 완료`);
     }catch(err){
       console.error(err);
       setDbStatus('error','Excel Import 실패');
