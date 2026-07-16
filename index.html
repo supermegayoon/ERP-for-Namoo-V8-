@@ -153,7 +153,7 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   <div><h1 id="pageTitle">수주등록</h1><p>모든 모듈은 등록된 대표 Style No. 기준으로 연결됩니다.</p></div>
   <div class="actions">
     <div class="db-status" id="dbStatus"><span class="db-dot"></span><span id="dbStatusText">DB 연결 중</span></div>
-    <button class="btn migrate-btn" id="migrateBtn" onclick="migrateLocalDataOnce()">기존 데이터 이전</button>
+    <button class="btn migrate-btn" id="migrateBtn" title="현재 브라우저 데이터를 공용 DB로 한 번 이전" onclick="migrateLocalDataOnce()">기존 데이터 이전</button>
     <label class="btn green">Excel Import<input id="excelImport" type="file" accept=".xlsx,.xls,.csv" hidden></label>
     <button class="btn" id="excelExport">Excel Export</button>
     <button class="btn primary" id="saveBtn">공용 저장</button>
@@ -353,11 +353,102 @@ let state=JSON.parse(JSON.stringify(DEFAULT_STATE));
 let erpVersion=0,saveTimer=null,realtimeChannel=null,applyingRemote=false;
 function setDbStatus(type,text){const el=document.getElementById('dbStatus'),tx=document.getElementById('dbStatusText');if(!el||!tx)return;el.className='db-status '+(type||'');tx.textContent=text;}
 function normalizeState(input){const next=input&&typeof input==='object'?input:JSON.parse(JSON.stringify(DEFAULT_STATE));next.styles=Array.isArray(next.styles)?next.styles:[];next.costs=next.costs||{};next.sales=next.sales||{};next.purchases=Array.isArray(next.purchases)?next.purchases:[];next.rates=next.rates||JSON.parse(JSON.stringify(DEFAULT_STATE.rates));next.styles.forEach(s=>{if(s.garmentPrice==null)s.garmentPrice=0;if(!Array.isArray(s.colors))s.colors=[];if(!Array.isArray(s.bom))s.bom=[];if(s.sketchPath===undefined)s.sketchPath='';if(s.sketch===undefined)s.sketch='';});if(!next.currentStyleId&&next.styles[0])next.currentStyleId=next.styles[0].id;return next;}
-async function loadFromSupabase(){setDbStatus('saving','공용 DB 불러오는 중');const {data,error}=await supabaseClient.from('erp_state').select('data, version').eq('id','main').single();if(error){console.error(error);setDbStatus('error','DB 불러오기 실패');state=normalizeState(JSON.parse(localStorage.getItem(KEY)||'null')||DEFAULT_STATE);renderAll();alert('Supabase DB 불러오기 실패: '+error.message);return;}state=normalizeState(data?.data||DEFAULT_STATE);erpVersion=Number(data?.version||1);localStorage.setItem(KEY,JSON.stringify(state));renderAll();await refreshAllSketchUrls();setDbStatus('connected','공용 DB 연결됨');subscribeRealtime();}
-async function saveToSupabase(showAlert=false){if(applyingRemote)return false;try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}setDbStatus('saving','공용 저장 중');const nextVersion=erpVersion+1;const payload=JSON.parse(JSON.stringify(state));payload.styles.forEach(s=>{if(s.sketchPath)s.sketch='';});const {data,error}=await supabaseClient.from('erp_state').update({data:payload,version:nextVersion,updated_at:new Date().toISOString()}).eq('id','main').select('version').single();if(error){console.error(error);setDbStatus('error','공용 저장 실패');if(showAlert)alert('공용 저장 실패: '+error.message);return false;}erpVersion=Number(data?.version||nextVersion);setDbStatus('connected','공용 저장 완료');if(showAlert)alert('Supabase 공용 DB에 저장되었습니다.');return true;}
+async function loadFromSupabase(){
+  setDbStatus('saving','공용 DB 불러오는 중');
+  const localRaw=localStorage.getItem(KEY);
+  let localState=null;
+  try{localState=localRaw?normalizeState(JSON.parse(localRaw)):null;}catch(e){console.warn(e);}
+  const {data,error}=await supabaseClient.from('erp_state').select('data, version').eq('id','main').single();
+  if(error){
+    console.error(error);
+    state=localState||normalizeState(DEFAULT_STATE);
+    renderAll();
+    setDbStatus('error','DB 연결 실패 · 기존 데이터 유지');
+    alert('Supabase DB를 불러오지 못했습니다. 기존 데이터는 유지됩니다.
+'+error.message);
+    return;
+  }
+  const remoteState=normalizeState(data?.data||{});
+  const remoteCount=Array.isArray(remoteState.styles)?remoteState.styles.length:0;
+  const localCount=Array.isArray(localState?.styles)?localState.styles.length:0;
+  erpVersion=Number(data?.version||1);
+  if(remoteCount===0&&localCount>0){
+    state=localState;
+    renderAll();
+    await refreshAllSketchUrls();
+    setDbStatus('connected','기존 데이터 유지 · 이전 버튼 필요');
+    subscribeRealtime();
+    return;
+  }
+  if(remoteCount===0&&localCount===0){
+    state=normalizeState(DEFAULT_STATE);
+    localStorage.setItem(KEY,JSON.stringify(state));
+    renderAll();
+    setDbStatus('connected','공용 DB 비어 있음 · 기본 화면');
+    subscribeRealtime();
+    return;
+  }
+  state=remoteState;
+  localStorage.setItem(KEY,JSON.stringify(state));
+  renderAll();
+  await refreshAllSketchUrls();
+  setDbStatus('connected','공용 DB 연결됨');
+  subscribeRealtime();
+}
+async function saveToSupabase(showAlert=false){
+  if(applyingRemote)return false;
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  setDbStatus('saving','공용 저장 중');
+  const nextVersion=erpVersion+1;
+  const payload=JSON.parse(JSON.stringify(state));
+  payload.styles.forEach(s=>{if(s.sketchPath)s.sketch='';});
+  const {data,error}=await supabaseClient.from('erp_state').upsert({
+    id:'main',data:payload,version:nextVersion,updated_at:new Date().toISOString()
+  },{onConflict:'id'}).select('version').single();
+  if(error){
+    console.error(error);
+    setDbStatus('error','공용 저장 실패');
+    if(showAlert)alert('공용 저장 실패: '+error.message);
+    return false;
+  }
+  erpVersion=Number(data?.version||nextVersion);
+  setDbStatus('connected','공용 저장 완료');
+  if(showAlert)alert('Supabase 공용 DB에 저장되었습니다.');
+  return true;
+}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveToSupabase(false),700);}
 function subscribeRealtime(){if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel);realtimeChannel=supabaseClient.channel('namoo-erp-state-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'erp_state',filter:'id=eq.main'},async payload=>{const incoming=payload.new;if(Number(incoming.version||0)<=erpVersion)return;applyingRemote=true;state=normalizeState(incoming.data);erpVersion=Number(incoming.version||erpVersion);localStorage.setItem(KEY,JSON.stringify(state));renderAll();await refreshAllSketchUrls();setDbStatus('connected','다른 사용자 변경 반영');applyingRemote=false;}).subscribe(status=>{if(status==='SUBSCRIBED')setDbStatus('connected','실시간 연결됨');});}
-async function migrateLocalDataOnce(){const oldRaw=localStorage.getItem(KEY);if(!oldRaw){alert('이 브라우저에 이전할 기존 데이터가 없습니다.');return;}let oldState;try{oldState=normalizeState(JSON.parse(oldRaw));}catch(e){alert('기존 데이터를 읽을 수 없습니다.');return;}const count=oldState.styles?.length||0;if(!confirm(`기존 Style ${count}개를 공용 DB로 이전할까요?\n현재 공용 데이터는 교체됩니다.`))return;state=oldState;setDbStatus('saving','기존 데이터 이전 중');for(const style of state.styles){if(style.sketch&&style.sketch.startsWith('data:image/')){try{const blob=await (await fetch(style.sketch)).blob();const ext=blob.type.includes('png')?'png':blob.type.includes('webp')?'webp':'jpg';const file=new File([blob],`${style.styleNo||style.id}.${ext}`,{type:blob.type});await uploadSketchFile(style,file,false);}catch(e){console.warn(e);}}}await saveToSupabase(false);renderAll();await refreshAllSketchUrls();setDbStatus('connected','기존 데이터 이전 완료');alert(`기존 Style ${count}개를 공용 DB로 이전했습니다.`);}
+async function migrateLocalDataOnce(){
+  const oldRaw=localStorage.getItem(KEY);
+  if(!oldRaw){alert('이 브라우저에 이전할 기존 데이터가 없습니다.');return;}
+  let oldState;
+  try{oldState=normalizeState(JSON.parse(oldRaw));}catch(e){alert('기존 데이터를 읽을 수 없습니다.');return;}
+  const count=oldState.styles?.length||0;
+  if(count===0){alert('이전할 스타일 데이터가 없습니다.');return;}
+  if(!confirm(`현재 브라우저의 Style ${count}개를 공용 DB로 이전할까요?
+
+공용 DB 내용은 현재 브라우저 데이터로 교체됩니다.
+관리자 PC에서 한 번만 실행하세요.`))return;
+  state=oldState;
+  setDbStatus('saving','기존 데이터 이전 중');
+  for(const style of state.styles){
+    if(style.sketch&&style.sketch.startsWith('data:image/')){
+      try{
+        const blob=await (await fetch(style.sketch)).blob();
+        const ext=blob.type.includes('png')?'png':blob.type.includes('webp')?'webp':'jpg';
+        const file=new File([blob],`${style.styleNo||style.id}.${ext}`,{type:blob.type});
+        await uploadSketchFile(style,file,false);
+      }catch(e){console.warn(e);}
+    }
+  }
+  const ok=await saveToSupabase(false);
+  if(!ok)return;
+  localStorage.setItem('erp_supabase_migrated_at',new Date().toISOString());
+  renderAll();
+  await refreshAllSketchUrls();
+  setDbStatus('connected','기존 데이터 이전 완료');
+  alert(`기존 Style ${count}개를 공용 DB로 이전했습니다.`);
+}
 async function initSupabaseApp(){state=normalizeState(JSON.parse(localStorage.getItem(KEY)||'null')||DEFAULT_STATE);renderAll();await loadFromSupabase();}
 function makeEmptyStyle(){
   return {
