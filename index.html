@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ERP Namoo HTML</title>
+<title>ERP Namoo V4</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#0d1020;--side:#121526;--card:#15192b;--card2:#0f1324;--line:#282e43;--text:#f6f7fb;--muted:#8d97ab;--accent:#6d5dfc;--accent2:#2d2759;--green:#0f766e;--input:#0d1120}
-body.light{--bg:#f3f5f9;--side:#fff;--card:#fff;--card2:#f8fafc;--line:#dfe5ee;--text:#1f2937;--muted:#718096;--accent:#5b5bd6;--accent2:#ecebff;--green:#0f766e;--input:#fff}
+:root{--bg:#0d1020;--side:#121526;--card:#15192b;--card2:#0f1324;--line:#282e43;--text:#f6f7fb;--muted:#8d97ab;--accent:#6d5dfc;--accent2:#2d2759;--green:#0f766e;--red:#7f1d1d;--input:#0d1120}
+body.light{--bg:#f3f5f9;--side:#fff;--card:#fff;--card2:#f8fafc;--line:#dfe5ee;--text:#1f2937;--muted:#718096;--accent:#5b5bd6;--accent2:#ecebff;--green:#0f766e;--red:#b91c1c;--input:#fff}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Malgun Gothic",sans-serif}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 .app{display:grid;grid-template-columns:242px 1fr;min-height:100vh}
 .sidebar{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column}
 .brand{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px;padding:0 18px}
@@ -17,40 +17,101 @@ button,input,select{font:inherit}
 .nav{padding:12px 10px;flex:1;overflow:auto}.nav-title{font-size:11px;color:var(--muted);padding:10px 9px 6px}
 .nav-item{width:100%;border:0;background:transparent;color:var(--text);padding:10px 11px;border-radius:9px;text-align:left;display:flex;gap:10px;align-items:center;cursor:pointer;margin-bottom:2px}
 .nav-item:hover,.nav-item.active{background:var(--accent2);font-weight:800}
-.sidebar-bottom{border-top:1px solid var(--line);padding:11px}.theme-btn{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--text);padding:9px;display:flex;justify-content:space-between;cursor:pointer}
-.user{display:flex;align-items:center;gap:9px;padding:11px 2px 2px}.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:900}
+.sidebar-bottom{border-top:1px solid var(--line);padding:11px}
+.theme-btn{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--text);padding:9px;display:flex;justify-content:space-between;cursor:pointer}
+.user{display:flex;align-items:center;gap:9px;padding:11px 2px 2px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:900}
 .user strong,.user small{display:block}.user small{color:var(--muted)}
 .main{min-width:0}.topbar{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px}
 .topbar h1{margin:0;font-size:22px}.topbar p{margin:4px 0 0;color:var(--muted);font-size:12px}
-.content{padding:18px;display:grid;gap:14px}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}.head h2{margin:0}.head p{color:var(--muted);font-size:12px}
-.btn{height:39px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.green{background:var(--green);border-color:var(--green);color:#fff}
-.actions{display:flex;gap:8px;flex-wrap:wrap}.tabs{display:flex;gap:7px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:8px 11px;border-radius:9px;cursor:pointer}.tab.active{background:var(--accent);color:#fff}
-.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.order-grid{display:grid;grid-template-columns:220px 1fr;gap:14px}
-label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:8px;background:var(--input);color:var(--text);padding:0 9px;height:36px}
-.sketch{border:1px dashed var(--line);border-radius:13px;background:var(--card2);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid var(--line);padding:8px;white-space:nowrap}th{background:var(--card2);color:var(--muted);font-size:11px;text-align:center}td input{height:29px;margin:0;min-width:70px}.wide{min-width:1700px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}.kpi span{color:var(--muted);font-size:11px}.kpi strong{display:block;font-size:20px;margin-top:6px}
-.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.flow-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}.flow-card span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
-.hidden{display:none}.positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
-
-.order-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px}
-.style-selector{display:flex;align-items:end;gap:8px;flex-wrap:wrap}.style-selector label{min-width:260px}
-.style-summary{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.style-summary span{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px}
-.btn.danger{background:#7f1d1d;border-color:#7f1d1d;color:#fff}
-.style-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.style-card{border:1px solid var(--line);border-radius:13px;background:var(--card2);overflow:hidden;cursor:pointer;transition:.2s}
-.style-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.content{padding:18px;display:grid;gap:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}
+.head h2{margin:0}.head p{color:var(--muted);font-size:12px;margin:5px 0 0}
+.btn{height:39px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.actions,.page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.searchbar{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.searchbar label{min-width:280px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:8px 11px;border-radius:9px;cursor:pointer}
+.tab.active{background:var(--accent);color:#fff}
+.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.order-grid{display:grid;grid-template-columns:240px 1fr;gap:14px}
+label{font-size:11px;font-weight:800;color:var(--muted)}
+input,select,textarea{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:8px;background:var(--input);color:var(--text);padding:0 9px;height:36px}
+textarea{height:80px;padding-top:8px}
+.sketch{border:1px dashed var(--line);border-radius:13px;background:var(--card2);min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;overflow:hidden}
+.sketch img{max-width:100%;max-height:230px;object-fit:contain;background:#fff;border-radius:8px}
+.sketch.dragover{border-color:var(--accent);background:var(--accent2)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{border:1px solid var(--line);padding:8px;white-space:nowrap}
+th{background:var(--card2);color:var(--muted);font-size:11px;text-align:center}
+td input,td select{height:29px;margin:0;min-width:70px}.wide{min-width:1700px}
+.style-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.style-card{border:1px solid var(--line);border-radius:13px;background:var(--card2);overflow:hidden;cursor:pointer;transition:.15s}
+.style-card:hover{border-color:var(--accent)}
 .style-card.active{outline:2px solid var(--accent)}
-.style-card-image{height:150px;background:var(--input);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:32px}
-.style-card-image img{width:100%;height:100%;object-fit:contain;background:#fff}
-.style-card-body{padding:12px}.style-card-body strong,.style-card-body span{display:block}.style-card-body span{color:var(--muted);font-size:11px;margin-top:5px}.style-card-meta{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-size:11px}
-.sketch-upload{position:relative;overflow:hidden;min-height:320px}.sketch-upload.dragover{border-color:var(--accent);background:var(--accent2)}
-.sketch-upload img{max-width:100%;max-height:230px;object-fit:contain;background:#fff;border-radius:8px}
-.sketch-icon{font-size:44px}.sketch-btn{margin-top:8px}.span2{grid-column:span 2}
+.style-img{height:150px;background:var(--input);display:flex;align-items:center;justify-content:center;font-size:34px}
+.style-img img{width:100%;height:100%;object-fit:contain;background:#fff}
+.style-body{padding:12px}.style-body span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.cost-section{display:grid;gap:10px}
+.cost-row{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.cost-top{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) 40px;gap:8px}
+.stage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.stage-card{border:1px solid var(--line);border-radius:10px;padding:10px}
+.stage-card h4{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.stage-inputs{display:grid;grid-template-columns:1fr 1fr 90px;gap:7px}
+.stage-result{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.summary-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}
+.summary-card h3{margin:0 0 10px;font-size:15px}
+.line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+.line.final{background:var(--accent2);padding:10px;border-radius:8px;margin-top:8px;border:none;font-weight:800}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi,.metric{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}
+.kpi span,.metric span{color:var(--muted);font-size:11px}.kpi strong,.metric strong{display:block;font-size:20px;margin-top:6px}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.purchase-grid{display:grid;grid-template-columns:1fr;gap:12px}
 
-@media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr}.style-card-grid{grid-template-columns:1fr}.order-toolbar{align-items:stretch;flex-direction:column}.style-summary{justify-content:flex-start}}}
+/* ── DASHBOARD SEARCH ── */
+.dash-search-wrap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.dash-search-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dash-search-input{flex:1;margin:0;height:38px;font-size:14px}
+.dash-filter-chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:5px 12px;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.dash-result-note{font-size:12px;color:var(--muted);margin-top:8px}
+.dash-table-wrap .goto-btn{height:26px;padding:0 9px;font-size:11px;border-radius:7px}
+mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2px}
+
+/* ── AI CHAT PANEL ── */
+.ai-fab{position:fixed;bottom:26px;right:26px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#6d5dfc,#ec4899);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 24px rgba(109,93,252,.55);z-index:100;display:flex;align-items:center;justify-content:center;transition:.2s}
+.ai-fab:hover{transform:scale(1.1)}
+.ai-panel{position:fixed;right:0;top:0;bottom:0;width:380px;background:var(--side);border-left:1px solid var(--line);display:flex;flex-direction:column;z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:-6px 0 40px rgba(0,0,0,.4)}
+.ai-panel.open{transform:translateX(0)}
+.ai-panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ai-panel-head h3{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+.ai-badge{font-size:10px;background:var(--accent2);color:var(--accent);padding:3px 8px;border-radius:999px;font-weight:800}
+.ai-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;padding:0}
+.ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.ai-msg.user{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.ai-msg.bot{background:var(--card2);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--line)}
+.ai-msg.loading{color:var(--muted);font-style:italic}
+.ai-quick-row{padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.ai-q{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap}
+.ai-q:hover{border-color:var(--accent);color:var(--accent)}
+.ai-input-row{padding:12px 14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-shrink:0}
+.ai-textarea{flex:1;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--text);padding:8px 11px;font-size:13px;resize:none;height:60px;outline:none;margin:0}
+.ai-send{width:44px;height:60px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:18px;flex-shrink:0}
+.ai-send:disabled{opacity:.35;cursor:not-allowed}
+
+.hidden{display:none!important}
+.positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
+@media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis,.metric-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}.style-grid{grid-template-columns:1fr}.cost-top,.stage-grid{grid-template-columns:1fr}.ai-panel{width:100%}}
 </style>
 </head>
 <body>
@@ -58,7 +119,8 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
 <aside class="sidebar">
   <div class="brand"><div style="font-size:28px">👗</div><div><strong>Fashion ERP</strong><small>Namoo 통합 관리</small></div></div>
   <nav class="nav">
-    <div class="nav-title">메인</div><button class="nav-item" data-page="dashboard">📊 대시보드</button>
+    <div class="nav-title">메인</div>
+    <button class="nav-item" data-page="dashboard">📊 대시보드</button>
     <div class="nav-title">수주</div>
     <button class="nav-item active" data-page="order">🧾 수주등록</button>
     <button class="nav-item" data-page="cost">💰 원가관리</button>
@@ -85,7 +147,7 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
 
 <main class="main">
 <header class="topbar">
-  <div><h1 id="pageTitle">수주등록</h1><p>Style No. 기준으로 수주부터 정산까지 연결됩니다.</p></div>
+  <div><h1 id="pageTitle">수주등록</h1><p>모든 모듈은 등록된 대표 Style No. 기준으로 연결됩니다.</p></div>
   <div class="actions">
     <label class="btn green">Excel Import<input id="excelImport" type="file" accept=".xlsx,.xls,.csv" hidden></label>
     <button class="btn" id="excelExport">Excel Export</button>
@@ -94,475 +156,662 @@ label{font-size:11px;font-weight:800;color:var(--muted)}input,select{width:100%;
 </header>
 
 <section class="content">
-  <div id="dashboard" class="page hidden">
-    <div class="kpis">
-      <div class="kpi"><span>수주 Style</span><strong id="kpiOrders">1</strong></div>
-      <div class="kpi"><span>발주 건수</span><strong>3</strong></div>
-      <div class="kpi"><span>패킹 건수</span><strong>2</strong></div>
-      <div class="kpi"><span>미정산</span><strong class="warning">1</strong></div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard" class="page hidden">
+  <!-- 검색 & 필터 -->
+  <div class="dash-search-wrap">
+    <div class="dash-search-row">
+      <span style="color:var(--muted);font-size:17px">🔍</span>
+      <input id="dashSearch" class="dash-search-input" placeholder="Style No., Buyer, Item, Factory 실시간 검색..." oninput="renderDashboard()">
+      <button class="btn" onclick="document.getElementById('dashSearch').value='';renderDashboard()">초기화</button>
     </div>
-    <div class="panel"><div class="head"><div><h2>전체 흐름</h2></div></div><div class="flow">
-      <div class="flow-card"><b>1. 수주</b><span>Sketch / Qty / BOM</span></div>
-      <div class="flow-card"><b>2. 발주</b><span>원단 / 부자재 / 공임</span></div>
-      <div class="flow-card"><b>3. 물류</b><span>Packing / 출고 / 수입</span></div>
-      <div class="flow-card"><b>4. 매입</b><span>Invoice / 실제 환율</span></div>
-      <div class="flow-card"><b>5. 정산</b><span>예상 vs 실제</span></div>
-    </div></div>
+    <div class="dash-filter-chips" id="dashChips">
+      <button class="chip active" onclick="setChip(this,'all')">전체</button>
+      <button class="chip" onclick="setChip(this,'수주등록')">수주등록</button>
+      <button class="chip" onclick="setChip(this,'원가진행')">원가진행</button>
+      <button class="chip" onclick="setChip(this,'발주진행')">발주진행</button>
+      <button class="chip" onclick="setChip(this,'생산확정')">생산확정</button>
+    </div>
+    <div class="dash-result-note" id="dashNote"></div>
   </div>
-
-  <div id="order" class="page">
-    <div class="order-toolbar panel">
-      <div class="style-selector">
-        <label>등록 스타일
-          <select id="styleSelector" onchange="selectStyle(this.value)"></select>
-        </label>
-        <button class="btn primary" onclick="newStyle()">+ 신규 스타일</button>
-        <button class="btn" onclick="duplicateStyle()">복사 등록</button>
-        <button class="btn danger" onclick="deleteStyle()">삭제</button>
-      </div>
-      <div class="style-summary" id="styleSummary"></div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="registry">스타일 등록</button>
-      <button class="tab" data-tab="basic">기본정보</button>
-      <button class="tab" data-tab="qty">Color/Size Qty</button>
-      <button class="tab" data-tab="bom">BOM</button>
-    </div>
-
-    <div id="tab-registry" class="tab-panel panel">
-      <div class="head">
-        <div><h2>스타일 등록 현황</h2><p>등록된 Style을 선택하면 Sketch, 수량, BOM을 함께 불러옵니다.</p></div>
-        <button class="btn primary" onclick="newStyle()">+ 스타일 등록</button>
-      </div>
-      <div class="style-card-grid" id="styleCardGrid"></div>
-    </div>
-
-    <div id="tab-basic" class="tab-panel panel order-grid hidden">
-      <div class="sketch sketch-upload" id="sketchBox">
-        <img id="sketchPreview" class="hidden" alt="Sketch preview">
-        <div id="sketchPlaceholder">
-          <div class="sketch-icon">🖼️</div>
-          <b>Sketch / Style Image</b>
-          <small>JPG, PNG 파일을 선택하거나 이곳에 드래그하세요.</small>
-        </div>
-        <label class="btn sketch-btn">Sketch 업로드
-          <input id="sketchInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-        </label>
-        <button class="btn hidden" id="removeSketchBtn" onclick="removeSketch()">이미지 삭제</button>
-      </div>
-
-      <div class="form-grid">
-        <label>Buyer<input id="buyer"></label>
-        <label>Season<input id="season"></label>
-        <label>Style No.<input id="styleNo"></label>
-        <label>Item<input id="item"></label>
-        <label>Quantity<input id="qty" type="number"></label>
-        <label>Factory<input id="factory"></label>
-        <label>Brand<input id="brand"></label>
-        <label>Department<input id="department"></label>
-        <label>Status
-          <select id="status"><option>수주등록</option><option>원가진행</option><option>발주진행</option><option>생산확정</option></select>
-        </label>
-        <label>등록일<input id="createdDate" type="date"></label>
-        <label class="span2">Remark<input id="remark"></label>
-      </div>
-    </div>
-
-    <div id="tab-qty" class="tab-panel panel hidden">
-      <div class="head"><div><h2>색상 · 사이즈별 수량</h2><p>현재 선택된 스타일에 저장됩니다.</p></div><button class="btn" onclick="addColorRow()">+ 색상 추가</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Color</th><th>090(S)</th><th>095(M)</th><th>100(L)</th><th>105(XL)</th><th>110(XXL)</th><th>Total</th><th>삭제</th></tr></thead><tbody id="colorBody"></tbody></table></div>
-    </div>
-
-    <div id="tab-bom" class="tab-panel panel hidden">
-      <div class="head"><div><h2>BOM 정보</h2><p>Excel의 모든 BOM 행을 자동 탐색하여 가져옵니다. Cons.와 Required Qty는 자동 계산됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
-      <div class="table-wrap"><table class="wide"><thead><tr>
-        <th>Style No.</th><th>Position</th><th>Sub Position</th><th>Garment Color</th><th>Garment Size</th><th>Item Description</th><th>Width / Size</th><th>Color</th><th>Qty</th><th>Net</th><th>Loss %</th><th>Cons.</th><th>Required Qty</th><th>Unit</th><th>Supplier</th><th>삭제</th>
-      </tr></thead><tbody id="bomBody"></tbody></table></div>
+  <!-- KPI -->
+  <div class="kpis">
+    <div class="kpi"><span>등록 Style (필터)</span><strong id="kpiStyles">0</strong></div>
+    <div class="kpi"><span>총 수주수량</span><strong id="kpiQty">0</strong></div>
+    <div class="kpi"><span>원가 진행</span><strong id="kpiCost">0</strong></div>
+    <div class="kpi"><span>발주 건수</span><strong id="kpiPO">0</strong></div>
+  </div>
+  <!-- 테이블 -->
+  <div class="panel dash-table-wrap">
+    <div class="head"><div><h2>수주 현황</h2></div></div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Style No.</th><th>Buyer</th><th>Item</th><th>Season</th><th>Qty</th><th>Garment Price</th><th>Factory</th><th>Status</th><th>등록일</th><th>바로가기</th></tr></thead>
+      <tbody id="dashBody"></tbody></table>
     </div>
   </div>
+</div>
 
-  <div id="cost" class="page hidden"><div class="panel"><h2>원가관리</h2><p>수주 BOM에서 원가 데이터를 연결합니다.</p></div></div>
-  <div id="sales" class="page hidden"><div class="panel"><h2>매출·수익</h2><p>Selling FOB와 제조원가를 연결해 Margin을 계산합니다.</p></div></div>
-  <div id="fabric" class="page hidden"><div class="panel"><h2>원단 발주</h2></div></div>
-  <div id="trim" class="page hidden"><div class="panel"><h2>부자재 발주</h2></div></div>
-  <div id="cm" class="page hidden"><div class="panel"><h2>공임 발주</h2></div></div>
-  <div id="exchange" class="page hidden"><div class="panel"><h2>환율 관리</h2><div class="form-grid"><label>USD→KRW<input id="usdKrw" type="number" value="1470"></label><label>USD→VND<input type="number" value="26200"></label><label>KRW→VND<input type="number" value="17.82"></label><label>적용일<input type="date" value="2026-07-14"></label></div></div></div>
-  <div id="packing" class="page hidden"><div class="panel"><h2>패킹리스트</h2><p>Namoo 표준 양식 Excel Import/Export</p></div></div>
-  <div id="shipping" class="page hidden"><div class="panel"><h2>출고·수입 현황</h2></div></div>
-  <div id="actual" class="page hidden"><div class="panel"><h2>실제 매입현황</h2></div></div>
-  <div id="payment" class="page hidden"><div class="panel"><h2>월별 결제</h2></div></div>
-  <div id="settlement" class="page hidden"><div class="panel"><h2>사후정산</h2><p>예상 발주액과 실제 매입액을 자동 비교합니다.</p></div></div>
+<!-- ===== ORDER ===== -->
+<div id="order" class="page">
+  <div class="panel searchbar">
+    <label>대표 Style 검색<input id="orderSearch" placeholder="Style No., Buyer, Item 검색" oninput="renderStyleCards()"></label>
+    <button class="btn primary" onclick="newStyle()">+ 신규 스타일 등록</button>
+    <button class="btn danger" onclick="deleteStyle()">삭제</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="registry">등록 스타일</button>
+    <button class="tab" data-tab="basic">기본정보</button>
+    <button class="tab" data-tab="qty">Color/Size Qty</button>
+    <button class="tab" data-tab="bom">BOM</button>
+  </div>
+  <div id="tab-registry" class="tab-panel panel">
+    <div class="head"><div><h2>등록 스타일</h2><p>대표 Style No.를 선택하면 모든 정보가 로드됩니다.</p></div></div>
+    <div id="styleGrid" class="style-grid"></div>
+  </div>
+  <div id="tab-basic" class="tab-panel panel order-grid hidden">
+    <div class="sketch" id="sketchBox">
+      <img id="sketchPreview" class="hidden">
+      <div id="sketchPlaceholder">🖼️<br><b>Sketch 업로드</b><br><small>JPG/PNG/WEBP, 최대 3MB</small></div>
+      <label class="btn">파일 선택<input id="sketchInput" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+      <button class="btn danger hidden" id="removeSketchBtn" onclick="removeSketch()">삭제</button>
+    </div>
+    <div class="form-grid">
+      <label>Buyer<input id="buyer"></label>
+      <label>Season<input id="season"></label>
+      <label>대표 Style No.<input id="styleNo"></label>
+      <label>Item<input id="item"></label>
+      <label>Quantity<input id="qty" type="number"></label>
+      <label>Garment Price (USD)<input id="garmentPrice" type="number" step="0.01" placeholder="0.00"></label>
+      <label>Factory<input id="factory"></label>
+      <label>Brand<input id="brand"></label>
+      <label>Department<input id="department"></label>
+      <label>Status<select id="status"><option>수주등록</option><option>원가진행</option><option>발주진행</option><option>생산확정</option></select></label>
+      <label>등록일<input id="createdDate" type="date"></label>
+      <label style="grid-column:span 2">Remark<input id="remark"></label>
+    </div>
+  </div>
+  <div id="tab-qty" class="tab-panel panel hidden">
+    <div class="head"><div><h2>Color / Size Qty</h2></div><button class="btn" onclick="addColorRow()">+ 색상 추가</button></div>
+    <div class="table-wrap"><table><thead><tr><th>Color</th><th>090(S)</th><th>095(M)</th><th>100(L)</th><th>105(XL)</th><th>110(XXL)</th><th>Total</th><th>삭제</th></tr></thead><tbody id="colorBody"></tbody></table></div>
+  </div>
+  <div id="tab-bom" class="tab-panel panel hidden">
+    <div class="head"><div><h2>BOM</h2><p>대표 Style No. 기준으로 발주와 원가에 연결됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
+    <div class="table-wrap"><table class="wide"><thead><tr><th>Style No.</th><th>Position</th><th>Sub Position</th><th>Garment Color</th><th>Garment Size</th><th>Item Description</th><th>Width / Size</th><th>Color</th><th>Qty</th><th>Net</th><th>Loss %</th><th>Cons.</th><th>Required Qty</th><th>Unit</th><th>Supplier</th><th>삭제</th></tr></thead><tbody id="bomBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ===== COST ===== -->
+<div id="cost" class="page hidden">
+  <div class="panel searchbar">
+    <label>대표 Style 검색<input id="costSearch" placeholder="Style No. 검색 후 Enter 또는 불러오기">  </label>
+    <button class="btn" onclick="loadCostStyle()">불러오기</button>
+  </div>
+  <div id="costArea"></div>
+</div>
+
+<!-- ===== SALES ===== -->
+<div id="sales" class="page hidden">
+  <div class="panel searchbar">
+    <label>대표 Style 검색<input id="salesSearch" placeholder="Style No. 검색"></label>
+    <button class="btn" onclick="loadSalesStyle()">불러오기</button>
+  </div>
+  <div id="salesArea"></div>
+</div>
+
+<!-- ===== FABRIC ===== -->
+<div id="fabric" class="page hidden">
+  <div class="panel searchbar">
+    <label>대표 Style 검색<input id="fabricSearch" placeholder="Style No. 검색"></label>
+    <button class="btn" onclick="loadPurchaseStyle('원단')">수주 BOM 불러오기</button>
+    <button class="btn primary" onclick="addManualPO('원단')">+ 수기 발주</button>
+  </div>
+  <div id="fabricArea"></div>
+</div>
+
+<!-- ===== TRIM ===== -->
+<div id="trim" class="page hidden">
+  <div class="panel searchbar">
+    <label>대표 Style 검색<input id="trimSearch" placeholder="Style No. 검색"></label>
+    <button class="btn" onclick="loadPurchaseStyle('부자재')">수주 BOM 불러오기</button>
+    <button class="btn primary" onclick="addManualPO('부자재')">+ 수기 발주</button>
+  </div>
+  <div id="trimArea"></div>
+</div>
+
+<!-- ===== CM ===== -->
+<div id="cm" class="page hidden">
+  <div class="panel searchbar">
+    <label>대표 Style 검색<input id="cmSearch" placeholder="Style No. 검색"></label>
+    <button class="btn" onclick="loadPurchaseStyle('공임')">수주정보 불러오기</button>
+    <button class="btn primary" onclick="addManualPO('공임')">+ 수기 발주</button>
+  </div>
+  <div id="cmArea"></div>
+</div>
+
+<!-- ===== EXCHANGE ===== -->
+<div id="exchange" class="page hidden">
+  <div class="panel">
+    <div class="head"><div><h2>환율 관리</h2></div><button class="btn primary" onclick="saveRates()">저장</button></div>
+    <div class="form-grid">
+      <label>USD → KRW<input id="usdKrw" type="number" value="1470"></label>
+      <label>USD → VND<input id="usdVnd" type="number" value="26200"></label>
+      <label>KRW → VND<input id="krwVnd" type="number" value="17.82"></label>
+      <label>적용일<input id="rateDate" type="date"></label>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STUB PAGES ===== -->
+<div id="packing"  class="page hidden"><div class="panel"><h2>📦 패킹리스트</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
+<div id="shipping" class="page hidden"><div class="panel"><h2>🚚 출고·수입 현황</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
+<div id="actual"   class="page hidden"><div class="panel"><h2>🧾 실제 매입현황</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
+<div id="payment"  class="page hidden"><div class="panel"><h2>💳 월별 결제</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
+<div id="settlement" class="page hidden"><div class="panel"><h2>✅ 사후정산</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
+
 </section>
 </main>
 </div>
 
+<!-- AI FAB -->
+<button class="ai-fab" id="aiFab" onclick="toggleAI()" title="AI 어시스턴트">🤖</button>
+
+<!-- AI PANEL -->
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-panel-head">
+    <h3>🤖 AI 어시스턴트 <span class="ai-badge">ERP 연결됨</span></h3>
+    <button class="ai-close" onclick="toggleAI()">×</button>
+  </div>
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="ai-msg bot">안녕하세요 Yoon님! 👋<br>ERP 데이터를 기반으로 질문하실 수 있어요.<br><br>예) "현재 수주 현황 요약해줘", "NJ5JS53JK BOM 분석해줘", "원가 마진 계산해줘"</div>
+  </div>
+  <div class="ai-quick-row">
+    <button class="ai-q" onclick="aiQ('현재 수주 현황 전체 요약해줘')">📋 수주 요약</button>
+    <button class="ai-q" onclick="aiQ('등록된 스타일의 원가와 FOB 분석해줘')">💰 원가 분석</button>
+    <button class="ai-q" onclick="aiQ('BOM 공급업체 정리해줘')">🧵 공급업체</button>
+    <button class="ai-q" onclick="aiQ('발주 현황 알려줘')">🛒 발주 현황</button>
+  </div>
+  <div class="ai-input-row">
+    <textarea id="aiInput" class="ai-textarea" placeholder="ERP 데이터에 대해 질문하세요... (Enter 전송)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="sendAI()">➤</button>
+  </div>
+</div>
+
 <script>
-const KEY='erp_namoo_html_v3';
-const legacy=JSON.parse(localStorage.getItem('erp_namoo_html')||'null');
-let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
- currentStyleId:'STYLE-001',
- styles:[{
-  id:'STYLE-001',
-  buyer:'THE NORTH FACE',
-  season:'F26',
-  styleNo:'NJ5JS53JK',
-  item:'COMFY TRAINING ZIP UP',
-  qty:4800,
-  factory:'',
-  brand:'THE NORTH FACE',
-  department:'OUTER',
-  status:'수주등록',
-  createdDate:new Date().toISOString().slice(0,10),
-  remark:'',
-  sketch:'',
-  colors:legacy?.colors||[{color:'BLK(J)',s:240,m:800,l:950,xl:740,xxl:270},{color:'DSL(K)',s:140,m:470,l:580,xl:450,xxl:160}],
-  bom:legacy?.bom||[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]
- }]
+const KEY = 'erp_namoo_v4';
+const TODAY = new Date().toISOString().slice(0,10);
+
+let state = JSON.parse(localStorage.getItem(KEY)||'null') || {
+  currentStyleId:'S1',
+  styles:[{
+    id:'S1', buyer:'THE NORTH FACE', season:'F26', styleNo:'NJ5JS53JK',
+    item:'COMFY TRAINING ZIP UP', qty:4800, garmentPrice:0, factory:'', brand:'THE NORTH FACE',
+    department:'OUTER', status:'수주등록', createdDate:TODAY, remark:'', sketch:'',
+    colors:[{color:'BLK',s:240,m:800,l:950,xl:740,xxl:270}],
+    bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]
+  }],
+  costs:{}, sales:{}, purchases:[],
+  rates:{usdKrw:1470, usdVnd:26200, krwVnd:17.82, date:TODAY}
 };
 
-function currentStyle(){
- return state.styles.find(s=>s.id===state.currentStyleId)||state.styles[0];
+state.styles.forEach(s=>{
+  if(s.garmentPrice===undefined || s.garmentPrice===null) s.garmentPrice=0;
+});
+function persist(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
+function cs(){ return state.styles.find(s=>s.id===state.currentStyleId)||state.styles[0]; }
+function n(v){ const x=Number(v); return Number.isFinite(x)?x:0; }
+function usd(v){ return '$'+n(v).toFixed(2); }
+function krwFmt(v){ return '₩'+Math.round(n(v)).toLocaleString(); }
+function uid(p){ return p+'-'+Date.now()+'-'+Math.random().toString(16).slice(2,8); }
+
+/* ── NAV ── */
+function openTab(name){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+  document.querySelectorAll('.tab-panel').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('tab-'+name)?.classList.remove('hidden');
 }
-function persist(){
- persist();
-}
-function emptyStyle(){
- return {
-  id:'STYLE-'+Date.now(),
-  buyer:'',season:'',styleNo:'',item:'',qty:0,factory:'',brand:'',department:'',
-  status:'수주등록',createdDate:new Date().toISOString().slice(0,10),remark:'',sketch:'',
-  colors:[],bom:[]
- };
-}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+  document.getElementById(btn.dataset.page).classList.remove('hidden');
+  document.getElementById('pageTitle').textContent=btn.textContent.trim();
+  if(btn.dataset.page==='dashboard') renderDashboard();
+});
+document.getElementById('themeBtn').onclick=()=>{
+  document.body.classList.toggle('light');
+  const l=document.body.classList.contains('light');
+  document.getElementById('themeIcon').textContent=l?'☀️':'🌙';
+  document.getElementById('themeText').textContent=l?'라이트 모드':'다크 모드';
+};
+
+/* ── STYLE CRUD ── */
 function newStyle(){
- const style=emptyStyle();
- state.styles.unshift(style);
- state.currentStyleId=style.id;
- persist();renderAll();openTab('basic');
-}
-function duplicateStyle(){
- const source=currentStyle();
- const clone=JSON.parse(JSON.stringify(source));
- clone.id='STYLE-'+Date.now();
- clone.styleNo=clone.styleNo?clone.styleNo+'-COPY':'';
- clone.createdDate=new Date().toISOString().slice(0,10);
- state.styles.unshift(clone);state.currentStyleId=clone.id;persist();renderAll();openTab('basic');
+  const s={id:uid('STYLE'),buyer:'',season:'',styleNo:'',item:'',qty:0,garmentPrice:0,factory:'',brand:'',department:'',status:'수주등록',createdDate:TODAY,remark:'',sketch:'',colors:[],bom:[]};
+  state.styles.unshift(s); state.currentStyleId=s.id; persist(); renderAll(); openTab('basic');
 }
 function deleteStyle(){
- if(state.styles.length===1) return alert('최소 한 개의 스타일은 남아 있어야 합니다.');
- const s=currentStyle();
- if(!confirm((s.styleNo||'신규 스타일')+'을 삭제하시겠습니까?')) return;
- state.styles=state.styles.filter(x=>x.id!==s.id);
- state.currentStyleId=state.styles[0].id;
- persist();renderAll();
+  if(state.styles.length===1)return alert('최소 한 개의 스타일은 남아 있어야 합니다.');
+  if(!confirm((cs().styleNo||'신규 스타일')+' 을 삭제할까요?'))return;
+  state.styles=state.styles.filter(x=>x.id!==state.currentStyleId);
+  state.currentStyleId=state.styles[0].id;
+  persist(); renderAll();
 }
-function selectStyle(id){
- state.currentStyleId=id;persist();renderAll();openTab('basic');
-}
-function bindStyleInputs(){
- const s=currentStyle();
- ['buyer','season','styleNo','item','qty','factory','brand','department','status','createdDate','remark'].forEach(key=>{
-  const el=document.getElementById(key);
-  if(!el)return;
-  el.value=s[key]??'';
-  el.oninput=()=>{
-   s[key]=key==='qty'?Number(el.value||0):el.value;
-   if(key==='styleNo') s.bom.forEach(r=>{if(!r.styleNo||r.styleNo===el.defaultValue)r.styleNo=el.value});
-   persist();renderStyleSelector();renderStyleCards();renderStyleSummary();
-  };
- });
-}
-function renderStyleSelector(){
- const sel=document.getElementById('styleSelector');if(!sel)return;
- sel.innerHTML=state.styles.map(s=>`<option value="${s.id}" ${s.id===state.currentStyleId?'selected':''}>${s.styleNo||'신규 스타일'} · ${s.item||'품명 미정'}</option>`).join('');
-}
-function renderStyleSummary(){
- const s=currentStyle();const el=document.getElementById('styleSummary');if(!el)return;
- el.innerHTML=`<span>Buyer: ${s.buyer||'-'}</span><span>Season: ${s.season||'-'}</span><span>Qty: ${Number(s.qty||0).toLocaleString()}</span><span>BOM: ${s.bom.length}행</span>`;
+function selectStyle(id){ state.currentStyleId=id; persist(); renderAll(); openTab('basic'); }
+function bindInputs(){
+  const s=cs();
+  ['buyer','season','styleNo','item','qty','garmentPrice','factory','brand','department','status','createdDate','remark'].forEach(k=>{
+    const el=document.getElementById(k); if(!el)return;
+    el.value=s[k]??'';
+    el.oninput=()=>{ s[k]=['qty','garmentPrice'].includes(k)?n(el.value):el.value; if(k==='styleNo')s.bom.forEach(r=>r.styleNo=el.value); persist(); renderStyleCards(); };
+  });
 }
 function renderStyleCards(){
- const wrap=document.getElementById('styleCardGrid');if(!wrap)return;
- wrap.innerHTML=state.styles.map(s=>`
-  <div class="style-card ${s.id===state.currentStyleId?'active':''}" onclick="selectStyle('${s.id}')">
-   <div class="style-card-image">${s.sketch?`<img src="${s.sketch}" alt="">`:'🖼️'}</div>
-   <div class="style-card-body">
-    <strong>${s.styleNo||'신규 스타일'}</strong>
-    <span>${s.item||'품명 미정'}</span>
-    <div class="style-card-meta"><span>${s.buyer||'-'} · ${s.season||'-'}</span><span>${Number(s.qty||0).toLocaleString()} PCS</span></div>
-   </div>
-  </div>`).join('');
+  const q=(document.getElementById('orderSearch')?.value||'').toLowerCase();
+  const grid=document.getElementById('styleGrid'); if(!grid)return;
+  const filtered=state.styles.filter(s=>[s.styleNo,s.buyer,s.item].join(' ').toLowerCase().includes(q));
+  grid.innerHTML=filtered.map(s=>`
+    <div class="style-card ${s.id===state.currentStyleId?'active':''}" onclick="selectStyle('${s.id}')">
+      <div class="style-img">${s.sketch?`<img src="${s.sketch}">`:'🖼️'}</div>
+      <div class="style-body">
+        <strong>${s.styleNo||'신규 스타일'}</strong>
+        <span>${s.item||'품명 미정'}</span>
+        <span>${s.buyer||'-'} · ${s.season||'-'} · ${n(s.qty).toLocaleString()} PCS</span>
+        <span>Garment Price: ${usd(s.garmentPrice||0)}</span>
+        <span style="margin-top:4px"><b>${s.status||''}</b></span>
+      </div>
+    </div>`).join('') || '<div style="color:var(--muted);padding:16px">검색 결과 없음</div>';
 }
+
+/* ── SKETCH ── */
 function renderSketch(){
- const s=currentStyle();
- const img=document.getElementById('sketchPreview');
- const ph=document.getElementById('sketchPlaceholder');
- const remove=document.getElementById('removeSketchBtn');
- if(!img)return;
- if(s.sketch){
-  img.src=s.sketch;img.classList.remove('hidden');ph.classList.add('hidden');remove.classList.remove('hidden');
- }else{
-  img.removeAttribute('src');img.classList.add('hidden');ph.classList.remove('hidden');remove.classList.add('hidden');
- }
+  const s=cs();
+  const pr=document.getElementById('sketchPreview');
+  const ph=document.getElementById('sketchPlaceholder');
+  const rm=document.getElementById('removeSketchBtn');
+  if(!pr)return;
+  if(s.sketch){pr.src=s.sketch;pr.classList.remove('hidden');ph.classList.add('hidden');rm.classList.remove('hidden');}
+  else{pr.classList.add('hidden');ph.classList.remove('hidden');rm.classList.add('hidden');}
 }
-function processSketchFile(file){
- if(!file)return;
- if(!file.type.startsWith('image/')) return alert('JPG, PNG 또는 WEBP 이미지만 업로드할 수 있습니다.');
- if(file.size>3*1024*1024) return alert('이미지 크기는 3MB 이하로 올려주세요.');
- const reader=new FileReader();
- reader.onload=e=>{
-  currentStyle().sketch=e.target.result;
-  persist();renderSketch();renderStyleCards();
- };
- reader.readAsDataURL(file);
+function processSketch(f){
+  if(!f)return;
+  if(!f.type.startsWith('image/'))return alert('이미지 파일만 가능합니다.');
+  if(f.size>3*1024*1024)return alert('3MB 이하 이미지를 사용해 주세요.');
+  const r=new FileReader(); r.onload=e=>{cs().sketch=e.target.result;persist();renderSketch();renderStyleCards();}; r.readAsDataURL(f);
 }
-function removeSketch(){currentStyle().sketch='';persist();renderSketch();renderStyleCards()}
-function setupSketchUpload(){
- const input=document.getElementById('sketchInput');
- const box=document.getElementById('sketchBox');
- if(input)input.onchange=e=>{processSketchFile(e.target.files[0]);e.target.value=''};
- if(box){
-  box.ondragover=e=>{e.preventDefault();box.classList.add('dragover')};
-  box.ondragleave=()=>box.classList.remove('dragover');
-  box.ondrop=e=>{e.preventDefault();box.classList.remove('dragover');processSketchFile(e.dataTransfer.files[0])};
- }
-}
-function openTab(name){
- document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
- document.querySelectorAll('.tab-panel').forEach(x=>x.classList.add('hidden'));
- document.getElementById('tab-'+name)?.classList.remove('hidden');
-}
-function renderAll(){
- renderStyleSelector();renderStyleSummary();renderStyleCards();bindStyleInputs();renderSketch();renderAll();setupSketchUpload();
-}
-function save(){ persist(); alert((currentStyle().styleNo||'신규 스타일')+'이 저장되었습니다.'); }
+document.getElementById('sketchInput').onchange=e=>{processSketch(e.target.files[0]);e.target.value='';};
+const sketchBox=document.getElementById('sketchBox');
+sketchBox.ondragover=e=>{e.preventDefault();sketchBox.classList.add('dragover');};
+sketchBox.ondragleave=()=>sketchBox.classList.remove('dragover');
+sketchBox.ondrop=e=>{e.preventDefault();sketchBox.classList.remove('dragover');processSketch(e.dataTransfer.files[0]);};
+function removeSketch(){cs().sketch='';persist();renderSketch();renderStyleCards();}
+
+/* ── COLORS ── */
 function renderColors(){
- const b=document.getElementById('colorBody');b.innerHTML='';
- currentStyle().colors.forEach((r,i)=>{
-  const total=['s','m','l','xl','xxl'].reduce((a,k)=>a+Number(r[k]||0),0);
-  b.insertAdjacentHTML('beforeend',`<tr>
-   ${['color','s','m','l','xl','xxl'].map(k=>`<td><input value="${r[k]??''}" onchange="currentStyle().colors[${i}].${k}=this.value;renderColors()"></td>`).join('')}
-   <td>${total.toLocaleString()}</td><td><button onclick="currentStyle().colors.splice(${i},1);renderColors()">×</button></td></tr>`);
- });
+  const s=cs(); const b=document.getElementById('colorBody'); if(!b)return;
+  b.innerHTML=s.colors.map((r,i)=>`<tr>
+    ${['color','s','m','l','xl','xxl'].map(k=>`<td><input value="${r[k]??''}" onchange="cs().colors[${i}].${k}=this.value;persist();renderColors()"></td>`).join('')}
+    <td>${['s','m','l','xl','xxl'].reduce((a,k)=>a+n(r[k]),0).toLocaleString()}</td>
+    <td><button onclick="cs().colors.splice(${i},1);persist();renderColors()">×</button></td>
+  </tr>`).join('');
 }
-function addColorRow(){currentStyle().colors.push({color:'',s:0,m:0,l:0,xl:0,xxl:0});renderColors()}
+function addColorRow(){ cs().colors.push({color:'',s:0,m:0,l:0,xl:0,xxl:0}); persist(); renderColors(); }
 
-const bomCols=['styleNo','position','subPosition','garmentColor','garmentSize','description','widthSize','color','qty','net','loss','cons','requiredQty','unit','supplier'];
-function recalcBom(r){r.cons=Number(r.net||0)*(1+Number(r.loss||0)/100);r.requiredQty=Number(r.cons||0)*Number(r.qty||0)}
+/* ── BOM ── */
+const BCOLS=['styleNo','position','subPosition','garmentColor','garmentSize','description','widthSize','color','qty','net','loss','cons','requiredQty','unit','supplier'];
 function renderBom(){
- const b=document.getElementById('bomBody');b.innerHTML='';
- currentStyle().bom.forEach((r,i)=>{
-  recalcBom(r);
-  b.insertAdjacentHTML('beforeend',`<tr>${bomCols.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${r[k]??''}" onchange="currentStyle().bom[${i}].${k}=this.value;renderBom()"></td>`).join('')}<td><button onclick="currentStyle().bom.splice(${i},1);renderBom()">×</button></td></tr>`);
- });
+  const s=cs(); const b=document.getElementById('bomBody'); if(!b)return;
+  s.bom.forEach(r=>{r.cons=n(r.net)*(1+n(r.loss)/100);r.requiredQty=n(r.cons)*n(r.qty);});
+  b.innerHTML=s.bom.map((r,i)=>`<tr>
+    ${BCOLS.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${k==='cons'?n(r[k]).toFixed(4):k==='requiredQty'?Math.ceil(n(r[k])):r[k]??''}" onchange="cs().bom[${i}].${k}=this.value;persist();renderBom()"></td>`).join('')}
+    <td><button onclick="cs().bom.splice(${i},1);persist();renderBom()">×</button></td>
+  </tr>`).join('');
 }
-function addBomRow(){currentStyle().bom.push(Object.fromEntries(bomCols.map(k=>[k,''])));renderBom()}
+function addBomRow(){ const r=Object.fromEntries(BCOLS.map(k=>[k,''])); r.styleNo=cs().styleNo; cs().bom.push(r); persist(); renderBom(); }
 
-document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
- document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
- document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
- document.getElementById(btn.dataset.page).classList.remove('hidden');
- document.getElementById('pageTitle').textContent=btn.textContent.trim();
-});
-document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>openTab(btn.dataset.tab));
-document.getElementById('themeBtn').onclick=()=>{document.body.classList.toggle('light');const light=document.body.classList.contains('light');document.getElementById('themeIcon').textContent=light?'☀️':'🌙';document.getElementById('themeText').textContent=light?'라이트 모드':'다크 모드'};
-document.getElementById('saveBtn').onclick=save;
+/* ── COST ── */
+function ensureCost(styleNo){
+  if(!state.costs[styleNo])state.costs[styleNo]={rows:[],stage:{quote:{pureSewing:0,margin:15},nego1:{pureSewing:0,margin:15},final:{pureSewing:0,margin:15}}};
+  return state.costs[styleNo];
+}
+function syncCostFromBom(style){
+  const c=ensureCost(style.styleNo);
+  if(!c.rows.length) c.rows=style.bom.map(b=>({
+    id:uid('C'), category:/SHELL|LINING|FABRIC/i.test(b.position)?'원자재':'부자재',
+    item:b.position, description:b.description, supplier:b.supplier, unit:b.unit,
+    quote:{usage:n(b.cons),unitPrice:0,currency:'USD'},
+    nego1:{usage:n(b.cons),unitPrice:0,currency:'USD'},
+    final:{usage:n(b.cons),unitPrice:0,currency:'USD'}
+  }));
+  persist(); return c;
+}
+function loadCostStyle(){
+  const q=document.getElementById('costSearch')?.value.trim();
+  const s=state.styles.find(x=>x.styleNo===q); if(!s)return alert('등록된 대표 Style No.가 없습니다.');
+  renderCost(s);
+}
+function stageTotal(styleNo,k){
+  const c=ensureCost(styleNo);
+  const toUsd=(r,k)=>n(r[k].usage)*n(r[k].unitPrice)/(r[k].currency==='KRW'?state.rates.usdKrw:1);
+  const material=c.rows.filter(r=>r.category==='원자재').reduce((a,r)=>a+toUsd(r,k),0);
+  const trim=c.rows.filter(r=>r.category!=='원자재').reduce((a,r)=>a+toUsd(r,k),0);
+  const sewing=n(c.stage[k].pureSewing);
+  const sub=material+trim+sewing;
+  const margin=sub*n(c.stage[k].margin)/100;
+  return {material,trim,sewing,margin,total:sub+margin};
+}
+function renderCost(style){
+  const c=syncCostFromBom(style);
+  document.getElementById('costArea').innerHTML=`
+    <div class="panel">
+      <div class="head"><div><h2>${style.styleNo} 원가관리</h2><p>${style.item}</p></div>
+      <button class="btn" onclick="addCostRow('${style.styleNo}')">+ 수기 원가 추가</button></div>
+      <div class="cost-section">${c.rows.map((r,i)=>costRowHtml(style.styleNo,r,i)).join('')}</div>
+    </div>
+    <div class="summary-grid">${['quote','nego1','final'].map(k=>summaryHtml(style.styleNo,k)).join('')}</div>`;
+}
+function costRowHtml(styleNo,r,i){
+  return `<div class="cost-row">
+    <div class="cost-top">
+      <label>Category<select onchange="state.costs['${styleNo}'].rows[${i}].category=this.value;persist()"><option ${r.category==='원자재'?'selected':''}>원자재</option><option ${r.category==='부자재'?'selected':''}>부자재</option><option ${r.category==='기타비용'?'selected':''}>기타비용</option></select></label>
+      ${['item','description','supplier','unit'].map(k=>`<label>${k}<input value="${r[k]??''}" onchange="state.costs['${styleNo}'].rows[${i}].${k}=this.value;persist()"></label>`).join('')}
+      <button class="btn danger" style="margin-top:22px" onclick="state.costs['${styleNo}'].rows.splice(${i},1);persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))">×</button>
+    </div>
+    <div class="stage-grid">${['quote','nego1','final'].map(k=>`
+      <div class="stage-card">
+        <h4>${{quote:'견적',nego1:'협상',final:'확정'}[k]}</h4>
+        <div class="stage-inputs">
+          <label>요척<input type="number" value="${r[k].usage}" onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].usage=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
+          <label>단가<input type="number" value="${r[k].unitPrice}" onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].unitPrice=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
+          <label>화폐<select onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].currency=this.value;persist()"><option ${r[k].currency==='USD'?'selected':''}>USD</option><option ${r[k].currency==='KRW'?'selected':''}>KRW</option></select></label>
+        </div>
+        <div class="stage-result"><span>금액</span><strong>${usd(n(r[k].usage)*n(r[k].unitPrice)/(r[k].currency==='KRW'?state.rates.usdKrw:1))}</strong></div>
+      </div>`).join('')}</div>
+  </div>`;
+}
+function summaryHtml(styleNo,k){
+  const t=stageTotal(styleNo,k);
+  const label={quote:'견적',nego1:'협상1차',final:'최종확정'}[k];
+  return `<div class="summary-card">
+    <h3>${label}</h3>
+    <label>순수봉제비(USD)<input type="number" value="${ensureCost(styleNo).stage[k].pureSewing}" onchange="state.costs['${styleNo}'].stage['${k}'].pureSewing=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
+    <label style="margin-top:8px">마진 %<input type="number" value="${ensureCost(styleNo).stage[k].margin}" onchange="state.costs['${styleNo}'].stage['${k}'].margin=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
+    <div class="line" style="margin-top:10px"><span>원자재</span><b>${usd(t.material)}</b></div>
+    <div class="line"><span>부자재</span><b>${usd(t.trim)}</b></div>
+    <div class="line"><span>공임</span><b>${usd(t.sewing)}</b></div>
+    <div class="line"><span>마진</span><b>${usd(t.margin)}</b></div>
+    <div class="line final"><span>FOB</span><b>${usd(t.total)}</b></div>
+  </div>`;
+}
+function addCostRow(styleNo){
+  ensureCost(styleNo).rows.push({id:uid('C'),category:'기타비용',item:'',description:'',supplier:'',unit:'EA',quote:{usage:1,unitPrice:0,currency:'USD'},nego1:{usage:1,unitPrice:0,currency:'USD'},final:{usage:1,unitPrice:0,currency:'USD'}});
+  persist(); renderCost(state.styles.find(x=>x.styleNo===styleNo));
+}
 
-document.getElementById('excelExport').onclick=()=>{
- const wb=XLSX.utils.book_new();
- const s=currentStyle();
- const basic=[{Buyer:s.buyer,Season:s.season,StyleNo:s.styleNo,Item:s.item,Quantity:s.qty,Factory:s.factory,Brand:s.brand,Department:s.department,Status:s.status,CreatedDate:s.createdDate,Remark:s.remark}];
- XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(basic),'BasicInfo');
- XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.colors),'ColorSize');
- XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.bom),'BOM');
- XLSX.writeFile(wb,(s.styleNo||'Order')+'_ERP.xlsx');
-};
-function cleanText(v){
- return String(v ?? '').replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim();
+/* ── SALES ── */
+function loadSalesStyle(){
+  const s=state.styles.find(x=>x.styleNo===document.getElementById('salesSearch')?.value.trim());
+  if(!s)return alert('등록된 대표 Style No.가 없습니다.');
+  if(!state.sales[s.styleNo])state.sales[s.styleNo]={sellingFob:0};
+  renderSales(s);
 }
-function norm(v){
- return cleanText(v).toUpperCase().replace(/[^A-Z0-9가-힣#]/g,'');
+function renderSales(s){
+  const calculatedFinalCost=stageTotal(s.styleNo,'final').total;
+  const finalCost=calculatedFinalCost>0?calculatedFinalCost:n(s.garmentPrice);
+  const sale=state.sales[s.styleNo]||{sellingFob:0};
+  const profit=n(sale.sellingFob)-finalCost;
+  const margin=n(sale.sellingFob)?profit/n(sale.sellingFob)*100:0;
+  const markup=finalCost?profit/finalCost*100:0;
+  document.getElementById('salesArea').innerHTML=`
+    <div class="panel">
+      <div class="head"><div><h2>${s.styleNo} 매출·수익</h2><p>${s.item}</p></div></div>
+      <div class="metric-grid">
+        <div class="metric"><span>제조원가 (원가 Final / Garment Price)</span><strong>${usd(finalCost)}</strong></div>
+        <label>Selling FOB (USD)<input type="number" value="${sale.sellingFob}" onchange="state.sales['${s.styleNo}'].sellingFob=this.value;persist();renderSales(state.styles.find(x=>x.styleNo==='${s.styleNo}'))"></label>
+        <div class="metric"><span>Unit Profit</span><strong class="${profit<0?'negative':'positive'}">${usd(profit)}</strong></div>
+        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(1)}%</strong></div>
+        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(1)}%</strong></div>
+        <div class="metric"><span>총 매출</span><strong>${usd(n(sale.sellingFob)*n(s.qty))}</strong></div>
+        <div class="metric"><span>총 이익</span><strong class="${profit<0?'negative':'positive'}">${usd(profit*n(s.qty))}</strong></div>
+        <div class="metric"><span>수주 수량</span><strong>${n(s.qty).toLocaleString()} PCS</strong></div>
+      </div>
+    </div>`;
 }
-function numberValue(v){
- if(typeof v==='number') return v;
- const x=Number(String(v ?? '').replace(/,/g,'').replace(/[^\d.-]/g,''));
- return Number.isFinite(x)?x:0;
-}
-function findLabelValue(rows,labelNames){
- const targets=labelNames.map(norm);
- for(let r=0;r<Math.min(rows.length,25);r++){
-  for(let c=0;c<(rows[r]||[]).length;c++){
-   if(targets.includes(norm(rows[r][c]))){
-    for(let offset=1;offset<=3;offset++){
-     const value=cleanText(rows[r][c+offset]);
-     if(value) return value;
-    }
-   }
+
+/* ── PURCHASE ── */
+function poSearchInput(type){ return document.getElementById({원단:'fabricSearch',부자재:'trimSearch',공임:'cmSearch'}[type]); }
+function poArea(type){ return document.getElementById({원단:'fabricArea',부자재:'trimArea',공임:'cmArea'}[type]); }
+function loadPurchaseStyle(type){
+  const s=state.styles.find(x=>x.styleNo===poSearchInput(type)?.value.trim());
+  if(!s)return alert('등록된 대표 Style No.가 없습니다.');
+  if(type==='공임'){
+    if(!state.purchases.some(p=>p.styleNo===s.styleNo&&p.type==='공임'))
+      state.purchases.push({id:uid('PO'),type:'공임',styleNo:s.styleNo,supplier:s.factory||'',description:'SEWING CM',qty:s.qty,unit:'PCS',currency:'USD',unitPrice:0,exchangeRate:state.rates.usdKrw,status:'발주대기'});
+  } else {
+    s.bom.forEach(b=>{
+      const cat=/SHELL|LINING|FABRIC/i.test(b.position)?'원단':'부자재';
+      if(cat===type&&!state.purchases.some(p=>p.styleNo===s.styleNo&&p.description===b.description))
+        state.purchases.push({id:uid('PO'),type,styleNo:s.styleNo,supplier:b.supplier,description:b.description,qty:b.requiredQty,unit:b.unit,currency:'USD',unitPrice:0,exchangeRate:state.rates.usdKrw,status:'발주대기'});
+    });
   }
- }
- return '';
+  persist(); renderPurchase(type,s.styleNo);
 }
-function findHeaderRow(rows,required){
- for(let i=0;i<rows.length;i++){
-  const normalized=(rows[i]||[]).map(norm);
-  const matches=required.filter(x=>normalized.some(v=>v.includes(norm(x)))).length;
-  if(matches>=required.length) return i;
- }
- return -1;
+function addManualPO(type){
+  const styleNo=poSearchInput(type)?.value.trim();
+  if(!styleNo)return alert('대표 Style No.를 먼저 입력해 주세요.');
+  state.purchases.push({id:uid('PO'),type,styleNo,supplier:'',description:'',qty:0,unit:type==='공임'?'PCS':'EA',currency:'USD',unitPrice:0,exchangeRate:state.rates.usdKrw,status:'수기등록'});
+  persist(); renderPurchase(type,styleNo);
 }
-function mapBomFromRows(rows,headerIndex){
- const header=(rows[headerIndex]||[]).map(cleanText);
- const findCol=(aliases,fallback)=>{
-  const norms=aliases.map(norm);
-  const idx=header.findIndex(h=>norms.some(a=>norm(h).includes(a)));
-  return idx>=0?idx:fallback;
- };
- const cols={
-  styleNo:findCol(['STYLE#','STYLE NO','STYLE'],0),
-  position:findCol(['POSITION'],1),
-  subPosition:2,
-  garmentColor:findCol(['G.COLOR','GARMENT COLOR'],3),
-  garmentSize:findCol(['G.SIZE','GARMENT SIZE'],4),
-  description:findCol(['ITEM DESCRIPTION','DESCRIPTION'],5),
-  widthSize:findCol(['WIDTH/SIZE','WIDTH SIZE'],6),
-  color:findCol(['COLOR'],7),
-  qty:findCol(["Q'TY",'QTY','QUANTITY'],8),
-  net:findCol(['NET'],9),
-  cons:findCol(['CONS'],10),
-  requiredQty:findCol(["ND Q'TY",'REQUIRED QTY','NEED QTY'],11),
-  unit:findCol(['UNIT'],12),
-  supplier:findCol(['SUPPLIER'],13)
- };
- const result=[];
- for(let i=headerIndex+1;i<rows.length;i++){
-  const row=rows[i]||[];
-  const style=cleanText(row[cols.styleNo]);
-  const position=cleanText(row[cols.position]);
-  const description=cleanText(row[cols.description]);
-  const supplier=cleanText(row[cols.supplier]);
-  const meaningful=[style,position,description,supplier].some(Boolean);
-  if(!meaningful) continue;
-  if(norm(style)==='TOTAL'||norm(position)==='TOTAL') continue;
-  const net=numberValue(row[cols.net]);
-  const cons=numberValue(row[cols.cons]);
-  const qty=numberValue(row[cols.qty]);
-  const inferredLoss=net>0&&cons>0?Math.max(0,(cons/net-1)*100):3;
-  result.push({
-   styleNo:style||document.getElementById('styleNo').value||'',
-   position,
-   subPosition:cleanText(row[cols.subPosition]),
-   garmentColor:cleanText(row[cols.garmentColor]),
-   garmentSize:cleanText(row[cols.garmentSize]),
-   description,
-   widthSize:cleanText(row[cols.widthSize]),
-   color:cleanText(row[cols.color]),
-   qty,
-   net,
-   loss:Number(inferredLoss.toFixed(4)),
-   cons:cons||net*(1+inferredLoss/100),
-   requiredQty:numberValue(row[cols.requiredQty])||(cons||net*(1+inferredLoss/100))*qty,
-   unit:cleanText(row[cols.unit]),
-   supplier
+function renderPurchase(type,styleNo){
+  const rows=state.purchases.filter(p=>p.type===type&&p.styleNo===styleNo);
+  const totalKrw=rows.reduce((a,r)=>a+n(r.qty)*n(r.unitPrice)*n(r.exchangeRate),0);
+  poArea(type).innerHTML=`
+    <div class="panel">
+      <div class="head"><div><h2>${styleNo} · ${type} 발주</h2><p>총 KRW: <b>${krwFmt(totalKrw)}</b></p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Style</th><th>Supplier</th><th>Description</th><th>Qty</th><th>Unit</th><th>Currency</th><th>Unit Price</th><th>환율</th><th>KRW 금액</th><th>Status</th><th>삭제</th></tr></thead>
+        <tbody>${rows.map(r=>{
+          const idx=state.purchases.indexOf(r);
+          return `<tr><td>${r.styleNo}</td>
+            ${['supplier','description','qty','unit','currency','unitPrice','exchangeRate'].map(k=>`<td><input value="${r[k]}" onchange="state.purchases[${idx}].${k}=this.value;persist();renderPurchase('${type}','${styleNo}')"></td>`).join('')}
+            <td>${krwFmt(n(r.qty)*n(r.unitPrice)*n(r.exchangeRate))}</td>
+            <td><select onchange="state.purchases[${idx}].status=this.value;persist()">${['발주대기','발주완료','입고예정','입고완료','수기등록'].map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
+            <td><button onclick="state.purchases.splice(${idx},1);persist();renderPurchase('${type}','${styleNo}')">×</button></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ── EXCHANGE ── */
+function saveRates(){
+  state.rates={usdKrw:n(document.getElementById('usdKrw').value),usdVnd:n(document.getElementById('usdVnd').value),krwVnd:n(document.getElementById('krwVnd').value),date:document.getElementById('rateDate').value};
+  persist(); alert('환율이 저장되었습니다.');
+}
+
+/* ── DASHBOARD (검색+필터) ── */
+let dashFilterStatus='all';
+function setChip(el,val){
+  dashFilterStatus=val;
+  document.querySelectorAll('#dashChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderDashboard();
+}
+function hl(text,kw){
+  if(!kw)return String(text||'-');
+  return String(text||'-').replace(new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<mark>${m}</mark>`);
+}
+function renderDashboard(){
+  const kw=(document.getElementById('dashSearch')?.value||'').trim().toLowerCase();
+  const filtered=state.styles.filter(s=>{
+    if(dashFilterStatus!=='all'&&s.status!==dashFilterStatus)return false;
+    if(!kw)return true;
+    return [s.styleNo,s.buyer,s.item,s.factory,s.season,s.brand,s.garmentPrice].some(v=>String(v||'').toLowerCase().includes(kw));
   });
- }
- return result;
+  // KPI
+  document.getElementById('kpiStyles').textContent=filtered.length+' / '+state.styles.length;
+  document.getElementById('kpiQty').textContent=filtered.reduce((a,s)=>a+n(s.qty),0).toLocaleString();
+  document.getElementById('kpiCost').textContent=Object.keys(state.costs).length;
+  document.getElementById('kpiPO').textContent=state.purchases.length;
+  // note
+  const note=document.getElementById('dashNote');
+  if(note)note.textContent=(kw||dashFilterStatus!=='all')?`${filtered.length}개 스타일 검색됨`:'';
+  // table
+  const b=document.getElementById('dashBody'); if(!b)return;
+  if(!filtered.length){b.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:22px">검색 결과가 없습니다.</td></tr>`;return;}
+  b.innerHTML=filtered.map(s=>{
+    const sc=s.status==='생산확정'?'positive':s.status==='발주진행'?'warning':'';
+    return `<tr>
+      <td><strong>${hl(s.styleNo,kw)}</strong></td>
+      <td>${hl(s.buyer,kw)}</td>
+      <td>${hl(s.item,kw)}</td>
+      <td>${s.season||'-'}</td>
+      <td>${n(s.qty).toLocaleString()}</td>
+      <td>${usd(s.garmentPrice||0)}</td>
+      <td>${hl(s.factory,kw)}</td>
+      <td class="${sc}">${s.status||'-'}</td>
+      <td>${s.createdDate||'-'}</td>
+      <td><button class="btn goto-btn" onclick="jumpStyle('${s.id}')">열기 →</button></td>
+    </tr>`;
+  }).join('');
 }
-function mapColorSize(rows,headerIndex){
- const header=(rows[headerIndex]||[]).map(norm);
- const idx=(aliases,fallback)=>{
-  const a=aliases.map(norm);
-  const found=header.findIndex(h=>a.some(x=>h.includes(x)));
-  return found>=0?found:fallback;
- };
- const colColor=idx(['S#','COLOR'],0);
- const cs=[idx(['090S','90S'],1),idx(['095M','95M'],2),idx(['100L'],3),idx(['105XL'],4),idx(['110XXL'],5)];
- const result=[];
- for(let i=headerIndex+1;i<rows.length;i++){
-  const row=rows[i]||[];
-  const color=cleanText(row[colColor]);
-  if(!color||norm(color)==='TOTAL') continue;
-  const nums=cs.map(c=>numberValue(row[c]));
-  if(!color && nums.every(v=>v===0)) continue;
-  result.push({color,s:nums[0],m:nums[1],l:nums[2],xl:nums[3],xxl:nums[4]});
- }
- return result;
+function jumpStyle(id){
+  state.currentStyleId=id; persist();
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-page="order"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('order').classList.remove('hidden');
+  document.getElementById('pageTitle').textContent='🧾 수주등록';
+  renderAll(); openTab('basic');
 }
 
-document.getElementById('excelImport').onchange=e=>{
- const f=e.target.files[0];if(!f)return;
- const reader=new FileReader();
- reader.onload=ev=>{
-  try{
-   const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
-   let importedBom=[];
-   let importedColors=[];
-   let masterRows=null;
-
-   wb.SheetNames.forEach(sheetName=>{
-    const ws=wb.Sheets[sheetName];
-    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:true});
-
-    const bomHeader=findHeaderRow(rows,['STYLE','POSITION','ITEM DESCRIPTION']);
-    if(bomHeader>=0){
-     const rowsFound=mapBomFromRows(rows,bomHeader);
-     if(rowsFound.length>importedBom.length){
-      importedBom=rowsFound;
-      masterRows=rows;
-     }
-    }
-
-    const sizeHeader=findHeaderRow(rows,['090','095','100']);
-    if(sizeHeader>=0){
-     const sizeRows=mapColorSize(rows,sizeHeader);
-     if(sizeRows.length>importedColors.length) importedColors=sizeRows;
-    }
-   });
-
-   if(masterRows){
-    const buyerValue=findLabelValue(masterRows,['BUYER']);
-    const seasonValue=findLabelValue(masterRows,['SEASON']);
-    const itemValue=findLabelValue(masterRows,['ITEM']);
-    const qtyValue=findLabelValue(masterRows,['QUANTITY','QTY']);
-    const factoryValue=findLabelValue(masterRows,['FACTORY']);
-    const styleValue=findLabelValue(masterRows,['STYLE#','STYLE #','STYLE NO']);
-
-    if(buyerValue) document.getElementById('buyer').value=buyerValue;
-    if(seasonValue) document.getElementById('season').value=seasonValue;
-    if(itemValue) document.getElementById('item').value=itemValue;
-    if(qtyValue) document.getElementById('qty').value=numberValue(qtyValue);
-    if(factoryValue) document.getElementById('factory').value=factoryValue;
-    if(styleValue) document.getElementById('styleNo').value=styleValue;
-    else if(importedBom[0]?.styleNo) document.getElementById('styleNo').value=importedBom[0].styleNo;
-
-    const s=currentStyle();
-    s.buyer=document.getElementById('buyer').value;
-    s.season=document.getElementById('season').value;
-    s.item=document.getElementById('item').value;
-    s.qty=numberValue(document.getElementById('qty').value);
-    s.factory=document.getElementById('factory').value;
-    s.styleNo=document.getElementById('styleNo').value;
-   }
-
-   if(importedBom.length) currentStyle().bom=importedBom;
-   if(importedColors.length) currentStyle().colors=importedColors;
-
-   renderBom();
-   renderColors();
-   persist();
-
-   alert(
-    'Excel Import 완료\n' +
-    'BOM: '+importedBom.length+'행\n' +
-    'Color/Size: '+importedColors.length+'행\n' +
-    'Workbook Sheets: '+wb.SheetNames.length+'개'
-   );
-  }catch(err){
-   console.error(err);
-   alert('Excel Import 중 오류가 발생했습니다.\n'+(err.message||err));
+/* ── EXCEL ── */
+function cleanTxt(v){return String(v??'').replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim();}
+function nrm(v){return cleanTxt(v).toUpperCase().replace(/[^A-Z0-9가-힣#]/g,'');}
+function numVal(v){if(typeof v==='number')return v;const x=Number(String(v??'').replace(/,/g,'').replace(/[^\d.-]/g,''));return Number.isFinite(x)?x:0;}
+function findLbl(rows,labels){const t=labels.map(nrm);for(let r=0;r<Math.min(rows.length,25);r++)for(let c=0;c<(rows[r]||[]).length;c++)if(t.includes(nrm(rows[r][c])))for(let o=1;o<=3;o++){const v=cleanTxt(rows[r][c+o]);if(v)return v;}return '';}
+function findHdr(rows,req){for(let i=0;i<rows.length;i++){const norm=(rows[i]||[]).map(nrm);if(req.filter(x=>norm.some(v=>v.includes(nrm(x)))).length>=req.length)return i;}return -1;}
+function mapBom(rows,hi){
+  const hdr=(rows[hi]||[]).map(cleanTxt);
+  const fc=(a,fb)=>{const nn=a.map(nrm);const idx=hdr.findIndex(h=>nn.some(x=>nrm(h).includes(x)));return idx>=0?idx:fb;};
+  const cols={styleNo:fc(['STYLE#','STYLE NO'],0),position:fc(['POSITION'],1),subPosition:2,garmentColor:fc(['G.COLOR','GARMENT COLOR'],3),garmentSize:fc(['G.SIZE','GARMENT SIZE'],4),description:fc(['ITEM DESCRIPTION','DESCRIPTION'],5),widthSize:fc(['WIDTH/SIZE','WIDTH SIZE'],6),color:fc(['COLOR'],7),qty:fc(["Q'TY",'QTY','QUANTITY'],8),net:fc(['NET'],9),cons:fc(['CONS'],10),requiredQty:fc(["ND Q'TY",'REQUIRED QTY'],11),unit:fc(['UNIT'],12),supplier:fc(['SUPPLIER'],13)};
+  const res=[];
+  for(let i=hi+1;i<rows.length;i++){
+    const row=rows[i]||[];const st=cleanTxt(row[cols.styleNo]);const pos=cleanTxt(row[cols.position]);const desc=cleanTxt(row[cols.description]);const sup=cleanTxt(row[cols.supplier]);
+    if(![st,pos,desc,sup].some(Boolean))continue;if(nrm(st)==='TOTAL'||nrm(pos)==='TOTAL')continue;
+    const net=numVal(row[cols.net]);const cons=numVal(row[cols.cons]);const qty=numVal(row[cols.qty]);
+    const loss=net>0&&cons>0?Math.max(0,(cons/net-1)*100):3;
+    res.push({styleNo:st||cs().styleNo||'',position:pos,subPosition:cleanTxt(row[cols.subPosition]),garmentColor:cleanTxt(row[cols.garmentColor]),garmentSize:cleanTxt(row[cols.garmentSize]),description:desc,widthSize:cleanTxt(row[cols.widthSize]),color:cleanTxt(row[cols.color]),qty,net,loss:Number(loss.toFixed(4)),cons:cons||net*(1+loss/100),requiredQty:numVal(row[cols.requiredQty])||(cons||net*(1+loss/100))*qty,unit:cleanTxt(row[cols.unit]),supplier:sup});
   }
- };
- reader.readAsArrayBuffer(f);
+  return res;
+}
+function mapColors(rows,hi){
+  const hdr=(rows[hi]||[]).map(nrm);
+  const idx=(a,fb)=>{const nn=a.map(nrm);const f=hdr.findIndex(h=>nn.some(x=>h.includes(x)));return f>=0?f:fb;};
+  const cc=idx(['S#','COLOR'],0);const cs2=[idx(['090S','90S'],1),idx(['095M','95M'],2),idx(['100L'],3),idx(['105XL'],4),idx(['110XXL'],5)];
+  const res=[];
+  for(let i=hi+1;i<rows.length;i++){const row=rows[i]||[];const color=cleanTxt(row[cc]);if(!color||nrm(color)==='TOTAL')continue;res.push({color,s:numVal(row[cs2[0]]),m:numVal(row[cs2[1]]),l:numVal(row[cs2[2]]),xl:numVal(row[cs2[3]]),xxl:numVal(row[cs2[4]])});}
+  return res;
+}
+document.getElementById('excelImport').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
+      let bom=[],colors=[],master=null;
+      wb.SheetNames.forEach(sn=>{
+        const ws=wb.Sheets[sn];const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:true});
+        const bh=findHdr(rows,['STYLE','POSITION','ITEM DESCRIPTION']);if(bh>=0){const r=mapBom(rows,bh);if(r.length>bom.length){bom=r;master=rows;}}
+        const sh=findHdr(rows,['090','095','100']);if(sh>=0){const r=mapColors(rows,sh);if(r.length>colors.length)colors=r;}
+      });
+      if(master){
+        const vals={buyer:findLbl(master,['BUYER']),season:findLbl(master,['SEASON']),item:findLbl(master,['ITEM']),qty:findLbl(master,['QUANTITY','QTY']),garmentPrice:findLbl(master,['GARMENT PRICE','GARMENT COST','GARMENT FOB','FACTORY FOB']),factory:findLbl(master,['FACTORY']),styleNo:findLbl(master,['STYLE#','STYLE #','STYLE NO'])};
+        const s=cs();Object.entries(vals).forEach(([k,v])=>{if(v){s[k]=['qty','garmentPrice'].includes(k)?numVal(v):v;const el=document.getElementById(k);if(el)el.value=s[k];}});
+        if(!vals.styleNo&&bom[0]?.styleNo)s.styleNo=bom[0].styleNo;
+      }
+      if(bom.length)cs().bom=bom;if(colors.length)cs().colors=colors;
+      renderAll();persist();
+      alert('Import 완료\nBOM:'+bom.length+'행 / Color:'+colors.length+'행');
+    }catch(err){alert('Import 오류: '+err.message);}
+  };
+  reader.readAsArrayBuffer(f);e.target.value='';
 };
+document.getElementById('excelExport').onclick=()=>{
+  const s=cs();const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Buyer:s.buyer,Season:s.season,StyleNo:s.styleNo,Item:s.item,Quantity:s.qty,GarmentPriceUSD:s.garmentPrice,Factory:s.factory}]),'BasicInfo');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.colors),'ColorSize');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.bom),'BOM');
+  XLSX.writeFile(wb,(s.styleNo||'Style')+'_ERP.xlsx');
+};
+document.getElementById('saveBtn').onclick=()=>{persist();alert('저장되었습니다.');};
+
+/* ── AI CHAT ── */
+let aiOpen=false;
+let aiHistory=[];
+let aiMsgCnt=0;
+function toggleAI(){
+  aiOpen=!aiOpen;
+  document.getElementById('aiPanel').classList.toggle('open',aiOpen);
+  document.getElementById('aiFab').textContent=aiOpen?'✕':'🤖';
+}
+function getCtx(){
+  const styles=state.styles.map(s=>{
+    const costs=(state.costs[s.styleNo]||{rows:[]}).rows;
+    const fob=stageTotal(s.styleNo,'final').total;
+    const bom3=s.bom.slice(0,3).map(b=>`${b.position}:${b.description}(${b.supplier})`).join(', ');
+    return `[${s.styleNo}] Buyer:${s.buyer} Season:${s.season} Item:${s.item} Qty:${n(s.qty)} GarmentPrice:${usd(s.garmentPrice||0)} Factory:${s.factory||'-'} Status:${s.status} FOB:${usd(fob)} BOM예시:${bom3||'없음'}`;
+  }).join('\n');
+  return `=== Namoo Fashion ERP 현황 (${TODAY}) ===
+Style ${state.styles.length}개:
+${styles}
+환율 USD/KRW=${state.rates.usdKrw}, USD/VND=${state.rates.usdVnd}
+발주건수: ${state.purchases.length}건`;
+}
+async function sendAI(){
+  const inp=document.getElementById('aiInput');
+  const msg=(inp.value||'').trim(); if(!msg)return;
+  inp.value='';
+  addMsg('user',msg); aiHistory.push({role:'user',content:msg});
+  const btn=document.getElementById('aiSendBtn'); btn.disabled=true;
+  const lid=addMsg('bot','...', true);
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',max_tokens:1000,
+        system:`당신은 Namoo Fashion의 ERP 전문 AI 어시스턴트입니다. 수출 의류 비즈니스(바이어: THE NORTH FACE 등 미국 브랜드, 베트남 공장)에 특화된 전문가로서 아래 실시간 ERP 데이터를 참고하여 Yoon님의 질문에 한국어로 간결하고 실용적으로 답변하세요.\n\n${getCtx()}`,
+        messages:aiHistory.slice(-12)
+      })
+    });
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'응답을 받지 못했습니다.';
+    aiHistory.push({role:'assistant',content:reply});
+    updMsg(lid,reply);
+  }catch(err){ updMsg(lid,'오류: '+err.message); }
+  finally{ btn.disabled=false; }
+}
+function aiQ(text){ document.getElementById('aiInput').value=text; sendAI(); }
+function addMsg(role,text,loading=false){
+  const id='m'+(++aiMsgCnt);
+  const box=document.getElementById('aiMsgs');
+  box.insertAdjacentHTML('beforeend',`<div class="ai-msg ${role}${loading?' loading':''}" id="${id}">${text}</div>`);
+  box.scrollTop=box.scrollHeight; return id;
+}
+function updMsg(id,text){
+  const el=document.getElementById(id);
+  if(el){el.textContent=text;el.classList.remove('loading');document.getElementById('aiMsgs').scrollTop=9999;}
+}
+
+/* ── INIT ── */
+function renderAll(){
+  bindInputs(); renderStyleCards(); renderSketch(); renderColors(); renderBom();
+  document.getElementById('usdKrw').value=state.rates.usdKrw;
+  document.getElementById('usdVnd').value=state.rates.usdVnd;
+  document.getElementById('krwVnd').value=state.rates.krwVnd;
+  document.getElementById('rateDate').value=state.rates.date||TODAY;
+}
 renderAll();
 </script>
 </body>
