@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ERP Namoo V4</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0d1020;--side:#121526;--card:#15192b;--card2:#0f1324;--line:#282e43;--text:#f6f7fb;--muted:#8d97ab;--accent:#6d5dfc;--accent2:#2d2759;--green:#0f766e;--red:#7f1d1d;--input:#0d1120}
 body.light{--bg:#f3f5f9;--side:#fff;--card:#fff;--card2:#f8fafc;--line:#dfe5ee;--text:#1f2937;--muted:#718096;--accent:#5b5bd6;--accent2:#ecebff;--green:#0f766e;--red:#b91c1c;--input:#fff}
@@ -109,6 +110,8 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 .ai-send{width:44px;height:60px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:18px;flex-shrink:0}
 .ai-send:disabled{opacity:.35;cursor:not-allowed}
 
+/* SUPABASE STATUS */
+.db-status{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card2);font-size:11px;font-weight:800;white-space:nowrap}.db-dot{width:8px;height:8px;border-radius:50%;background:#f59e0b}.db-status.connected .db-dot{background:#22c55e}.db-status.saving .db-dot{background:#3b82f6;animation:pulse 1s infinite}.db-status.error .db-dot{background:#ef4444}@keyframes pulse{50%{opacity:.35}}.migrate-btn{border-color:#d97706!important;color:#fbbf24!important}
 .hidden{display:none!important}
 .positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
 @media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis,.metric-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}.style-grid{grid-template-columns:1fr}.cost-top,.stage-grid{grid-template-columns:1fr}.ai-panel{width:100%}}
@@ -149,9 +152,11 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 <header class="topbar">
   <div><h1 id="pageTitle">수주등록</h1><p>모든 모듈은 등록된 대표 Style No. 기준으로 연결됩니다.</p></div>
   <div class="actions">
+    <div class="db-status" id="dbStatus"><span class="db-dot"></span><span id="dbStatusText">DB 연결 준비</span></div>
+    <button class="btn migrate-btn" id="migrateBtn" onclick="migrateLocalDataOnce()">기존 데이터 이전</button>
     <label class="btn green">Excel Import<input id="excelImport" type="file" accept=".xlsx,.xls,.csv" hidden></label>
     <button class="btn" id="excelExport">Excel Export</button>
-    <button class="btn primary" id="saveBtn">저장</button>
+    <button class="btn primary" id="saveBtn">공용 저장</button>
   </div>
 </header>
 
@@ -341,23 +346,21 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 const KEY = 'erp_namoo_v4';
 const TODAY = new Date().toISOString().slice(0,10);
 
-let state = JSON.parse(localStorage.getItem(KEY)||'null') || {
-  currentStyleId:'S1',
-  styles:[{
-    id:'S1', buyer:'THE NORTH FACE', season:'F26', styleNo:'NJ5JS53JK',
-    item:'COMFY TRAINING ZIP UP', qty:4800, garmentPrice:0, factory:'', brand:'THE NORTH FACE',
-    department:'OUTER', status:'수주등록', createdDate:TODAY, remark:'', sketch:'',
-    colors:[{color:'BLK',s:240,m:800,l:950,xl:740,xxl:270}],
-    bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]
-  }],
-  costs:{}, sales:{}, purchases:[],
-  rates:{usdKrw:1470, usdVnd:26200, krwVnd:17.82, date:TODAY}
-};
+const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_PUBLISHABLE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 
-state.styles.forEach(s=>{
-  if(s.garmentPrice===undefined || s.garmentPrice===null) s.garmentPrice=0;
-});
-function persist(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
+const DEFAULT_STATE={currentStyleId:'S1',styles:[{id:'S1',buyer:'THE NORTH FACE',season:'F26',styleNo:'NJ5JS53JK',item:'COMFY TRAINING ZIP UP',qty:4800,garmentPrice:0,factory:'',brand:'THE NORTH FACE',department:'OUTER',status:'수주등록',createdDate:TODAY,remark:'',sketch:'',sketchPath:'',colors:[{color:'BLK',s:240,m:800,l:950,xl:740,xxl:270}],bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]}],costs:{},sales:{},purchases:[],rates:{usdKrw:1470,usdVnd:26200,krwVnd:17.82,date:TODAY}};
+let state=JSON.parse(JSON.stringify(DEFAULT_STATE));let erpVersion=0;let saveTimer=null;let realtimeChannel=null;let applyingRemote=false;
+function setDbStatus(type,text){const el=document.getElementById('dbStatus'),tx=document.getElementById('dbStatusText');if(!el||!tx)return;el.className='db-status '+(type||'');tx.textContent=text;}
+function isSupabaseConfigured(){return SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('PASTE_YOUR_')&&SUPABASE_PUBLISHABLE_KEY&&!SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR_');}
+function normalizeState(input){const next=input&&typeof input==='object'?input:JSON.parse(JSON.stringify(DEFAULT_STATE));next.styles=Array.isArray(next.styles)?next.styles:[];next.costs=next.costs||{};next.sales=next.sales||{};next.purchases=Array.isArray(next.purchases)?next.purchases:[];next.rates=next.rates||JSON.parse(JSON.stringify(DEFAULT_STATE.rates));next.styles.forEach(s=>{if(s.garmentPrice==null)s.garmentPrice=0;if(!Array.isArray(s.colors))s.colors=[];if(!Array.isArray(s.bom))s.bom=[];if(s.sketchPath===undefined)s.sketchPath='';if(s.sketch===undefined)s.sketch='';});if(!next.currentStyleId&&next.styles[0])next.currentStyleId=next.styles[0].id;return next;}
+async function loadFromSupabase(){if(!isSupabaseConfigured()){setDbStatus('error','URL/Key 입력 필요');state=normalizeState(JSON.parse(localStorage.getItem(KEY)||'null')||DEFAULT_STATE);renderAll();return;}setDbStatus('saving','공용 DB 불러오는 중');const {data,error}=await supabaseClient.from('erp_state').select('data, version, updated_at').eq('id','main').single();if(error){console.error(error);setDbStatus('error','DB 불러오기 실패');state=normalizeState(JSON.parse(localStorage.getItem(KEY)||'null')||DEFAULT_STATE);renderAll();alert('Supabase DB 불러오기 실패: '+error.message);return;}state=normalizeState(data?.data||DEFAULT_STATE);erpVersion=Number(data?.version||1);localStorage.setItem(KEY,JSON.stringify(state));renderAll();await refreshAllSketchUrls();setDbStatus('connected','공용 DB 연결됨');subscribeRealtime();}
+async function saveToSupabase(showAlert=false){if(applyingRemote)return false;try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}if(!isSupabaseConfigured()){setDbStatus('error','URL/Key 입력 필요');if(showAlert)alert('Supabase URL과 Publishable Key를 먼저 넣어주세요.');return false;}setDbStatus('saving','공용 저장 중');const nextVersion=erpVersion+1;const payload=JSON.parse(JSON.stringify(state));payload.styles.forEach(s=>{if(s.sketchPath)s.sketch='';});const {data,error}=await supabaseClient.from('erp_state').update({data:payload,version:nextVersion,updated_at:new Date().toISOString()}).eq('id','main').select('version').single();if(error){console.error(error);setDbStatus('error','공용 저장 실패');if(showAlert)alert('공용 저장 실패: '+error.message);return false;}erpVersion=Number(data?.version||nextVersion);setDbStatus('connected','공용 저장 완료');if(showAlert)alert('Supabase 공용 DB에 저장되었습니다.');return true;}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveToSupabase(false),700);}
+function subscribeRealtime(){if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel);realtimeChannel=supabaseClient.channel('namoo-erp-state-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'erp_state',filter:'id=eq.main'},async payload=>{const incoming=payload.new;if(Number(incoming.version||0)<=erpVersion)return;applyingRemote=true;state=normalizeState(incoming.data);erpVersion=Number(incoming.version||erpVersion);localStorage.setItem(KEY,JSON.stringify(state));renderAll();await refreshAllSketchUrls();setDbStatus('connected','다른 사용자 변경 반영');applyingRemote=false;}).subscribe(status=>{if(status==='SUBSCRIBED')setDbStatus('connected','실시간 연결됨');});}
+async function migrateLocalDataOnce(){if(!isSupabaseConfigured()){alert('먼저 HTML에 Supabase URL과 Publishable Key를 입력해 주세요.');return;}const oldRaw=localStorage.getItem(KEY);if(!oldRaw){alert('이 브라우저에 이전할 기존 데이터가 없습니다.');return;}let oldState;try{oldState=normalizeState(JSON.parse(oldRaw));}catch(e){alert('기존 데이터를 읽을 수 없습니다.');return;}const count=oldState.styles?.length||0;if(!confirm(`기존 Style ${count}개를 공용 DB로 이전할까요?\n현재 공용 데이터는 교체됩니다.`))return;state=oldState;setDbStatus('saving','기존 데이터 이전 중');for(const style of state.styles){if(style.sketch&&style.sketch.startsWith('data:image/')){try{const blob=await (await fetch(style.sketch)).blob();const ext=blob.type.includes('png')?'png':blob.type.includes('webp')?'webp':'jpg';const file=new File([blob],`${style.styleNo||style.id}.${ext}`,{type:blob.type});await uploadSketchFile(style,file,false);}catch(e){console.warn('Sketch migration skipped',e);}}}await saveToSupabase(false);localStorage.setItem('erp_supabase_migrated_at',new Date().toISOString());renderAll();await refreshAllSketchUrls();setDbStatus('connected','기존 데이터 이전 완료');alert(`기존 Style ${count}개를 공용 DB로 이전했습니다.`);}
+async function initSupabaseApp(){state=normalizeState(JSON.parse(localStorage.getItem(KEY)||'null')||DEFAULT_STATE);renderAll();await loadFromSupabase();}
 function cs(){ return state.styles.find(s=>s.id===state.currentStyleId)||state.styles[0]; }
 function n(v){ const x=Number(v); return Number.isFinite(x)?x:0; }
 function usd(v){ return '$'+n(v).toFixed(2); }
@@ -425,27 +428,14 @@ function renderStyleCards(){
 }
 
 /* ── SKETCH ── */
-function renderSketch(){
-  const s=cs();
-  const pr=document.getElementById('sketchPreview');
-  const ph=document.getElementById('sketchPlaceholder');
-  const rm=document.getElementById('removeSketchBtn');
-  if(!pr)return;
-  if(s.sketch){pr.src=s.sketch;pr.classList.remove('hidden');ph.classList.add('hidden');rm.classList.remove('hidden');}
-  else{pr.classList.add('hidden');ph.classList.remove('hidden');rm.classList.add('hidden');}
-}
-function processSketch(f){
-  if(!f)return;
-  if(!f.type.startsWith('image/'))return alert('이미지 파일만 가능합니다.');
-  if(f.size>3*1024*1024)return alert('3MB 이하 이미지를 사용해 주세요.');
-  const r=new FileReader(); r.onload=e=>{cs().sketch=e.target.result;persist();renderSketch();renderStyleCards();}; r.readAsDataURL(f);
-}
-document.getElementById('sketchInput').onchange=e=>{processSketch(e.target.files[0]);e.target.value='';};
-const sketchBox=document.getElementById('sketchBox');
-sketchBox.ondragover=e=>{e.preventDefault();sketchBox.classList.add('dragover');};
-sketchBox.ondragleave=()=>sketchBox.classList.remove('dragover');
-sketchBox.ondrop=e=>{e.preventDefault();sketchBox.classList.remove('dragover');processSketch(e.dataTransfer.files[0]);};
-function removeSketch(){cs().sketch='';persist();renderSketch();renderStyleCards();}
+async function getSignedSketchUrl(path){if(!path)return '';const {data,error}=await supabaseClient.storage.from('sketches').createSignedUrl(path,60*60*24);if(error){console.error(error);return '';}return data?.signedUrl||'';}
+async function refreshAllSketchUrls(){if(!isSupabaseConfigured())return;await Promise.all(state.styles.map(async s=>{if(s.sketchPath)s.sketch=await getSignedSketchUrl(s.sketchPath);}));renderSketch();renderStyleCards();}
+function renderSketch(){const s=cs(),pr=document.getElementById('sketchPreview'),ph=document.getElementById('sketchPlaceholder'),rm=document.getElementById('removeSketchBtn');if(!pr)return;if(s.sketch){pr.src=s.sketch;pr.classList.remove('hidden');ph.classList.add('hidden');rm.classList.remove('hidden');}else{pr.removeAttribute('src');pr.classList.add('hidden');ph.classList.remove('hidden');rm.classList.add('hidden');}}
+async function uploadSketchFile(style,file,saveAfter=true){if(!file)return false;if(!file.type.startsWith('image/')){alert('이미지 파일만 가능합니다.');return false;}if(file.size>5*1024*1024){alert('5MB 이하 이미지를 사용해 주세요.');return false;}if(!isSupabaseConfigured()){alert('Supabase URL과 Publishable Key를 먼저 설정해 주세요.');return false;}const safeStyle=(style.styleNo||style.id||'style').replace(/[^a-zA-Z0-9_-]/g,'_');const ext=(file.name.split('.').pop()||'jpg').toLowerCase();const path=`${safeStyle}/${Date.now()}_${Math.random().toString(16).slice(2)}.${ext}`;setDbStatus('saving','Sketch 업로드 중');const {error}=await supabaseClient.storage.from('sketches').upload(path,file,{cacheControl:'3600',upsert:false});if(error){console.error(error);setDbStatus('error','Sketch 업로드 실패');alert('Sketch 업로드 실패: '+error.message);return false;}if(style.sketchPath)await supabaseClient.storage.from('sketches').remove([style.sketchPath]);style.sketchPath=path;style.sketch=await getSignedSketchUrl(path);if(saveAfter)await saveToSupabase(false);renderSketch();renderStyleCards();setDbStatus('connected','Sketch 저장 완료');return true;}
+async function processSketch(file){await uploadSketchFile(cs(),file,true);}
+document.getElementById('sketchInput').onchange=async e=>{await processSketch(e.target.files[0]);e.target.value='';};
+const sketchBox=document.getElementById('sketchBox');sketchBox.ondragover=e=>{e.preventDefault();sketchBox.classList.add('dragover');};sketchBox.ondragleave=()=>sketchBox.classList.remove('dragover');sketchBox.ondrop=async e=>{e.preventDefault();sketchBox.classList.remove('dragover');await processSketch(e.dataTransfer.files[0]);};
+async function removeSketch(){const style=cs();if(style.sketchPath&&isSupabaseConfigured()){const {error}=await supabaseClient.storage.from('sketches').remove([style.sketchPath]);if(error){alert('Sketch 삭제 실패: '+error.message);return;}}style.sketch='';style.sketchPath='';await saveToSupabase(false);renderSketch();renderStyleCards();}
 
 /* ── COLORS ── */
 function renderColors(){
@@ -745,7 +735,7 @@ document.getElementById('excelExport').onclick=()=>{
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(s.bom),'BOM');
   XLSX.writeFile(wb,(s.styleNo||'Style')+'_ERP.xlsx');
 };
-document.getElementById('saveBtn').onclick=()=>{persist();alert('저장되었습니다.');};
+document.getElementById('saveBtn').onclick=async()=>{await saveToSupabase(true);};
 
 /* ── AI CHAT ── */
 let aiOpen=false;
@@ -812,7 +802,8 @@ function renderAll(){
   document.getElementById('krwVnd').value=state.rates.krwVnd;
   document.getElementById('rateDate').value=state.rates.date||TODAY;
 }
-renderAll();
+window.addEventListener('beforeunload',()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}});
+initSupabaseApp();
 </script>
 </body>
 </html>
