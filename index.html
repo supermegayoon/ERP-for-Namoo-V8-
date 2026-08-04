@@ -351,7 +351,7 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
     </div>
     <div class="order-lookup-toolbar">
       <label>전체 Style
-        <select id="orderStyleSelect" onchange="selectOrderStyle(this.value)"></select>
+        <select id="orderStyleSelect" onchange="previewOrderStyle(this.value)"></select>
       </label>
       <label>검색
         <input id="orderSearch" placeholder="Style No., Buyer, Item, Factory, 담당자" oninput="renderOrderLookup()">
@@ -368,10 +368,12 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
       <label>등록일 To<input id="orderDateTo" type="date" onchange="renderOrderLookup()"></label>
     </div>
     <div class="actions" style="margin-top:10px">
+      <button class="btn primary" onclick="openSelectedOrderDetail()">선택 Style 상세정보 열기</button>
       <button class="btn" onclick="resetOrderFilters()">조회 초기화</button>
       <button class="btn" onclick="exportOrderLookup()">조회 결과 Excel</button>
     </div>
     <div id="orderLookupKpis" class="order-lookup-kpis"></div>
+    <div id="selectedOrderStyleSummary" style="margin-top:12px"></div>
   </div>
   <div class="tabs">
     <button class="tab active" data-tab="registry">수주 조회</button>
@@ -914,11 +916,16 @@ function uid(p){ return p+'-'+Date.now()+'-'+Math.random().toString(16).slice(2,
 
 /* ── NAV ── */
 function openTab(name){
-  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
-  document.querySelectorAll('.tab-panel').forEach(x=>x.classList.add('hidden'));
+  document.querySelectorAll('#order .tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+  document.querySelectorAll('#order .tab-panel').forEach(x=>x.classList.add('hidden'));
   document.getElementById('tab-'+name)?.classList.remove('hidden');
+
+  if(name==='basic'){bindInputs();renderSketch();renderOrderSummary();}
+  if(name==='qty'){renderColors();renderPackingMode();}
+  if(name==='tna')renderTna();
+  if(name==='bom')renderBom();
 }
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+document.querySelectorAll('#order .tab').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
 document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
   btn.classList.add('active');
@@ -1179,8 +1186,11 @@ function populateOrderLookupFilters(){
   if(styleSel){
     const old=styleSel.value;
     styleSel.innerHTML=state.styles.map(s=>`<option value="${s.id}">${styleDisplayText(s)}</option>`).join('');
-    styleSel.value=old&&state.styles.some(s=>s.id===old)?old:(state.currentStyleId||state.styles[0]?.id||'');
+    styleSel.value=state.styles.some(s=>s.id===state.currentStyleId)
+      ? state.currentStyleId
+      : (old&&state.styles.some(s=>s.id===old)?old:(state.styles[0]?.id||''));
   }
+  renderSelectedOrderSummary();
   const seasonSel=document.getElementById('orderSeasonFilter');
   if(seasonSel){
     const old=seasonSel.value;
@@ -1189,9 +1199,52 @@ function populateOrderLookupFilters(){
     seasonSel.value=seasons.includes(old)?old:'';
   }
 }
+function previewOrderStyle(id){
+  const s=state.styles.find(x=>x.id===id);if(!s)return;
+  state.currentStyleId=s.id;
+  touchRecentStyle(s.id);
+  persist();
+  renderSelectedOrderSummary();
+}
+function openSelectedOrderDetail(){
+  const id=document.getElementById('orderStyleSelect')?.value||state.currentStyleId;
+  selectOrderStyle(id);
+}
 function selectOrderStyle(id){
   const s=state.styles.find(x=>x.id===id);if(!s)return;
-  state.currentStyleId=s.id;touchRecentStyle(s.id);persist();renderAll();openTab('basic');
+  state.currentStyleId=s.id;
+  touchRecentStyle(s.id);
+  persist();
+
+  bindInputs();
+  renderSketch();
+  renderColors();
+  renderPackingMode();
+  renderTna();
+  renderOrderSummary();
+  renderBom();
+  renderSelectedOrderSummary();
+
+  openTab('basic');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderSelectedOrderSummary(){
+  const el=document.getElementById('selectedOrderStyleSummary');if(!el)return;
+  const s=cs();if(!s){el.innerHTML='';return;}
+  const totalUsd=n(s.qty)*n(s.garmentPrice);
+  el.innerHTML=`<div class="panel" style="margin:0;background:var(--card2)">
+    <div class="head" style="margin-bottom:8px">
+      <div><h3>${s.styleNo||'신규 Style'} · ${s.item||'-'}</h3>
+      <p>${s.buyer||'-'} · ${s.season||'-'} · ${s.factory||'-'}</p></div>
+      <button class="btn primary" onclick="selectOrderStyle('${s.id}')">상세정보 열기</button>
+    </div>
+    <div class="order-summary" style="margin-top:0">
+      <div class="order-summary-card"><span>Quantity</span><strong>${fmtQty(s.qty)} PCS</strong></div>
+      <div class="order-summary-card"><span>FOB</span><strong>${usd(s.garmentPrice)}</strong></div>
+      <div class="order-summary-card"><span>Order Amount</span><strong>${usd(totalUsd)}</strong></div>
+      <div class="order-summary-card"><span>진행구분</span><strong>${s.completed?'마무리':'진행중'}</strong></div>
+    </div>
+  </div>`;
 }
 function orderLookupRows(){
   const q=String(document.getElementById('orderSearch')?.value||'').trim().toLowerCase();
@@ -2514,7 +2567,7 @@ function updMsg(id,text){
 /* ── INIT ── */
 function renderAll(){
   ensureCurrentStyle();
-  bindInputs(); renderStyleCards(); renderSketch(); renderColors(); renderPackingMode(); renderTna(); renderOrderSummary(); renderBom();
+  bindInputs(); renderStyleCards(); renderSketch(); renderColors(); renderPackingMode(); renderTna(); renderOrderSummary(); renderBom(); renderSelectedOrderSummary();
   ['packingStyle','shippingStyle','actualStyle','paymentStyle','settlementStyle'].forEach(fillStyleSelect);
   populateIntegratedStyleSelectors();
   document.getElementById('usdKrw').value=state.rates.usdKrw;
