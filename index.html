@@ -820,6 +820,8 @@ function normalizeState(input){const next=input&&typeof input==='object'?input:J
 });if(!next.currentStyleId&&next.styles[0])next.currentStyleId=next.styles[0].id;return next;}
 async function loadFromSupabase(){
   setDbStatus('saving','공용 DB 불러오는 중');
+  const note=document.getElementById('dashNote');
+  if(note)note.textContent='공용 데이터를 불러오는 중입니다…';
   const localRaw=localStorage.getItem(KEY);
   let localState=null;
   try{localState=localRaw?normalizeState(JSON.parse(localRaw)):null;}catch(e){console.warn(e);}
@@ -840,6 +842,8 @@ async function loadFromSupabase(){
     state=localState;
     renderAll();
     await refreshAllSketchUrls();
+    renderDashboard();
+    refreshOrderWorkspace();
     setDbStatus('connected','기존 데이터 유지 · 이전 버튼 필요');
     subscribeRealtime();
     return;
@@ -856,6 +860,8 @@ async function loadFromSupabase(){
   localStorage.setItem(KEY,JSON.stringify(state));
   renderAll();
   await refreshAllSketchUrls();
+  renderDashboard();
+  refreshOrderWorkspace();
   setDbStatus('connected','공용 DB 연결됨');
   subscribeRealtime();
 }
@@ -2207,7 +2213,14 @@ function populateDashboardSeasonFilter(){
   const old=e.value;
   const seasons=[...new Set(state.styles.map(s=>String(s.season||'').trim()).filter(Boolean))].sort();
   e.innerHTML='<option value="">전체 Season</option>'+seasons.map(v=>`<option>${v}</option>`).join('');
-  e.value=seasons.includes(old)?old:'';
+
+  if(old&&seasons.includes(old)){
+    e.value=old;
+  }else if(seasons.length===1){
+    e.value=seasons[0];
+  }else{
+    e.value='';
+  }
 }
 function dashboardBaseStyles(){
   const includeCompleted=document.getElementById('dashShowCompleted')?.checked||false;
@@ -2229,7 +2242,12 @@ function reopenStyle(id){
 function setDashboardSeason(season){
   const e=document.getElementById('dashSeasonFilter');
   if(e)e.value=season;
+  dashFilterStatus='all';
+  document.querySelectorAll('#dashChips .chip').forEach((x,i)=>x.classList.toggle('active',i===0));
   renderDashboard();
+
+  const table=document.querySelector('.dash-table-wrap');
+  if(table)table.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function resetDashboardFilters(){
   const q=document.getElementById('dashSearch');if(q)q.value='';
@@ -2653,13 +2671,45 @@ function updMsg(id,text){
 /* ── INIT ── */
 function renderAll(){
   ensureCurrentStyle();
-  bindInputs(); renderStyleCards(); renderSketch(); renderColors(); renderPackingMode(); renderTna(); renderOrderSummary(); renderBom(); renderSelectedOrderSummary(); renderStyleTimeline();
-  ['packingStyle','shippingStyle','actualStyle','paymentStyle','settlementStyle'].forEach(fillStyleSelect);
+
+  // 수주등록 상세
+  bindInputs();
+  renderSketch();
+  renderColors();
+  renderPackingMode();
+  renderTna();
+  renderOrderSummary();
+  renderBom();
+  renderSelectedOrderSummary();
+  renderStyleTimeline();
+
+  // 수주등록 Style/Season 조회
+  populateOrderLookupFilters();
+  refreshOrderWorkspace();
+
+  // 원가·발주 Style 선택
   populateIntegratedStyleSelectors();
-  document.getElementById('usdKrw').value=state.rates.usdKrw;
-  document.getElementById('usdVnd').value=state.rates.usdVnd;
-  document.getElementById('krwVnd').value=state.rates.krwVnd;
-  document.getElementById('rateDate').value=state.rates.date||TODAY;
+  populatePurchaseStyleSelectors();
+
+  // 물류·매입·결제·정산 Style 선택
+  ['packingStyle','shippingStyle','actualStyle','paymentStyle','settlementStyle'].forEach(fillStyleSelect);
+  populateSettlementSeasonFilter();
+
+  // 대시보드: Supabase 로딩 후 반드시 다시 계산·표시
+  populateDashboardSeasonFilter();
+  renderDashboard();
+
+  // 환율
+  const usdKrw=document.getElementById('usdKrw');
+  const usdVnd=document.getElementById('usdVnd');
+  const krwVnd=document.getElementById('krwVnd');
+  const rateDate=document.getElementById('rateDate');
+  if(usdKrw)usdKrw.value=state.rates.usdKrw;
+  if(usdVnd)usdVnd.value=state.rates.usdVnd;
+  if(krwVnd)krwVnd.value=state.rates.krwVnd;
+  if(rateDate)rateDate.value=state.rates.date||TODAY;
+
+  renderRecentFavorite();
 }
 window.addEventListener('beforeunload',()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}});
 initSupabaseApp();
