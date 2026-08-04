@@ -794,11 +794,11 @@ function ensureCurrentStyle(){
 
 function cs(){ return ensureCurrentStyle(); }
 function n(v){ const x=Number(v); return Number.isFinite(x)?x:0; }
-function fmt3(v){return n(v).toLocaleString(undefined,{minimumFractionDigits:3,maximumFractionDigits:3});}
+function fmt4(v){return n(v).toLocaleString(undefined,{minimumFractionDigits:4,maximumFractionDigits:4});}
 function fmtQty(v){return Math.round(n(v)).toLocaleString();}
-function usd(v){ return '$'+fmt3(v); }
+function usd(v){ return '$'+fmt4(v); }
 function krwFmt(v){ return '₩'+Math.round(n(v)).toLocaleString(); }
-function pct(v){return fmt3(v)+'%';}
+function pct(v){return fmt4(v)+'%';}
 function marginClass(v){return n(v)<0?'margin-bad':n(v)<10?'margin-mid':'margin-good';}
 function uid(p){ return p+'-'+Date.now()+'-'+Math.random().toString(16).slice(2,8); }
 
@@ -1352,15 +1352,15 @@ function renderCost(style){
         <table class="cost-percent-table">
           <thead><tr><th>원자재</th><th>부자재</th><th>완제품</th><th>제조경비</th><th>통합관리비</th><th>판매비</th><th>공임</th><th>총 제조원가</th><th>매출이익</th></tr></thead>
           <tbody><tr>
-            <td>${percent(catSummary.원자재).toFixed(3)}%</td>
-            <td>${percent(catSummary.부자재).toFixed(3)}%</td>
-            <td>${percent(catSummary.완제품).toFixed(3)}%</td>
-            <td>${percent(catSummary.제조경비).toFixed(3)}%</td>
-            <td>${percent(catSummary.통합관리비).toFixed(3)}%</td>
-            <td>${percent(catSummary.판매비).toFixed(3)}%</td>
-            <td>${percent(final.sewing).toFixed(3)}%</td>
-            <td><b>${percent(final.total).toFixed(3)}%</b></td>
-            <td class="${unitProfit<0?'negative':'positive'}"><b>${margin.toFixed(3)}%</b></td>
+            <td>${percent(catSummary.원자재).toFixed(4)}%</td>
+            <td>${percent(catSummary.부자재).toFixed(4)}%</td>
+            <td>${percent(catSummary.완제품).toFixed(4)}%</td>
+            <td>${percent(catSummary.제조경비).toFixed(4)}%</td>
+            <td>${percent(catSummary.통합관리비).toFixed(4)}%</td>
+            <td>${percent(catSummary.판매비).toFixed(4)}%</td>
+            <td>${percent(final.sewing).toFixed(4)}%</td>
+            <td><b>${percent(final.total).toFixed(4)}%</b></td>
+            <td class="${unitProfit<0?'negative':'positive'}"><b>${margin.toFixed(4)}%</b></td>
           </tr></tbody>
         </table>
       </div>
@@ -1372,8 +1372,8 @@ function renderCost(style){
         <div class="metric"><span>Selling FOB</span><strong>${usd(sellingFob)}</strong></div>
         <div class="metric"><span>총 제조원가</span><strong>${usd(final.total)}</strong></div>
         <div class="metric"><span>Unit Profit</span><strong class="${unitProfit<0?'negative':'positive'}">${usd(unitProfit)}</strong></div>
-        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(3)}%</strong></div>
-        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(3)}%</strong></div>
+        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(4)}%</strong></div>
+        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(4)}%</strong></div>
         <div class="metric"><span>총 예상이익</span><strong class="${totalProfit<0?'negative':'positive'}">${usd(totalProfit)}</strong></div>
       </div>
       <div style="margin-top:12px;max-width:280px">
