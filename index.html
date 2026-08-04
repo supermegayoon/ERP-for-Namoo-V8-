@@ -380,30 +380,51 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 
 <!-- ===== FABRIC ===== -->
 <div id="fabric" class="page hidden">
-  <div class="panel searchbar">
-    <label>대표 Style 검색<input id="fabricSearch" placeholder="Style No. 검색"></label>
-    <button class="btn" onclick="loadPurchaseStyle('원단')">수주 BOM 불러오기</button>
-    <button class="btn primary" onclick="addManualPO('원단')">+ 수기 발주</button>
+  <div class="panel">
+    <div class="head"><div><h2>원단 발주 Style 선택</h2><p>전체 Style을 선택하거나 Style No., Item, Buyer로 검색할 수 있습니다.</p></div></div>
+    <div class="searchbar">
+      <label>전체 Style<select id="fabricStyleSelect" onchange="selectPurchaseStyle('원단',this.value)"></select></label>
+      <label>Style 검색
+        <input id="fabricSearch" list="fabricStyleDatalist" placeholder="Style No., Item, Buyer 검색" oninput="filterPurchaseStyle('원단')" onkeydown="if(event.key==='Enter')loadPurchaseStyle('원단')">
+        <datalist id="fabricStyleDatalist"></datalist>
+      </label>
+      <button class="btn" onclick="loadPurchaseStyle('원단')">수주 BOM 불러오기</button>
+      <button class="btn primary" onclick="addManualPO('원단')">+ 수기 발주</button>
+    </div>
   </div>
   <div id="fabricArea"></div>
 </div>
 
 <!-- ===== TRIM ===== -->
 <div id="trim" class="page hidden">
-  <div class="panel searchbar">
-    <label>대표 Style 검색<input id="trimSearch" placeholder="Style No. 검색"></label>
-    <button class="btn" onclick="loadPurchaseStyle('부자재')">수주 BOM 불러오기</button>
-    <button class="btn primary" onclick="addManualPO('부자재')">+ 수기 발주</button>
+  <div class="panel">
+    <div class="head"><div><h2>부자재 발주 Style 선택</h2><p>전체 Style을 선택하거나 Style No., Item, Buyer로 검색할 수 있습니다.</p></div></div>
+    <div class="searchbar">
+      <label>전체 Style<select id="trimStyleSelect" onchange="selectPurchaseStyle('부자재',this.value)"></select></label>
+      <label>Style 검색
+        <input id="trimSearch" list="trimStyleDatalist" placeholder="Style No., Item, Buyer 검색" oninput="filterPurchaseStyle('부자재')" onkeydown="if(event.key==='Enter')loadPurchaseStyle('부자재')">
+        <datalist id="trimStyleDatalist"></datalist>
+      </label>
+      <button class="btn" onclick="loadPurchaseStyle('부자재')">수주 BOM 불러오기</button>
+      <button class="btn primary" onclick="addManualPO('부자재')">+ 수기 발주</button>
+    </div>
   </div>
   <div id="trimArea"></div>
 </div>
 
 <!-- ===== CM ===== -->
 <div id="cm" class="page hidden">
-  <div class="panel searchbar">
-    <label>대표 Style 검색<input id="cmSearch" placeholder="Style No. 검색"></label>
-    <button class="btn" onclick="loadPurchaseStyle('공임')">수주정보 불러오기</button>
-    <button class="btn primary" onclick="addManualPO('공임')">+ 수기 발주</button>
+  <div class="panel">
+    <div class="head"><div><h2>공임 발주 Style 선택</h2><p>전체 Style을 선택하거나 Style No., Item, Buyer로 검색할 수 있습니다.</p></div></div>
+    <div class="searchbar">
+      <label>전체 Style<select id="cmStyleSelect" onchange="selectPurchaseStyle('공임',this.value)"></select></label>
+      <label>Style 검색
+        <input id="cmSearch" list="cmStyleDatalist" placeholder="Style No., Item, Buyer 검색" oninput="filterPurchaseStyle('공임')" onkeydown="if(event.key==='Enter')loadPurchaseStyle('공임')">
+        <datalist id="cmStyleDatalist"></datalist>
+      </label>
+      <button class="btn" onclick="loadPurchaseStyle('공임')">수주정보 불러오기</button>
+      <button class="btn primary" onclick="addManualPO('공임')">+ 수기 발주</button>
+    </div>
   </div>
   <div id="cmArea"></div>
 </div>
@@ -751,6 +772,7 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
   if(btn.dataset.page==='settlement') renderSettlementPage();
   if(btn.dataset.page==='cost'){
     populateIntegratedStyleSelectors();
+  populatePurchaseStyleSelectors();
     const s=state.styles.find(x=>x.id===document.getElementById('costStyleSelect')?.value)||cs();
     if(s){document.getElementById('costSearch').value=s.styleNo||'';renderCost(s);}
   }
@@ -758,6 +780,16 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
     populateIntegratedStyleSelectors();
     const s=state.styles.find(x=>x.id===document.getElementById('salesStyleSelect')?.value)||cs();
     if(s){document.getElementById('salesSearch').value=s.styleNo||'';renderSalesIntegrated(s);}
+  }
+  const purchasePageType={fabric:'원단',trim:'부자재',cm:'공임'}[btn.dataset.page];
+  if(purchasePageType){
+    populatePurchaseStyleSelectors();
+    const cfg=purchaseTypeConfig(purchasePageType);
+    const s=state.styles.find(x=>x.id===document.getElementById(cfg.select)?.value)||cs();
+    if(s){
+      document.getElementById(cfg.search).value=s.styleNo||'';
+      renderPurchase(purchasePageType,s.styleNo);
+    }
   }
 });
 document.getElementById('themeBtn').onclick=()=>{
@@ -1306,12 +1338,60 @@ function renderSales(s){
   renderSalesIntegrated(s);
 }
 
+/* ── PURCHASE STYLE SELECTORS ── */
+function purchaseTypeConfig(type){
+  return {
+    원단:{select:'fabricStyleSelect',search:'fabricSearch',list:'fabricStyleDatalist'},
+    부자재:{select:'trimStyleSelect',search:'trimSearch',list:'trimStyleDatalist'},
+    공임:{select:'cmStyleSelect',search:'cmSearch',list:'cmStyleDatalist'}
+  }[type];
+}
+function populatePurchaseStyleSelectors(){
+  const optionHtml=state.styles.map(s=>`<option value="${s.id}">${styleDisplayText(s)}</option>`).join('');
+  const dataHtml=state.styles.map(s=>`<option value="${s.styleNo||''}">${s.item||''} · ${s.buyer||''}</option>`).join('');
+
+  ['원단','부자재','공임'].forEach(type=>{
+    const cfg=purchaseTypeConfig(type);
+    const sel=document.getElementById(cfg.select);
+    const list=document.getElementById(cfg.list);
+    if(sel){
+      const old=sel.value;
+      sel.innerHTML=optionHtml;
+      sel.value=old&&state.styles.some(s=>s.id===old)?old:(state.currentStyleId||state.styles[0]?.id||'');
+    }
+    if(list)list.innerHTML=dataHtml;
+  });
+}
+function selectPurchaseStyle(type,id){
+  const s=state.styles.find(x=>x.id===id);
+  if(!s)return;
+  const cfg=purchaseTypeConfig(type);
+  state.currentStyleId=s.id;
+  document.getElementById(cfg.search).value=s.styleNo||'';
+  persist();
+  renderPurchase(type,s.styleNo);
+}
+function filterPurchaseStyle(type){
+  const cfg=purchaseTypeConfig(type);
+  const s=findStyleByIntegratedQuery(document.getElementById(cfg.search)?.value);
+  if(s){
+    const sel=document.getElementById(cfg.select);
+    if(sel)sel.value=s.id;
+  }
+}
+
 /* ── PURCHASE ── */
 function poSearchInput(type){ return document.getElementById({원단:'fabricSearch',부자재:'trimSearch',공임:'cmSearch'}[type]); }
 function poArea(type){ return document.getElementById({원단:'fabricArea',부자재:'trimArea',공임:'cmArea'}[type]); }
 function loadPurchaseStyle(type){
-  const s=state.styles.find(x=>x.styleNo===poSearchInput(type)?.value.trim());
-  if(!s)return alert('등록된 대표 Style No.가 없습니다.');
+  const cfg=purchaseTypeConfig(type);
+  const query=poSearchInput(type)?.value.trim();
+  const selectedId=document.getElementById(cfg.select)?.value;
+  const s=findStyleByIntegratedQuery(query)||state.styles.find(x=>x.id===selectedId);
+  if(!s)return alert('등록된 Style을 선택하거나 검색해 주세요.');
+  state.currentStyleId=s.id;
+  if(document.getElementById(cfg.select))document.getElementById(cfg.select).value=s.id;
+  if(poSearchInput(type))poSearchInput(type).value=s.styleNo||'';
   if(type==='공임'){
     if(!state.purchases.some(p=>p.styleNo===s.styleNo&&p.type==='공임'))
       state.purchases.push({id:uid('PO'),type:'공임',styleNo:s.styleNo,supplier:s.factory||'',description:'SEWING CM',qty:s.qty,unit:'PCS',currency:'USD',unitPrice:0,exchangeRate:state.rates.usdKrw,status:'발주대기'});
@@ -1325,8 +1405,16 @@ function loadPurchaseStyle(type){
   persist(); renderPurchase(type,s.styleNo);
 }
 function addManualPO(type){
-  const styleNo=poSearchInput(type)?.value.trim();
-  if(!styleNo)return alert('대표 Style No.를 먼저 입력해 주세요.');
+  const cfg=purchaseTypeConfig(type);
+  const selected=state.styles.find(s=>s.id===document.getElementById(cfg.select)?.value);
+  const found=findStyleByIntegratedQuery(poSearchInput(type)?.value.trim())||selected;
+  const styleNo=found?.styleNo||poSearchInput(type)?.value.trim();
+  if(!styleNo)return alert('Style을 선택하거나 검색해 주세요.');
+  if(found){
+    state.currentStyleId=found.id;
+    document.getElementById(cfg.select).value=found.id;
+    poSearchInput(type).value=found.styleNo||'';
+  }
   state.purchases.push({id:uid('PO'),type,styleNo,supplier:'',description:'',qty:0,unit:type==='공임'?'PCS':'EA',currency:'USD',unitPrice:0,exchangeRate:state.rates.usdKrw,status:'수기등록'});
   persist(); renderPurchase(type,styleNo);
 }
