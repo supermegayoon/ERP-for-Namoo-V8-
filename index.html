@@ -129,6 +129,51 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 .tnf-seed-note{font-size:11px;color:var(--muted)}
 @media(max-width:1100px){.order-summary,.tna-grid{grid-template-columns:repeat(2,1fr)}}
 
+
+/* ── LOGISTICS / ACTUAL / PAYMENT / SETTLEMENT ── */
+.logistics-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.logistics-card{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:12px}
+.logistics-card span{display:block;color:var(--muted);font-size:11px}
+.logistics-card strong{display:block;font-size:18px;margin-top:6px}
+.page-toolbar{display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin-bottom:12px}
+.page-toolbar label{min-width:260px}
+.month-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.month-summary .metric{min-height:82px}
+.settlement-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.settlement-detail{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-top:12px}
+.reconcile-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.reconcile-line.total{font-size:17px;font-weight:900;background:var(--accent2);padding:11px;border-radius:9px;margin-top:8px;border:none}
+@media(max-width:1100px){.logistics-kpis,.month-summary,.settlement-summary{grid-template-columns:repeat(2,1fr)}.settlement-detail{grid-template-columns:1fr}}
+
+
+/* ── INTEGRATED COST & PROFIT ── */
+.costing-sheet{display:grid;gap:12px}
+.costing-header{display:grid;grid-template-columns:1fr 220px;gap:12px}
+.style-info-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.info-cell{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:9px}
+.info-cell span{display:block;color:var(--muted);font-size:10px}
+.info-cell strong{display:block;margin-top:5px;font-size:13px}
+.cost-sketch{background:#fff;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;min-height:210px;overflow:hidden}
+.cost-sketch img{max-width:100%;max-height:205px;object-fit:contain}
+.cost-group-title{display:flex;align-items:center;justify-content:space-between;margin:4px 0 8px}
+.cost-group-title h3{margin:0;font-size:15px}
+.cost-table{min-width:1250px}
+.cost-percent-table{min-width:1050px}
+.cost-total-row td{font-weight:900;background:var(--accent2)}
+.cost-category-pill{display:inline-block;padding:3px 7px;border-radius:999px;background:var(--accent2);font-size:10px;font-weight:800}
+.cost-summary-band{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.cost-summary-box{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px}
+.cost-summary-box span{display:block;color:var(--muted);font-size:10px}
+.cost-summary-box strong{display:block;font-size:17px;margin-top:5px}
+.profit-band{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px}
+.profit-band .metric{min-height:82px}
+.cost-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cost-actual-table{min-width:900px}
+@media(max-width:1100px){
+  .costing-header,.cost-comparison{grid-template-columns:1fr}
+  .style-info-grid,.cost-summary-band,.profit-band{grid-template-columns:repeat(2,1fr)}
+}
+
 .hidden{display:none!important}
 .positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
 @media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis,.metric-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}.style-grid{grid-template-columns:1fr}.cost-top,.stage-grid{grid-template-columns:1fr}.ai-panel{width:100%}}
@@ -143,8 +188,8 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
     <button class="nav-item" data-page="dashboard">📊 대시보드</button>
     <div class="nav-title">수주</div>
     <button class="nav-item active" data-page="order">🧾 수주등록</button>
-    <button class="nav-item" data-page="cost">💰 원가관리</button>
-    <button class="nav-item" data-page="sales">📈 매출·수익</button>
+    <button class="nav-item" data-page="cost">💰 원가·매출수익</button>
+    <button class="nav-item" data-page="sales">📈 원가·매출수익 보기</button>
     <div class="nav-title">발주</div>
     <button class="nav-item" data-page="fabric">🧵 원단 발주</button>
     <button class="nav-item" data-page="trim">🪡 부자재 발주</button>
@@ -220,9 +265,7 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   <div class="panel searchbar">
     <label>대표 Style 검색<input id="orderSearch" placeholder="Style No., Buyer, Item 검색" oninput="renderStyleCards()"></label>
     <button class="btn primary" onclick="newStyle()">+ 신규 스타일 등록</button>
-    <button class="btn green" onclick="mergeTnfStyles()">TNF 25 Style 등록</button>
     <button class="btn danger" onclick="deleteStyle()">삭제</button>
-    <span class="tnf-seed-note">기존 Style은 유지하고 없는 Style만 추가합니다.</span>
   </div>
   <div class="tabs">
     <button class="tab active" data-tab="registry">등록 스타일</button>
@@ -295,20 +338,42 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   </div>
 </div>
 
-<!-- ===== COST ===== -->
+<!-- ===== COST + SALES INTEGRATED ===== -->
 <div id="cost" class="page hidden">
-  <div class="panel searchbar">
-    <label>대표 Style 검색<input id="costSearch" placeholder="Style No. 검색 후 Enter 또는 불러오기">  </label>
-    <button class="btn" onclick="loadCostStyle()">불러오기</button>
+  <div class="panel">
+    <div class="head">
+      <div><h2>원가·매출수익 Style 선택</h2><p>전체 등록 Style을 드롭다운에서 선택하거나 Style No./Item/Buyer로 검색할 수 있습니다.</p></div>
+    </div>
+    <div class="searchbar">
+      <label>전체 Style
+        <select id="costStyleSelect" onchange="selectCostStyle(this.value)"></select>
+      </label>
+      <label>Style 검색
+        <input id="costSearch" list="costStyleDatalist" placeholder="Style No., Item, Buyer 검색" oninput="filterCostStyleOptions()" onkeydown="if(event.key==='Enter')loadCostStyle()">
+        <datalist id="costStyleDatalist"></datalist>
+      </label>
+      <button class="btn" onclick="loadCostStyle()">불러오기</button>
+    </div>
   </div>
   <div id="costArea"></div>
 </div>
 
-<!-- ===== SALES ===== -->
+<!-- ===== SALES (INTEGRATED VIEW) ===== -->
 <div id="sales" class="page hidden">
-  <div class="panel searchbar">
-    <label>대표 Style 검색<input id="salesSearch" placeholder="Style No. 검색"></label>
-    <button class="btn" onclick="loadSalesStyle()">불러오기</button>
+  <div class="panel">
+    <div class="head">
+      <div><h2>원가·매출수익 Style 선택</h2><p>전체 등록 Style을 드롭다운에서 선택하거나 검색할 수 있습니다.</p></div>
+    </div>
+    <div class="searchbar">
+      <label>전체 Style
+        <select id="salesStyleSelect" onchange="selectSalesStyle(this.value)"></select>
+      </label>
+      <label>Style 검색
+        <input id="salesSearch" list="salesStyleDatalist" placeholder="Style No., Item, Buyer 검색" oninput="filterSalesStyleOptions()" onkeydown="if(event.key==='Enter')loadSalesStyle()">
+        <datalist id="salesStyleDatalist"></datalist>
+      </label>
+      <button class="btn" onclick="loadSalesStyle()">불러오기</button>
+    </div>
   </div>
   <div id="salesArea"></div>
 </div>
@@ -356,12 +421,103 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   </div>
 </div>
 
-<!-- ===== STUB PAGES ===== -->
-<div id="packing"  class="page hidden"><div class="panel"><h2>📦 패킹리스트</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
-<div id="shipping" class="page hidden"><div class="panel"><h2>🚚 출고·수입 현황</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
-<div id="actual"   class="page hidden"><div class="panel"><h2>🧾 실제 매입현황</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
-<div id="payment"  class="page hidden"><div class="panel"><h2>💳 월별 결제</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
-<div id="settlement" class="page hidden"><div class="panel"><h2>✅ 사후정산</h2><p style="color:var(--muted)">준비 중입니다.</p></div></div>
+<!-- ===== PACKING LIST ===== -->
+<div id="packing" class="page hidden">
+  <div class="panel">
+    <div class="head">
+      <div><h2>📦 패킹리스트</h2><p>대표 Style No. 기준으로 최종 가먼트 출고수량을 관리합니다.</p></div>
+      <button class="btn primary" onclick="addPackingRow()">+ 패킹 행 추가</button>
+    </div>
+    <div class="page-toolbar">
+      <label>대표 Style 선택<select id="packingStyle" onchange="renderPackingPage()"></select></label>
+    </div>
+    <div id="packingKpis" class="logistics-kpis"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Invoice No.</th><th>ETD</th><th>ETA</th><th>Color</th><th>Cartons</th><th>PCS</th><th>Container</th><th>Status</th><th>삭제</th></tr></thead>
+        <tbody id="packingBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SHIPPING / MATERIAL MOVEMENT ===== -->
+<div id="shipping" class="page hidden">
+  <div class="panel">
+    <div class="head">
+      <div><h2>🚚 출고·수입 현황</h2><p>원단·부자재·공임 발주와 연동하여 원부자재 입고 및 생산출고를 관리합니다.</p></div>
+      <button class="btn primary" onclick="addMaterialMovement()">+ 수기 입출고</button>
+    </div>
+    <div class="page-toolbar">
+      <label>대표 Style 선택<select id="shippingStyle" onchange="renderShippingPage()"></select></label>
+      <button class="btn" onclick="syncMovementsFromPO()">발주 데이터 연동</button>
+    </div>
+    <div id="shippingKpis" class="logistics-kpis"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>구분</th><th>Supplier</th><th>Item</th><th>발주Qty</th><th>입고Qty</th><th>생산출고Qty</th><th>잔량</th><th>Unit</th><th>Status</th><th>삭제</th></tr></thead>
+        <tbody id="movementBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ACTUAL COST ===== -->
+<div id="actual" class="page hidden">
+  <div class="panel">
+    <div class="head">
+      <div><h2>🧾 실제 매입현황</h2><p>원부자재 입고, 공임, 가먼트 최종 출고수량을 기준으로 실제 매입액을 기록합니다.</p></div>
+      <button class="btn primary" onclick="addActualRow()">+ 실제 매입 추가</button>
+    </div>
+    <div class="page-toolbar">
+      <label>대표 Style 선택<select id="actualStyle" onchange="renderActualPage()"></select></label>
+      <button class="btn" onclick="syncActualFromLogistics()">물류 데이터 연동</button>
+    </div>
+    <div id="actualKpis" class="logistics-kpis"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>매입월</th><th>구분</th><th>Supplier</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>USD</th><th>환율</th><th>KRW</th><th>결제상태</th><th>삭제</th></tr></thead>
+        <tbody id="actualBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAYMENT ===== -->
+<div id="payment" class="page hidden">
+  <div class="panel">
+    <div class="head">
+      <div><h2>💳 월별 결제</h2><p>실제 매입현황에서 미결제 항목을 불러와 월별 결제를 관리합니다.</p></div>
+      <button class="btn primary" onclick="addPaymentRow()">+ 결제 추가</button>
+    </div>
+    <div class="page-toolbar">
+      <label>대표 Style 선택<select id="paymentStyle" onchange="renderPaymentPage()"></select></label>
+      <label>결제월<input id="paymentMonthFilter" type="month" onchange="renderPaymentPage()"></label>
+      <button class="btn" onclick="syncPaymentsFromActual()">미결제 매입 불러오기</button>
+    </div>
+    <div id="paymentKpis" class="month-summary"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>결제월</th><th>구분</th><th>Supplier</th><th>Description</th><th>USD</th><th>환율</th><th>KRW</th><th>Payment Date</th><th>Status</th><th>삭제</th></tr></thead>
+        <tbody id="paymentBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SETTLEMENT ===== -->
+<div id="settlement" class="page hidden">
+  <div class="panel">
+    <div class="head">
+      <div><h2>✅ 사후정산</h2><p>수주금액, 최종 출고수량, 실제 매입, 결제 데이터를 연결해 최종 잔액과 Margin을 계산합니다.</p></div>
+    </div>
+    <div class="page-toolbar">
+      <label>대표 Style 선택<select id="settlementStyle" onchange="renderSettlementPage()"></select></label>
+    </div>
+    <div id="settlementSummary" class="settlement-summary"></div>
+    <div id="settlementDetail" class="settlement-detail"></div>
+  </div>
+</div>
 
 </section>
 </main>
@@ -408,6 +564,10 @@ function normalizeState(input){const next=input&&typeof input==='object'?input:J
   if(!Array.isArray(s.colors))s.colors=[];
   if(!Array.isArray(s.bom))s.bom=[];
   if(!Array.isArray(s.assortPacks))s.assortPacks=[];
+  if(!Array.isArray(s.packingRows))s.packingRows=[];
+  if(!Array.isArray(s.materialMovements))s.materialMovements=[];
+  if(!Array.isArray(s.actualCosts))s.actualCosts=[];
+  if(!Array.isArray(s.payments))s.payments=[];
   if(!s.packingType)s.packingType='SOLID';
   if(!s.tna||typeof s.tna!=='object')s.tna={};
   if(s.sketchPath===undefined)s.sketchPath='';
@@ -531,6 +691,10 @@ function makeEmptyStyle(){
     delivery:'',
     packingType:'SOLID',
     assortPacks:[],
+    packingRows:[],
+    materialMovements:[],
+    actualCosts:[],
+    payments:[],
     tna:{},
     status:'수주등록',
     createdDate:TODAY,
@@ -578,8 +742,23 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
   btn.classList.add('active');
   document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
   document.getElementById(btn.dataset.page).classList.remove('hidden');
-  document.getElementById('pageTitle').textContent=btn.textContent.trim();
+  document.getElementById('pageTitle').textContent=(btn.dataset.page==='cost'||btn.dataset.page==='sales')?'💰 원가·매출수익':btn.textContent.trim();
   if(btn.dataset.page==='dashboard') renderDashboard();
+  if(btn.dataset.page==='packing') renderPackingPage();
+  if(btn.dataset.page==='shipping') renderShippingPage();
+  if(btn.dataset.page==='actual') renderActualPage();
+  if(btn.dataset.page==='payment') renderPaymentPage();
+  if(btn.dataset.page==='settlement') renderSettlementPage();
+  if(btn.dataset.page==='cost'){
+    populateIntegratedStyleSelectors();
+    const s=state.styles.find(x=>x.id===document.getElementById('costStyleSelect')?.value)||cs();
+    if(s){document.getElementById('costSearch').value=s.styleNo||'';renderCost(s);}
+  }
+  if(btn.dataset.page==='sales'){
+    populateIntegratedStyleSelectors();
+    const s=state.styles.find(x=>x.id===document.getElementById('salesStyleSelect')?.value)||cs();
+    if(s){document.getElementById('salesSearch').value=s.styleNo||'';renderSalesIntegrated(s);}
+  }
 });
 document.getElementById('themeBtn').onclick=()=>{
   document.body.classList.toggle('light');
@@ -823,9 +1002,72 @@ function syncCostFromBom(style){
   }));
   persist(); return c;
 }
+function styleDisplayText(s){
+  return `${s.styleNo||'신규 Style'} · ${s.item||'-'} · ${s.buyer||'-'}`;
+}
+function populateIntegratedStyleSelectors(){
+  const costSel=document.getElementById('costStyleSelect');
+  const salesSel=document.getElementById('salesStyleSelect');
+  const costList=document.getElementById('costStyleDatalist');
+  const salesList=document.getElementById('salesStyleDatalist');
+
+  const options=state.styles.map(s=>`<option value="${s.id}">${styleDisplayText(s)}</option>`).join('');
+  const dataOptions=state.styles.map(s=>`<option value="${s.styleNo||''}">${s.item||''} · ${s.buyer||''}</option>`).join('');
+
+  [costSel,salesSel].forEach(sel=>{
+    if(!sel)return;
+    const old=sel.value;
+    sel.innerHTML=options;
+    sel.value=old&&state.styles.some(s=>s.id===old)?old:(state.currentStyleId||state.styles[0]?.id||'');
+  });
+  if(costList)costList.innerHTML=dataOptions;
+  if(salesList)salesList.innerHTML=dataOptions;
+}
+function findStyleByIntegratedQuery(query){
+  const q=String(query||'').trim().toLowerCase();
+  if(!q)return null;
+  return state.styles.find(s=>String(s.styleNo||'').toLowerCase()===q)
+    || state.styles.find(s=>[s.styleNo,s.item,s.buyer,s.factory,s.season].some(v=>String(v||'').toLowerCase().includes(q)));
+}
+function selectCostStyle(id){
+  const s=state.styles.find(x=>x.id===id);
+  if(!s)return;
+  state.currentStyleId=s.id;
+  document.getElementById('costSearch').value=s.styleNo||'';
+  persist();
+  renderCost(s);
+}
+function selectSalesStyle(id){
+  const s=state.styles.find(x=>x.id===id);
+  if(!s)return;
+  state.currentStyleId=s.id;
+  document.getElementById('salesSearch').value=s.styleNo||'';
+  persist();
+  renderSalesIntegrated(s);
+}
+function filterCostStyleOptions(){
+  const s=findStyleByIntegratedQuery(document.getElementById('costSearch')?.value);
+  if(s){
+    const sel=document.getElementById('costStyleSelect');
+    if(sel)sel.value=s.id;
+  }
+}
+function filterSalesStyleOptions(){
+  const s=findStyleByIntegratedQuery(document.getElementById('salesSearch')?.value);
+  if(s){
+    const sel=document.getElementById('salesStyleSelect');
+    if(sel)sel.value=s.id;
+  }
+}
 function loadCostStyle(){
   const q=document.getElementById('costSearch')?.value.trim();
-  const s=state.styles.find(x=>x.styleNo===q); if(!s)return alert('등록된 대표 Style No.가 없습니다.');
+  const selectedId=document.getElementById('costStyleSelect')?.value;
+  const s=findStyleByIntegratedQuery(q)||state.styles.find(x=>x.id===selectedId);
+  if(!s)return alert('등록된 Style을 선택하거나 검색해 주세요.');
+  state.currentStyleId=s.id;
+  document.getElementById('costStyleSelect').value=s.id;
+  document.getElementById('costSearch').value=s.styleNo||'';
+  persist();
   renderCost(s);
 }
 function stageTotal(styleNo,k){
@@ -840,80 +1082,228 @@ function stageTotal(styleNo,k){
 }
 function renderCost(style){
   const c=syncCostFromBom(style);
+  if(!state.sales[style.styleNo])state.sales[style.styleNo]={sellingFob:n(style.garmentPrice)||0};
+  const sale=state.sales[style.styleNo];
+  if(!n(sale.sellingFob)&&n(style.garmentPrice))sale.sellingFob=n(style.garmentPrice);
+
+  const quote=stageTotal(style.styleNo,'quote');
+  const nego=stageTotal(style.styleNo,'nego1');
+  const final=stageTotal(style.styleNo,'final');
+  const sellingFob=n(sale.sellingFob)||n(style.garmentPrice);
+  const unitProfit=sellingFob-final.total;
+  const margin=sellingFob?unitProfit/sellingFob*100:0;
+  const markup=final.total?unitProfit/final.total*100:0;
+  const totalSales=sellingFob*n(style.qty);
+  const totalProfit=unitProfit*n(style.qty);
+  const totalOrderKrw=totalSales*n(style.exchangeRate||state.rates.usdKrw);
+  const actualUsd=actualTotalUsd(style);
+  const shipped=packingTotal(style)||n(style.qty);
+  const realizedSales=sellingFob*shipped;
+  const realizedProfit=realizedSales-actualUsd;
+
+  const catSummary={원자재:0,부자재:0,완제품:0,제조경비:0,통합관리비:0,판매비:0,기타비용:0};
+  c.rows.forEach(r=>{
+    const amount=n(r.final.usage)*n(r.final.unitPrice)/(r.final.currency==='KRW'?n(state.rates.usdKrw)||1:1);
+    const cat=catSummary.hasOwnProperty(r.category)?r.category:'기타비용';
+    catSummary[cat]+=amount;
+  });
+
+  const percent=(v)=>sellingFob?v/sellingFob*100:0;
+  const sketch=style.sketch
+    ? `<img src="${style.sketch}">`
+    : `<div style="color:#777;text-align:center">No Sketch</div>`;
+
   document.getElementById('costArea').innerHTML=`
+  <div class="costing-sheet">
     <div class="panel">
-      <div class="head"><div><h2>${style.styleNo} 원가관리</h2><p>${style.item}</p></div>
-      <button class="btn" onclick="addCostRow('${style.styleNo}')">+ 수기 원가 추가</button></div>
-      <div class="cost-section">${c.rows.map((r,i)=>costRowHtml(style.styleNo,r,i)).join('')}</div>
-    </div>
-    <div class="summary-grid">${['quote','nego1','final'].map(k=>summaryHtml(style.styleNo,k)).join('')}</div>`;
-}
-function costRowHtml(styleNo,r,i){
-  return `<div class="cost-row">
-    <div class="cost-top">
-      <label>Category<select onchange="state.costs['${styleNo}'].rows[${i}].category=this.value;persist()"><option ${r.category==='원자재'?'selected':''}>원자재</option><option ${r.category==='부자재'?'selected':''}>부자재</option><option ${r.category==='기타비용'?'selected':''}>기타비용</option></select></label>
-      ${['item','description','supplier','unit'].map(k=>`<label>${k}<input value="${r[k]??''}" onchange="state.costs['${styleNo}'].rows[${i}].${k}=this.value;persist()"></label>`).join('')}
-      <button class="btn danger" style="margin-top:22px" onclick="state.costs['${styleNo}'].rows.splice(${i},1);persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))">×</button>
-    </div>
-    <div class="stage-grid">${['quote','nego1','final'].map(k=>`
-      <div class="stage-card">
-        <h4>${{quote:'견적',nego1:'협상',final:'확정'}[k]}</h4>
-        <div class="stage-inputs">
-          <label>요척<input type="number" value="${r[k].usage}" onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].usage=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
-          <label>단가<input type="number" value="${r[k].unitPrice}" onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].unitPrice=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
-          <label>화폐<select onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].currency=this.value;persist()"><option ${r[k].currency==='USD'?'selected':''}>USD</option><option ${r[k].currency==='KRW'?'selected':''}>KRW</option></select></label>
+      <div class="head">
+        <div><h2>${style.styleNo} · 목표원가 계산서</h2><p>원가관리와 매출·수익을 한 화면에서 관리합니다.</p></div>
+        <div class="actions">
+          <button class="btn" onclick="addCostRow('${style.styleNo}')">+ 원가 항목 추가</button>
+          <button class="btn primary" onclick="saveToSupabase(true)">공용 저장</button>
         </div>
-        <div class="stage-result"><span>금액</span><strong>${usd(n(r[k].usage)*n(r[k].unitPrice)/(r[k].currency==='KRW'?state.rates.usdKrw:1))}</strong></div>
-      </div>`).join('')}</div>
+      </div>
+
+      <div class="costing-header">
+        <div class="style-info-grid">
+          ${costInfoCell('Buyer',style.buyer)}
+          ${costInfoCell('Brand',style.brand)}
+          ${costInfoCell('Division / Gender',[style.division,style.gender].filter(Boolean).join(' / '))}
+          ${costInfoCell('Season',style.season)}
+          ${costInfoCell('Style No.',style.styleNo)}
+          ${costInfoCell('Delivery',style.delivery)}
+          ${costInfoCell('Quantity',n(style.qty).toLocaleString()+' PCS')}
+          ${costInfoCell('FOB Garment Price',usd(sellingFob))}
+          ${costInfoCell('Total Order Amount',usd(totalSales))}
+          ${costInfoCell('KRW Amount',krwFmt(totalOrderKrw))}
+          ${costInfoCell('Factory',style.factory)}
+          ${costInfoCell('TNF 담당자',style.tnfOwner||'-')}
+          ${costInfoCell('영업 담당자',style.salesOwner||'-')}
+          ${costInfoCell('Category',style.category||style.department||'-')}
+          ${costInfoCell('Exchange Rate',n(style.exchangeRate||state.rates.usdKrw).toLocaleString())}
+          ${costInfoCell('Status',style.status)}
+        </div>
+        <div class="cost-sketch">${sketch}</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="cost-group-title">
+        <h3>Fabric / Trim / Process / Expense Information</h3>
+        <span style="color:var(--muted);font-size:11px">Unit: USD / PCS</span>
+      </div>
+      <div class="table-wrap">
+        <table class="cost-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Category</th><th rowspan="2">Item</th><th rowspan="2">Description</th><th rowspan="2">Supplier</th><th rowspan="2">Unit</th>
+              <th colspan="3">견적</th><th colspan="3">협상</th><th colspan="3">최종확정</th><th rowspan="2">삭제</th>
+            </tr>
+            <tr><th>Usage</th><th>Unit Price</th><th>Amount</th><th>Usage</th><th>Unit Price</th><th>Amount</th><th>Usage</th><th>Unit Price</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            ${c.rows.map((r,i)=>integratedCostRowHtml(style.styleNo,r,i)).join('')}
+            <tr class="cost-total-row">
+              <td colspan="5">TOTAL MATERIAL / EXPENSE</td>
+              <td colspan="3">${usd(quote.material+quote.trim)}</td>
+              <td colspan="3">${usd(nego.material+nego.trim)}</td>
+              <td colspan="3">${usd(final.material+final.trim)}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="cost-group-title"><h3>제조원가 (PCS)</h3><span style="color:var(--muted);font-size:11px">Unit: USD</span></div>
+      <div class="cost-summary-band">
+        ${summaryBox('원자재',catSummary.원자재)}
+        ${summaryBox('부자재',catSummary.부자재)}
+        ${summaryBox('완제품 가공',catSummary.완제품)}
+        ${summaryBox('제조경비',catSummary.제조경비)}
+        ${summaryBox('통합관리비',catSummary.통합관리비)}
+        ${summaryBox('판매비',catSummary.판매비)}
+        ${summaryBox('순수봉제비',final.sewing)}
+        ${summaryBox('마진/기타',final.margin+catSummary.기타비용)}
+        ${summaryBox('총 제조원가',final.total,true)}
+        ${summaryBox('Selling FOB',sellingFob,true)}
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="cost-group-title"><h3>FOB Vs. 제조원가 비율</h3><span style="color:var(--muted);font-size:11px">Unit: %</span></div>
+      <div class="table-wrap">
+        <table class="cost-percent-table">
+          <thead><tr><th>원자재</th><th>부자재</th><th>완제품</th><th>제조경비</th><th>통합관리비</th><th>판매비</th><th>공임</th><th>총 제조원가</th><th>매출이익</th></tr></thead>
+          <tbody><tr>
+            <td>${percent(catSummary.원자재).toFixed(2)}%</td>
+            <td>${percent(catSummary.부자재).toFixed(2)}%</td>
+            <td>${percent(catSummary.완제품).toFixed(2)}%</td>
+            <td>${percent(catSummary.제조경비).toFixed(2)}%</td>
+            <td>${percent(catSummary.통합관리비).toFixed(2)}%</td>
+            <td>${percent(catSummary.판매비).toFixed(2)}%</td>
+            <td>${percent(final.sewing).toFixed(2)}%</td>
+            <td><b>${percent(final.total).toFixed(2)}%</b></td>
+            <td class="${unitProfit<0?'negative':'positive'}"><b>${margin.toFixed(2)}%</b></td>
+          </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="head"><div><h3>비용 합계 및 이익</h3></div></div>
+      <div class="profit-band">
+        <div class="metric"><span>Selling FOB</span><strong>${usd(sellingFob)}</strong></div>
+        <div class="metric"><span>총 제조원가</span><strong>${usd(final.total)}</strong></div>
+        <div class="metric"><span>Unit Profit</span><strong class="${unitProfit<0?'negative':'positive'}">${usd(unitProfit)}</strong></div>
+        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(2)}%</strong></div>
+        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(2)}%</strong></div>
+        <div class="metric"><span>총 예상이익</span><strong class="${totalProfit<0?'negative':'positive'}">${usd(totalProfit)}</strong></div>
+      </div>
+      <div style="margin-top:12px;max-width:280px">
+        <label>Selling FOB 수정
+          <input type="number" step="0.0001" value="${sellingFob}" onchange="state.sales['${style.styleNo}'].sellingFob=n(this.value);cs().garmentPrice=n(this.value);persist();renderCost(state.styles.find(x=>x.styleNo==='${style.styleNo}'))">
+        </label>
+      </div>
+    </div>
+
+    <div class="cost-comparison">
+      <div class="panel">
+        <h3>예상 원가 단계 비교</h3>
+        <div class="reconcile-line"><span>견적 제조원가</span><b>${usd(quote.total)}</b></div>
+        <div class="reconcile-line"><span>협상 제조원가</span><b>${usd(nego.total)}</b></div>
+        <div class="reconcile-line"><span>최종 제조원가</span><b>${usd(final.total)}</b></div>
+        <div class="reconcile-line total"><span>최종 Unit Profit</span><b>${usd(unitProfit)}</b></div>
+      </div>
+      <div class="panel">
+        <h3>실제 출고·매입 비교</h3>
+        <div class="reconcile-line"><span>최종 출고수량</span><b>${shipped.toLocaleString()} PCS</b></div>
+        <div class="reconcile-line"><span>실제 매출</span><b>${usd(realizedSales)}</b></div>
+        <div class="reconcile-line"><span>실제 매입</span><b>${usd(actualUsd)}</b></div>
+        <div class="reconcile-line total"><span>실제 잔액 / 이익</span><b class="${realizedProfit<0?'negative':'positive'}">${usd(realizedProfit)}</b></div>
+      </div>
+    </div>
   </div>`;
-}
-function summaryHtml(styleNo,k){
-  const t=stageTotal(styleNo,k);
-  const label={quote:'견적',nego1:'협상1차',final:'최종확정'}[k];
-  return `<div class="summary-card">
-    <h3>${label}</h3>
-    <label>순수봉제비(USD)<input type="number" value="${ensureCost(styleNo).stage[k].pureSewing}" onchange="state.costs['${styleNo}'].stage['${k}'].pureSewing=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
-    <label style="margin-top:8px">마진 %<input type="number" value="${ensureCost(styleNo).stage[k].margin}" onchange="state.costs['${styleNo}'].stage['${k}'].margin=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></label>
-    <div class="line" style="margin-top:10px"><span>원자재</span><b>${usd(t.material)}</b></div>
-    <div class="line"><span>부자재</span><b>${usd(t.trim)}</b></div>
-    <div class="line"><span>공임</span><b>${usd(t.sewing)}</b></div>
-    <div class="line"><span>마진</span><b>${usd(t.margin)}</b></div>
-    <div class="line final"><span>FOB</span><b>${usd(t.total)}</b></div>
-  </div>`;
-}
-function addCostRow(styleNo){
-  ensureCost(styleNo).rows.push({id:uid('C'),category:'기타비용',item:'',description:'',supplier:'',unit:'EA',quote:{usage:1,unitPrice:0,currency:'USD'},nego1:{usage:1,unitPrice:0,currency:'USD'},final:{usage:1,unitPrice:0,currency:'USD'}});
-  persist(); renderCost(state.styles.find(x=>x.styleNo===styleNo));
 }
 
-/* ── SALES ── */
+function costInfoCell(label,value){
+  return `<div class="info-cell"><span>${label}</span><strong>${value||'-'}</strong></div>`;
+}
+function summaryBox(label,value,highlight=false){
+  return `<div class="cost-summary-box" ${highlight?'style="background:var(--accent2)"':''}><span>${label}</span><strong>${usd(value)}</strong></div>`;
+}
+function stageAmount(row,key){
+  return n(row[key].usage)*n(row[key].unitPrice)/(row[key].currency==='KRW'?n(state.rates.usdKrw)||1:1);
+}
+function integratedCostRowHtml(styleNo,r,i){
+  const categories=['원자재','부자재','완제품','제조경비','통합관리비','판매비','기타비용'];
+  return `<tr>
+    <td><select onchange="state.costs['${styleNo}'].rows[${i}].category=this.value;persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))">
+      ${categories.map(v=>`<option ${r.category===v?'selected':''}>${v}</option>`).join('')}
+    </select></td>
+    ${['item','description','supplier','unit'].map(k=>`<td><input value="${r[k]??''}" onchange="state.costs['${styleNo}'].rows[${i}].${k}=this.value;persist()"></td>`).join('')}
+    ${['quote','nego1','final'].map(k=>`
+      <td><input type="number" step="0.0001" value="${r[k].usage}" onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].usage=n(this.value);persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></td>
+      <td><input type="number" step="0.0001" value="${r[k].unitPrice}" onchange="state.costs['${styleNo}'].rows[${i}]['${k}'].unitPrice=n(this.value);persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))"></td>
+      <td>${usd(stageAmount(r,k))}</td>`).join('')}
+    <td><button onclick="state.costs['${styleNo}'].rows.splice(${i},1);persist();renderCost(state.styles.find(x=>x.styleNo==='${styleNo}'))">×</button></td>
+  </tr>`;
+}
+function addCostRow(styleNo){
+  ensureCost(styleNo).rows.push({
+    id:uid('C'),category:'기타비용',item:'',description:'',supplier:'',unit:'EA',
+    quote:{usage:1,unitPrice:0,currency:'USD'},
+    nego1:{usage:1,unitPrice:0,currency:'USD'},
+    final:{usage:1,unitPrice:0,currency:'USD'}
+  });
+  persist();renderCost(state.styles.find(x=>x.styleNo===styleNo));
+}
+
+/* ── SALES (USES INTEGRATED COST VIEW) ── */
+function renderSalesIntegrated(s){
+  const salesArea=document.getElementById('salesArea');
+  const costArea=document.getElementById('costArea');
+  if(!salesArea||!costArea)return;
+
+  const originalCostHtml=costArea.innerHTML;
+  renderCost(s);
+  salesArea.innerHTML=costArea.innerHTML;
+  costArea.innerHTML=originalCostHtml;
+}
 function loadSalesStyle(){
-  const s=state.styles.find(x=>x.styleNo===document.getElementById('salesSearch')?.value.trim());
-  if(!s)return alert('등록된 대표 Style No.가 없습니다.');
-  if(!state.sales[s.styleNo])state.sales[s.styleNo]={sellingFob:0};
-  renderSales(s);
+  const q=document.getElementById('salesSearch')?.value.trim();
+  const selectedId=document.getElementById('salesStyleSelect')?.value;
+  const s=findStyleByIntegratedQuery(q)||state.styles.find(x=>x.id===selectedId);
+  if(!s)return alert('등록된 Style을 선택하거나 검색해 주세요.');
+  state.currentStyleId=s.id;
+  document.getElementById('salesStyleSelect').value=s.id;
+  document.getElementById('salesSearch').value=s.styleNo||'';
+  persist();
+  renderSalesIntegrated(s);
 }
 function renderSales(s){
-  const calculatedFinalCost=stageTotal(s.styleNo,'final').total;
-  const finalCost=calculatedFinalCost>0?calculatedFinalCost:n(s.garmentPrice);
-  const sale=state.sales[s.styleNo]||{sellingFob:0};
-  const profit=n(sale.sellingFob)-finalCost;
-  const margin=n(sale.sellingFob)?profit/n(sale.sellingFob)*100:0;
-  const markup=finalCost?profit/finalCost*100:0;
-  document.getElementById('salesArea').innerHTML=`
-    <div class="panel">
-      <div class="head"><div><h2>${s.styleNo} 매출·수익</h2><p>${s.item}</p></div></div>
-      <div class="metric-grid">
-        <div class="metric"><span>제조원가 (원가 Final / Garment Price)</span><strong>${usd(finalCost)}</strong></div>
-        <label>Selling FOB (USD)<input type="number" value="${sale.sellingFob}" onchange="state.sales['${s.styleNo}'].sellingFob=this.value;persist();renderSales(state.styles.find(x=>x.styleNo==='${s.styleNo}'))"></label>
-        <div class="metric"><span>Unit Profit</span><strong class="${profit<0?'negative':'positive'}">${usd(profit)}</strong></div>
-        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(1)}%</strong></div>
-        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(1)}%</strong></div>
-        <div class="metric"><span>총 매출</span><strong>${usd(n(sale.sellingFob)*n(s.qty))}</strong></div>
-        <div class="metric"><span>총 이익</span><strong class="${profit<0?'negative':'positive'}">${usd(profit*n(s.qty))}</strong></div>
-        <div class="metric"><span>수주 수량</span><strong>${n(s.qty).toLocaleString()} PCS</strong></div>
-      </div>
-    </div>`;
+  renderSalesIntegrated(s);
 }
 
 /* ── PURCHASE ── */
@@ -958,6 +1348,217 @@ function renderPurchase(type,styleNo){
           </tr>`;
         }).join('')}</tbody>
       </table></div>
+    </div>`;
+}
+
+
+/* ── LOGISTICS / ACTUAL / PAYMENT / SETTLEMENT ── */
+function fillStyleSelect(id){
+  const el=document.getElementById(id);if(!el)return null;
+  const old=el.value;
+  el.innerHTML=state.styles.map(s=>`<option value="${s.id}">${s.styleNo||'신규'} · ${s.item||''}</option>`).join('');
+  el.value=old&&state.styles.some(s=>s.id===old)?old:(state.currentStyleId||state.styles[0]?.id||'');
+  return el;
+}
+function styleFromSelect(id){
+  const el=fillStyleSelect(id);
+  return state.styles.find(s=>s.id===el?.value)||cs();
+}
+function packingTotal(style){return (style.packingRows||[]).reduce((a,r)=>a+n(r.pcs),0);}
+function movementTotals(style){
+  const rows=style.materialMovements||[];
+  return {
+    po:rows.reduce((a,r)=>a+n(r.poQty),0),
+    inbound:rows.reduce((a,r)=>a+n(r.inQty),0),
+    issued:rows.reduce((a,r)=>a+n(r.issueQty),0)
+  };
+}
+function actualTotalUsd(style){return (style.actualCosts||[]).reduce((a,r)=>a+n(r.usd)||a+n(r.qty)*n(r.unitPrice),0);}
+function actualTotalKrw(style){return (style.actualCosts||[]).reduce((a,r)=>a+(n(r.usd)||n(r.qty)*n(r.unitPrice))*n(r.exchangeRate||style.exchangeRate||state.rates.usdKrw),0);}
+function paidTotalUsd(style){return (style.payments||[]).filter(r=>r.status==='결제완료').reduce((a,r)=>a+n(r.usd),0);}
+function paidTotalKrw(style){return (style.payments||[]).filter(r=>r.status==='결제완료').reduce((a,r)=>a+n(r.usd)*n(r.exchangeRate||style.exchangeRate||state.rates.usdKrw),0);}
+
+/* Packing */
+function addPackingRow(){
+  const s=styleFromSelect('packingStyle');
+  s.packingRows.push({id:uid('PK'),invoiceNo:'',etd:'',eta:'',color:'',cartons:0,pcs:0,container:'',status:'준비중'});
+  persist();renderPackingPage();
+}
+function renderPackingPage(){
+  const s=styleFromSelect('packingStyle');if(!s)return;
+  const total=packingTotal(s),balance=Math.max(0,n(s.qty)-total);
+  document.getElementById('packingKpis').innerHTML=`
+    <div class="logistics-card"><span>수주수량</span><strong>${n(s.qty).toLocaleString()} PCS</strong></div>
+    <div class="logistics-card"><span>패킹수량</span><strong>${total.toLocaleString()} PCS</strong></div>
+    <div class="logistics-card"><span>미패킹수량</span><strong>${balance.toLocaleString()} PCS</strong></div>
+    <div class="logistics-card"><span>진행률</span><strong>${n(s.qty)?(total/n(s.qty)*100).toFixed(1):0}%</strong></div>`;
+  document.getElementById('packingBody').innerHTML=(s.packingRows||[]).map((r,i)=>`<tr>
+    ${['invoiceNo','etd','eta','color','cartons','pcs','container'].map(k=>`<td><input ${['cartons','pcs'].includes(k)?'type="number"':''} value="${r[k]??''}" onchange="styleFromSelect('packingStyle').packingRows[${i}].${k}=${['cartons','pcs'].includes(k)?'n(this.value)':'this.value'};persist();renderPackingPage()"></td>`).join('')}
+    <td><select onchange="styleFromSelect('packingStyle').packingRows[${i}].status=this.value;persist()">${['준비중','패킹완료','출고완료','취소'].map(v=>`<option ${r.status===v?'selected':''}>${v}</option>`).join('')}</select></td>
+    <td><button onclick="styleFromSelect('packingStyle').packingRows.splice(${i},1);persist();renderPackingPage()">×</button></td>
+  </tr>`).join('');
+}
+
+/* Material movement */
+function syncMovementsFromPO(){
+  const s=styleFromSelect('shippingStyle');
+  const poRows=state.purchases.filter(p=>p.styleNo===s.styleNo);
+  poRows.forEach(p=>{
+    if(!(s.materialMovements||[]).some(m=>m.sourcePoId===p.id)){
+      s.materialMovements.push({
+        id:uid('MV'),sourcePoId:p.id,type:p.type,supplier:p.supplier,description:p.description,
+        poQty:n(p.qty),inQty:0,issueQty:0,unit:p.unit,status:'입고대기'
+      });
+    }
+  });
+  persist();renderShippingPage();
+}
+function addMaterialMovement(){
+  const s=styleFromSelect('shippingStyle');
+  s.materialMovements.push({id:uid('MV'),sourcePoId:'',type:'원단',supplier:'',description:'',poQty:0,inQty:0,issueQty:0,unit:'YD',status:'수기등록'});
+  persist();renderShippingPage();
+}
+function renderShippingPage(){
+  const s=styleFromSelect('shippingStyle');if(!s)return;
+  const t=movementTotals(s);
+  document.getElementById('shippingKpis').innerHTML=`
+    <div class="logistics-card"><span>발주 총량</span><strong>${t.po.toLocaleString()}</strong></div>
+    <div class="logistics-card"><span>입고 총량</span><strong>${t.inbound.toLocaleString()}</strong></div>
+    <div class="logistics-card"><span>생산출고 총량</span><strong>${t.issued.toLocaleString()}</strong></div>
+    <div class="logistics-card"><span>미입고 잔량</span><strong>${Math.max(0,t.po-t.inbound).toLocaleString()}</strong></div>`;
+  document.getElementById('movementBody').innerHTML=(s.materialMovements||[]).map((r,i)=>`<tr>
+    ${['type','supplier','description','poQty','inQty','issueQty'].map(k=>`<td><input ${['poQty','inQty','issueQty'].includes(k)?'type="number"':''} value="${r[k]??''}" onchange="styleFromSelect('shippingStyle').materialMovements[${i}].${k}=${['poQty','inQty','issueQty'].includes(k)?'n(this.value)':'this.value'};persist();renderShippingPage()"></td>`).join('')}
+    <td>${Math.max(0,n(r.inQty)-n(r.issueQty)).toLocaleString()}</td>
+    <td><input value="${r.unit||''}" onchange="styleFromSelect('shippingStyle').materialMovements[${i}].unit=this.value;persist()"></td>
+    <td><select onchange="styleFromSelect('shippingStyle').materialMovements[${i}].status=this.value;persist()">${['입고대기','부분입고','입고완료','생산출고중','생산출고완료','수기등록'].map(v=>`<option ${r.status===v?'selected':''}>${v}</option>`).join('')}</select></td>
+    <td><button onclick="styleFromSelect('shippingStyle').materialMovements.splice(${i},1);persist();renderShippingPage()">×</button></td>
+  </tr>`).join('');
+}
+
+/* Actual cost */
+function syncActualFromLogistics(){
+  const s=styleFromSelect('actualStyle');
+  (s.materialMovements||[]).forEach(m=>{
+    if(!(s.actualCosts||[]).some(a=>a.sourceMovementId===m.id)){
+      const po=state.purchases.find(p=>p.id===m.sourcePoId);
+      s.actualCosts.push({
+        id:uid('AC'),sourceMovementId:m.id,month:TODAY.slice(0,7),category:m.type,
+        supplier:m.supplier,description:m.description,qty:n(m.inQty),unitPrice:n(po?.unitPrice),
+        usd:n(m.inQty)*n(po?.unitPrice),exchangeRate:n(po?.exchangeRate)||n(s.exchangeRate)||n(state.rates.usdKrw),paymentStatus:'미결제'
+      });
+    }
+  });
+  const garmentQty=packingTotal(s);
+  if(garmentQty>0 && !(s.actualCosts||[]).some(a=>a.category==='가먼트공임'&&a.autoGarment)){
+    const cm=state.purchases.find(p=>p.styleNo===s.styleNo&&p.type==='공임');
+    if(cm){
+      s.actualCosts.push({
+        id:uid('AC'),sourceMovementId:'',autoGarment:true,month:TODAY.slice(0,7),category:'가먼트공임',
+        supplier:cm.supplier||s.factory,description:'Final garment CM',qty:garmentQty,unitPrice:n(cm.unitPrice),
+        usd:garmentQty*n(cm.unitPrice),exchangeRate:n(cm.exchangeRate)||n(s.exchangeRate)||n(state.rates.usdKrw),paymentStatus:'미결제'
+      });
+    }
+  }
+  persist();renderActualPage();
+}
+function addActualRow(){
+  const s=styleFromSelect('actualStyle');
+  s.actualCosts.push({id:uid('AC'),month:TODAY.slice(0,7),category:'기타비용',supplier:'',description:'',qty:1,unitPrice:0,usd:0,exchangeRate:n(s.exchangeRate)||n(state.rates.usdKrw),paymentStatus:'미결제'});
+  persist();renderActualPage();
+}
+function renderActualPage(){
+  const s=styleFromSelect('actualStyle');if(!s)return;
+  const totalUsd=actualTotalUsd(s),totalKrw=actualTotalKrw(s),unpaid=(s.actualCosts||[]).filter(r=>r.paymentStatus!=='결제완료').reduce((a,r)=>a+(n(r.usd)||n(r.qty)*n(r.unitPrice)),0);
+  document.getElementById('actualKpis').innerHTML=`
+    <div class="logistics-card"><span>최종 패킹수량</span><strong>${packingTotal(s).toLocaleString()} PCS</strong></div>
+    <div class="logistics-card"><span>실제 매입 USD</span><strong>${usd(totalUsd)}</strong></div>
+    <div class="logistics-card"><span>실제 매입 KRW</span><strong>${krwFmt(totalKrw)}</strong></div>
+    <div class="logistics-card"><span>미결제 USD</span><strong>${usd(unpaid)}</strong></div>`;
+  document.getElementById('actualBody').innerHTML=(s.actualCosts||[]).map((r,i)=>`<tr>
+    ${['month','category','supplier','description','qty','unitPrice'].map(k=>`<td><input ${['qty','unitPrice'].includes(k)?'type="number"':''} value="${r[k]??''}" onchange="styleFromSelect('actualStyle').actualCosts[${i}].${k}=${['qty','unitPrice'].includes(k)?'n(this.value)':'this.value'};styleFromSelect('actualStyle').actualCosts[${i}].usd=n(styleFromSelect('actualStyle').actualCosts[${i}].qty)*n(styleFromSelect('actualStyle').actualCosts[${i}].unitPrice);persist();renderActualPage()"></td>`).join('')}
+    <td><input type="number" value="${n(r.usd)||n(r.qty)*n(r.unitPrice)}" onchange="styleFromSelect('actualStyle').actualCosts[${i}].usd=n(this.value);persist();renderActualPage()"></td>
+    <td><input type="number" value="${r.exchangeRate||s.exchangeRate||state.rates.usdKrw}" onchange="styleFromSelect('actualStyle').actualCosts[${i}].exchangeRate=n(this.value);persist();renderActualPage()"></td>
+    <td>${krwFmt((n(r.usd)||n(r.qty)*n(r.unitPrice))*n(r.exchangeRate||s.exchangeRate||state.rates.usdKrw))}</td>
+    <td><select onchange="styleFromSelect('actualStyle').actualCosts[${i}].paymentStatus=this.value;persist()">${['미결제','부분결제','결제완료'].map(v=>`<option ${r.paymentStatus===v?'selected':''}>${v}</option>`).join('')}</select></td>
+    <td><button onclick="styleFromSelect('actualStyle').actualCosts.splice(${i},1);persist();renderActualPage()">×</button></td>
+  </tr>`).join('');
+}
+
+/* Payments */
+function syncPaymentsFromActual(){
+  const s=styleFromSelect('paymentStyle');
+  (s.actualCosts||[]).filter(a=>a.paymentStatus!=='결제완료').forEach(a=>{
+    if(!(s.payments||[]).some(p=>p.sourceActualId===a.id)){
+      s.payments.push({
+        id:uid('PAY'),sourceActualId:a.id,month:a.month||TODAY.slice(0,7),category:a.category,
+        supplier:a.supplier,description:a.description,usd:n(a.usd)||n(a.qty)*n(a.unitPrice),
+        exchangeRate:n(a.exchangeRate)||n(s.exchangeRate)||n(state.rates.usdKrw),paymentDate:'',status:'미결제'
+      });
+    }
+  });
+  persist();renderPaymentPage();
+}
+function addPaymentRow(){
+  const s=styleFromSelect('paymentStyle');
+  s.payments.push({id:uid('PAY'),sourceActualId:'',month:TODAY.slice(0,7),category:'기타',supplier:'',description:'',usd:0,exchangeRate:n(s.exchangeRate)||n(state.rates.usdKrw),paymentDate:'',status:'미결제'});
+  persist();renderPaymentPage();
+}
+function renderPaymentPage(){
+  const s=styleFromSelect('paymentStyle');if(!s)return;
+  const month=document.getElementById('paymentMonthFilter')?.value||'';
+  const rows=(s.payments||[]).filter(r=>!month||r.month===month);
+  const totalUsd=rows.reduce((a,r)=>a+n(r.usd),0),paidUsd=rows.filter(r=>r.status==='결제완료').reduce((a,r)=>a+n(r.usd),0);
+  document.getElementById('paymentKpis').innerHTML=`
+    <div class="metric"><span>조회 결제 USD</span><strong>${usd(totalUsd)}</strong></div>
+    <div class="metric"><span>결제완료 USD</span><strong>${usd(paidUsd)}</strong></div>
+    <div class="metric"><span>미결제 USD</span><strong>${usd(totalUsd-paidUsd)}</strong></div>
+    <div class="metric"><span>결제완료 KRW</span><strong>${krwFmt(rows.filter(r=>r.status==='결제완료').reduce((a,r)=>a+n(r.usd)*n(r.exchangeRate),0))}</strong></div>`;
+  document.getElementById('paymentBody').innerHTML=rows.map(r=>{
+    const i=s.payments.indexOf(r);
+    return `<tr>
+      ${['month','category','supplier','description','usd','exchangeRate','paymentDate'].map(k=>`<td><input ${['usd','exchangeRate'].includes(k)?'type="number"':''} value="${r[k]??''}" onchange="styleFromSelect('paymentStyle').payments[${i}].${k}=${['usd','exchangeRate'].includes(k)?'n(this.value)':'this.value'};persist();renderPaymentPage()"></td>`).join('')}
+      <td>${krwFmt(n(r.usd)*n(r.exchangeRate))}</td>
+      <td><select onchange="styleFromSelect('paymentStyle').payments[${i}].status=this.value;if(this.value==='결제완료'){const a=styleFromSelect('paymentStyle').actualCosts.find(x=>x.id===styleFromSelect('paymentStyle').payments[${i}].sourceActualId);if(a)a.paymentStatus='결제완료';}persist();renderPaymentPage()">${['미결제','부분결제','결제완료'].map(v=>`<option ${r.status===v?'selected':''}>${v}</option>`).join('')}</select></td>
+      <td><button onclick="styleFromSelect('paymentStyle').payments.splice(${i},1);persist();renderPaymentPage()">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* Settlement */
+function renderSettlementPage(){
+  const s=styleFromSelect('settlementStyle');if(!s)return;
+  const shipped=packingTotal(s)||n(s.qty);
+  const revenueUsd=shipped*n(s.garmentPrice);
+  const actualUsd=actualTotalUsd(s);
+  const paidUsd=paidTotalUsd(s);
+  const profitUsd=revenueUsd-actualUsd;
+  const margin=revenueUsd?profitUsd/revenueUsd*100:0;
+  const revenueKrw=revenueUsd*n(s.exchangeRate||state.rates.usdKrw);
+  const actualKrw=actualTotalKrw(s);
+  const paidKrw=paidTotalKrw(s);
+  const remainingPay=actualUsd-paidUsd;
+  document.getElementById('settlementSummary').innerHTML=`
+    <div class="logistics-card"><span>정산 출고수량</span><strong>${shipped.toLocaleString()} PCS</strong></div>
+    <div class="logistics-card"><span>실제 매출 USD</span><strong>${usd(revenueUsd)}</strong></div>
+    <div class="logistics-card"><span>실제 매입 USD</span><strong>${usd(actualUsd)}</strong></div>
+    <div class="logistics-card"><span>최종 이익 / Margin</span><strong class="${profitUsd<0?'negative':'positive'}">${usd(profitUsd)} · ${margin.toFixed(1)}%</strong></div>`;
+  document.getElementById('settlementDetail').innerHTML=`
+    <div class="panel">
+      <h3>${s.styleNo} 사후정산</h3>
+      <div class="reconcile-line"><span>FOB</span><b>${usd(s.garmentPrice)}</b></div>
+      <div class="reconcile-line"><span>정산 출고수량</span><b>${shipped.toLocaleString()} PCS</b></div>
+      <div class="reconcile-line"><span>매출 USD</span><b>${usd(revenueUsd)}</b></div>
+      <div class="reconcile-line"><span>실제 매입 USD</span><b>${usd(actualUsd)}</b></div>
+      <div class="reconcile-line"><span>결제완료 USD</span><b>${usd(paidUsd)}</b></div>
+      <div class="reconcile-line"><span>미결제 USD</span><b>${usd(remainingPay)}</b></div>
+      <div class="reconcile-line total"><span>최종 잔액 / 이익</span><b class="${profitUsd<0?'negative':'positive'}">${usd(profitUsd)}</b></div>
+    </div>
+    <div class="panel">
+      <h3>KRW 환산</h3>
+      <div class="reconcile-line"><span>매출 KRW</span><b>${krwFmt(revenueKrw)}</b></div>
+      <div class="reconcile-line"><span>실제 매입 KRW</span><b>${krwFmt(actualKrw)}</b></div>
+      <div class="reconcile-line"><span>결제완료 KRW</span><b>${krwFmt(paidKrw)}</b></div>
+      <div class="reconcile-line total"><span>최종 KRW 이익</span><b class="${revenueKrw-actualKrw<0?'negative':'positive'}">${krwFmt(revenueKrw-actualKrw)}</b></div>
     </div>`;
 }
 
@@ -1322,6 +1923,8 @@ function updMsg(id,text){
 function renderAll(){
   ensureCurrentStyle();
   bindInputs(); renderStyleCards(); renderSketch(); renderColors(); renderPackingMode(); renderTna(); renderOrderSummary(); renderBom();
+  ['packingStyle','shippingStyle','actualStyle','paymentStyle','settlementStyle'].forEach(fillStyleSelect);
+  populateIntegratedStyleSelectors();
   document.getElementById('usdKrw').value=state.rates.usdKrw;
   document.getElementById('usdVnd').value=state.rates.usdVnd;
   document.getElementById('krwVnd').value=state.rates.krwVnd;
