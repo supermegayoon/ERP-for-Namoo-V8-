@@ -205,13 +205,31 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 .order-lookup-toolbar{display:grid;grid-template-columns:1.2fr 1.2fr repeat(4,minmax(130px,.7fr));gap:9px;align-items:end}
 .order-lookup-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-top:12px}
 .lookup-table{min-width:1450px}
-.season-settlement-filter{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:9px;align-items:end}
+.season-settlement-filter{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:9px;align-items:end}
 .season-settlement-kpis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;margin-top:12px}
 .season-settlement-table{min-width:1400px}
 .empty-result{text-align:center;color:var(--muted);padding:24px!important}
 @media(max-width:1100px){
   .order-lookup-toolbar,.season-settlement-filter{grid-template-columns:repeat(2,1fr)}
   .order-lookup-kpis,.season-settlement-kpis{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* ── ACTIVE DASHBOARD / SEASON SUMMARY ── */
+.dashboard-season-toolbar{display:grid;grid-template-columns:1fr 1.4fr auto auto;gap:9px;align-items:end}
+.season-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.season-summary-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px;cursor:pointer}
+.season-summary-card:hover{border-color:var(--accent)}
+.season-summary-card.active{outline:2px solid var(--accent)}
+.season-summary-card span{display:block;color:var(--muted);font-size:11px}
+.season-summary-card strong{display:block;font-size:18px;margin-top:5px}
+.season-summary-card small{display:block;color:var(--muted);margin-top:5px}
+.complete-btn{height:27px;padding:0 9px;border-radius:7px;border:1px solid #166534;background:#14532d;color:#dcfce7;font-size:11px;font-weight:800;cursor:pointer}
+.reopen-btn{height:27px;padding:0 9px;border-radius:7px;border:1px solid #92400e;background:#5f370e;color:#fef3c7;font-size:11px;font-weight:800;cursor:pointer}
+.completed-badge{display:inline-block;padding:3px 7px;border-radius:999px;background:#334155;color:#cbd5e1;font-size:10px}
+@media(max-width:1100px){
+  .dashboard-season-toolbar{grid-template-columns:repeat(2,1fr)}
+  .season-summary-grid{grid-template-columns:repeat(2,1fr)}
 }
 
 .hidden{display:none!important}
@@ -266,21 +284,35 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 
 <!-- ===== DASHBOARD ===== -->
 <div id="dashboard" class="page hidden">
-  <!-- 검색 & 필터 -->
+  <!-- 진행 Style 조회 -->
   <div class="dash-search-wrap">
-    <div class="dash-search-row">
-      <span style="color:var(--muted);font-size:17px">🔍</span>
-      <input id="dashSearch" class="dash-search-input" placeholder="Style No., Buyer, Item, Factory 실시간 검색..." oninput="renderDashboard()">
-      <button class="btn" onclick="document.getElementById('dashSearch').value='';renderDashboard()">초기화</button>
+    <div class="head">
+      <div><h2>현재 진행 Style</h2><p>마무리되지 않은 Style만 Season별로 조회합니다.</p></div>
     </div>
-    <div class="dash-filter-chips" id="dashChips">
-      <button class="chip active" onclick="setChip(this,'all')">전체</button>
+    <div class="dashboard-season-toolbar">
+      <label>Season
+        <select id="dashSeasonFilter" onchange="renderDashboard()"><option value="">전체 Season</option></select>
+      </label>
+      <label>검색
+        <input id="dashSearch" placeholder="Style No., Buyer, Item, Factory, 담당자" oninput="renderDashboard()">
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;height:36px;margin-top:5px;color:var(--text)">
+        <input id="dashShowCompleted" type="checkbox" style="width:auto;height:auto;margin:0" onchange="renderDashboard()"> 마무리 Style 포함
+      </label>
+      <button class="btn" onclick="resetDashboardFilters()">초기화</button>
+    </div>
+    <div class="dash-filter-chips" id="dashChips" style="margin-top:10px">
+      <button class="chip active" onclick="setChip(this,'all')">전체 Status</button>
       <button class="chip" onclick="setChip(this,'수주등록')">수주등록</button>
       <button class="chip" onclick="setChip(this,'원가진행')">원가진행</button>
       <button class="chip" onclick="setChip(this,'발주진행')">발주진행</button>
       <button class="chip" onclick="setChip(this,'생산확정')">생산확정</button>
     </div>
     <div class="dash-result-note" id="dashNote"></div>
+  </div>
+  <div class="panel">
+    <div class="head"><div><h2>Season별 진행 현황</h2><p>카드를 누르면 해당 Season만 조회합니다.</p></div></div>
+    <div id="dashboardSeasonSummary" class="season-summary-grid"></div>
   </div>
   <div class="panel">
     <div class="head"><div><h2>즐겨찾기 / 최근 작업</h2><p>최근 열어본 Style 10개와 즐겨찾기를 빠르게 엽니다.</p></div></div>
@@ -355,7 +387,7 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
         <thead><tr>
           <th>★</th><th>Style No.</th><th>Season</th><th>Buyer</th><th>Item</th><th>Factory</th>
           <th>Qty</th><th>FOB</th><th>Order USD</th><th>Order KRW</th><th>영업</th><th>TNF 담당</th>
-          <th>Delivery</th><th>Status</th><th>T&A</th><th>등록일</th><th>열기</th>
+          <th>Delivery</th><th>Status</th><th>진행구분</th><th>T&A</th><th>등록일</th><th>열기</th>
         </tr></thead>
         <tbody id="orderLookupBody"></tbody>
       </table>
@@ -639,6 +671,7 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
         <label>등록일 From<input id="settlementDateFrom" type="date" onchange="renderSeasonSettlement()"></label>
         <label>등록일 To<input id="settlementDateTo" type="date" onchange="renderSeasonSettlement()"></label>
         <label>Status<select id="settlementStatusFilter" onchange="renderSeasonSettlement()"><option value="">전체 Status</option><option>수주등록</option><option>원가진행</option><option>발주진행</option><option>생산확정</option></select></label>
+        <label>진행구분<select id="settlementCompletionFilter" onchange="renderSeasonSettlement()"><option value="">전체</option><option value="active">진행중</option><option value="completed">마무리</option></select></label>
         <button class="btn" onclick="resetSettlementFilters()">초기화</button>
       </div>
       <div class="actions" style="margin-top:10px"><button class="btn" onclick="exportSeasonSettlement()">정산 결과 Excel</button></div>
@@ -706,6 +739,8 @@ function normalizeState(input){const next=input&&typeof input==='object'?input:J
   if(!Array.isArray(s.bomAudit))s.bomAudit=[];
   if(!Array.isArray(s.costVersions))s.costVersions=[];
   if(typeof s.favorite!=='boolean')s.favorite=false;
+  if(typeof s.completed!=='boolean')s.completed=false;
+  if(s.completedDate==null)s.completedDate='';
   if(!s.packingType)s.packingType='SOLID';
   if(!s.tna||typeof s.tna!=='object')s.tna={};
   if(s.sketchPath===undefined)s.sketchPath='';
@@ -836,6 +871,8 @@ function makeEmptyStyle(){
     bomAudit:[],
     costVersions:[],
     favorite:false,
+    completed:false,
+    completedDate:'',
     tna:{},
     status:'수주등록',
     createdDate:TODAY,
@@ -900,6 +937,7 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
   populatePurchaseStyleSelectors();
   renderRecentFavorite();
   populateOrderLookupFilters();
+  populateDashboardSeasonFilter();
   renderOrderLookup();
   populateSettlementSeasonFilter();
   if(settlementMode==='season')renderSeasonSettlement();
@@ -1164,6 +1202,8 @@ function orderLookupRows(){
   return state.styles.filter(s=>{
     if(season&&s.season!==season)return false;
     if(status&&s.status!==status)return false;
+    if(completion==='active'&&s.completed)return false;
+    if(completion==='completed'&&!s.completed)return false;
     const d=String(s.createdDate||'');
     if(from&&d&&d<from)return false;
     if(to&&d&&d>to)return false;
@@ -1202,10 +1242,11 @@ function renderOrderLookup(){
       <td><strong>${s.styleNo||'-'}</strong></td><td>${s.season||'-'}</td><td>${s.buyer||'-'}</td><td>${s.item||'-'}</td><td>${s.factory||'-'}</td>
       <td class="num">${fmtQty(s.qty)}</td><td class="num">${usd(s.garmentPrice)}</td><td class="num">${usd(totalUsd)}</td><td class="num">${krwFmt(totalKrw)}</td>
       <td>${s.salesOwner||'-'}</td><td>${s.tnfOwner||'-'}</td><td>${s.delivery||'-'}</td><td>${s.status||'-'}</td>
+      <td>${s.completed?`<span class="completed-badge">마무리 ${s.completedDate||''}</span>`:'진행중'}</td>
       <td><div>${pct(progress)}</div><div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div></td>
       <td>${s.createdDate||'-'}</td><td><button class="btn goto-btn" onclick="selectOrderStyle('${s.id}')">열기 →</button></td>
     </tr>`;
-  }).join(''):'<tr><td colspan="17" class="empty-result">조회 결과가 없습니다.</td></tr>';
+  }).join(''):'<tr><td colspan="18" class="empty-result">조회 결과가 없습니다.</td></tr>';
 }
 function resetOrderFilters(){
   ['orderSearch','orderDateFrom','orderDateTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -1219,6 +1260,7 @@ function exportOrderLookup(){
     ExchangeRate:n(s.exchangeRate||state.rates.usdKrw),
     OrderKRW:n(s.qty)*n(s.garmentPrice)*n(s.exchangeRate||state.rates.usdKrw),
     SalesOwner:s.salesOwner,TNFOwner:s.tnfOwner,Delivery:s.delivery,Status:s.status,
+    ProgressStatus:s.completed?'마무리':'진행중',CompletedDate:s.completedDate||'',
     TNAProgressPct:tnaProgress(s),CreatedDate:s.createdDate
   }));
   const wb=XLSX.utils.book_new();
@@ -1917,6 +1959,7 @@ function seasonSettlementRows(){
   const from=document.getElementById('settlementDateFrom')?.value||'';
   const to=document.getElementById('settlementDateTo')?.value||'';
   const status=document.getElementById('settlementStatusFilter')?.value||'';
+  const completion=document.getElementById('settlementCompletionFilter')?.value||'';
   return state.styles.filter(s=>{
     if(season&&s.season!==season)return false;
     if(status&&s.status!==status)return false;
@@ -1968,7 +2011,7 @@ function renderSeasonSettlement(){
 }
 function resetSettlementFilters(){
   ['settlementDateFrom','settlementDateTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  ['settlementSeasonFilter','settlementStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['settlementSeasonFilter','settlementStatusFilter','settlementCompletionFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   renderSeasonSettlement();
 }
 function exportSeasonSettlement(){
@@ -2027,6 +2070,68 @@ function saveRates(){
   persist(); alert('환율이 저장되었습니다.');
 }
 
+
+function populateDashboardSeasonFilter(){
+  const e=document.getElementById('dashSeasonFilter');if(!e)return;
+  const old=e.value;
+  const seasons=[...new Set(state.styles.map(s=>String(s.season||'').trim()).filter(Boolean))].sort();
+  e.innerHTML='<option value="">전체 Season</option>'+seasons.map(v=>`<option>${v}</option>`).join('');
+  e.value=seasons.includes(old)?old:'';
+}
+function dashboardBaseStyles(){
+  const includeCompleted=document.getElementById('dashShowCompleted')?.checked||false;
+  return state.styles.filter(s=>includeCompleted||!s.completed);
+}
+function completeStyle(id){
+  const s=state.styles.find(x=>x.id===id);if(!s)return;
+  if(!confirm(`${s.styleNo||'Style'}을 마무리 처리할까요?\n대시보드에서는 숨겨지고 수주조회와 정산에서는 계속 조회됩니다.`))return;
+  s.completed=true;
+  s.completedDate=TODAY;
+  persist();renderDashboard();renderOrderLookup();
+}
+function reopenStyle(id){
+  const s=state.styles.find(x=>x.id===id);if(!s)return;
+  s.completed=false;
+  s.completedDate='';
+  persist();renderDashboard();renderOrderLookup();
+}
+function setDashboardSeason(season){
+  const e=document.getElementById('dashSeasonFilter');
+  if(e)e.value=season;
+  renderDashboard();
+}
+function resetDashboardFilters(){
+  const q=document.getElementById('dashSearch');if(q)q.value='';
+  const s=document.getElementById('dashSeasonFilter');if(s)s.value='';
+  const c=document.getElementById('dashShowCompleted');if(c)c.checked=false;
+  dashFilterStatus='all';
+  document.querySelectorAll('#dashChips .chip').forEach((x,i)=>x.classList.toggle('active',i===0));
+  renderDashboard();
+}
+function renderDashboardSeasonSummary(styles){
+  const el=document.getElementById('dashboardSeasonSummary');if(!el)return;
+  const selected=document.getElementById('dashSeasonFilter')?.value||'';
+  const groups={};
+  styles.forEach(s=>{
+    const season=s.season||'미지정';
+    if(!groups[season])groups[season]=[];
+    groups[season].push(s);
+  });
+  const entries=Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0]));
+  el.innerHTML=entries.length?entries.map(([season,rows])=>{
+    const qty=rows.reduce((a,s)=>a+n(s.qty),0);
+    const amount=rows.reduce((a,s)=>a+n(s.qty)*n(s.garmentPrice),0);
+    const profit=rows.reduce((a,s)=>{
+      const fob=n(state.sales[s.styleNo]?.sellingFob)||n(s.garmentPrice);
+      return a+(fob-stageTotal(s.styleNo,'final').total)*n(s.qty);
+    },0);
+    return `<div class="season-summary-card ${selected===season?'active':''}" onclick="setDashboardSeason('${season.replace(/'/g,"\\'")}')">
+      <span>${season}</span><strong>${rows.length} Styles · ${fmtQty(qty)} PCS</strong>
+      <small>수주 ${usd(amount)} · 예상이익 ${usd(profit)}</small>
+    </div>`;
+  }).join(''):'<div style="color:var(--muted)">진행 중인 Style이 없습니다.</div>';
+}
+
 /* ── DASHBOARD (검색+필터) ── */
 let dashFilterStatus='all';
 function setChip(el,val){
@@ -2040,51 +2145,68 @@ function hl(text,kw){
   return String(text||'-').replace(new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<mark>${m}</mark>`);
 }
 function renderDashboard(){
+  populateDashboardSeasonFilter();
   const kw=(document.getElementById('dashSearch')?.value||'').trim().toLowerCase();
-  const filtered=state.styles.filter(s=>{
+  const season=document.getElementById('dashSeasonFilter')?.value||'';
+  const base=dashboardBaseStyles();
+  renderDashboardSeasonSummary(base);
+
+  const filtered=base.filter(s=>{
+    if(season&&s.season!==season)return false;
     if(dashFilterStatus!=='all'&&s.status!==dashFilterStatus)return false;
     if(!kw)return true;
     return [s.styleNo,s.buyer,s.item,s.factory,s.season,s.brand,s.garmentPrice,s.tnfOwner,s.salesOwner].some(v=>String(v||'').toLowerCase().includes(kw));
   });
-  document.getElementById('kpiStyles').textContent=filtered.length+' / '+state.styles.length;
-  document.getElementById('kpiQty').textContent=filtered.reduce((a,s)=>a+n(s.qty),0).toLocaleString();
-  document.getElementById('kpiCost').textContent=Object.keys(state.costs).length;
-  document.getElementById('kpiPO').textContent=state.purchases.length;
+
+  document.getElementById('kpiStyles').textContent=filtered.length+' / '+base.length;
+  document.getElementById('kpiQty').textContent=fmtQty(filtered.reduce((a,s)=>a+n(s.qty),0));
+  document.getElementById('kpiCost').textContent=filtered.filter(s=>state.costs[s.styleNo]).length;
+  document.getElementById('kpiPO').textContent=state.purchases.filter(p=>filtered.some(s=>s.styleNo===p.styleNo)).length;
+
   const totalIssues=filtered.reduce((a,s)=>a+tnaIssueCount(s),0);
   const kpiTna=document.getElementById('kpiTna');if(kpiTna)kpiTna.textContent=totalIssues;
-  const monthProfit=filtered.reduce((a,s)=>{
+
+  const expectedProfit=filtered.reduce((a,s)=>{
     const finalCost=stageTotal(s.styleNo,'final').total;
     const fob=n(state.sales[s.styleNo]?.sellingFob)||n(s.garmentPrice);
     return a+(fob-finalCost)*n(s.qty);
   },0);
-  const monthEl=document.getElementById('kpiMonthProfit');if(monthEl)monthEl.textContent=usd(monthProfit);
+  const monthEl=document.getElementById('kpiMonthProfit');if(monthEl)monthEl.textContent=usd(expectedProfit);
+
   const delays=filtered.reduce((a,s)=>a+materialDelayCount(s),0);
   const delayEl=document.getElementById('kpiDelayWarnings');if(delayEl)delayEl.textContent=delays;
+
   renderRecentFavorite();
   const note=document.getElementById('dashNote');
-  if(note)note.textContent=(kw||dashFilterStatus!=='all')?`${filtered.length}개 스타일 검색됨`:'';
+  if(note)note.textContent=`${filtered.length}개 Style 조회됨${season?' · '+season:''}`;
+
   const b=document.getElementById('dashBody');if(!b)return;
-  if(!filtered.length){b.innerHTML=`<tr><td colspan="13" style="text-align:center;color:var(--muted);padding:22px">검색 결과가 없습니다.</td></tr>`;return;}
+  if(!filtered.length){
+    b.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--muted);padding:22px">현재 조건에 해당하는 진행 Style이 없습니다.</td></tr>';
+    return;
+  }
+
   b.innerHTML=filtered.map(s=>{
-    const sc=s.status==='생산확정'?'positive':s.status==='발주진행'?'warning':'';
     const totalUsd=n(s.qty)*n(s.garmentPrice);
-    const totalKrw=totalUsd*(n(s.exchangeRate)||n(state.rates.usdKrw));
-    const issues=tnaIssueCount(s);
+    const fob=n(state.sales[s.styleNo]?.sellingFob)||n(s.garmentPrice);
+    const profit=(fob-stageTotal(s.styleNo,'final').total)*n(s.qty);
+    const progress=tnaProgress(s);
     return `<tr>
-      <td><strong>${hl(s.styleNo,kw)}</strong></td>
-      <td>${hl(s.buyer,kw)}</td>
-      <td>${hl(s.item,kw)}</td>
-      <td>${s.season||'-'}</td>
-      <td>${n(s.qty).toLocaleString()}</td>
-      <td>${usd(s.garmentPrice||0)}</td>
-      <td>${usd(totalUsd)}</td>
-      <td>${krwFmt(totalKrw)}</td>
       <td><button class="favorite-btn" onclick="toggleFavorite('${s.id}')">${s.favorite?'★':'☆'}</button></td>
-      <td>${hl(s.tnfOwner||'-',kw)}</td>
-      <td><div>${pct(tnaProgress(s))}</div><div class="progress-bar"><div class="progress-fill" style="width:${tnaProgress(s)}%"></div></div></td>
-      <td>${materialDelayCount(s)?`<span class="negative">${materialDelayCount(s)}건</span>`:'0'}</td>
-      <td>${hl(s.factory,kw)}</td>
-      <td class="${sc}">${s.status||'-'}</td>
+      <td><strong>${s.styleNo||'-'}</strong></td>
+      <td>${s.season||'-'}</td>
+      <td>${s.buyer||'-'}</td>
+      <td>${s.item||'-'}</td>
+      <td class="num">${fmtQty(s.qty)}</td>
+      <td class="num">${usd(s.garmentPrice)}</td>
+      <td class="num">${usd(totalUsd)}</td>
+      <td class="num ${profit<0?'negative':'positive'}">${usd(profit)}</td>
+      <td><div>${pct(progress)}</div><div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div></td>
+      <td>${s.factory||'-'}</td>
+      <td>${s.completed?'<span class="completed-badge">마무리</span>':(s.status||'-')}</td>
+      <td>${s.completed
+        ? `<button class="reopen-btn" onclick="reopenStyle('${s.id}')">다시 진행</button>`
+        : `<button class="complete-btn" onclick="completeStyle('${s.id}')">마무리</button>`}</td>
       <td><button class="btn goto-btn" onclick="jumpStyle('${s.id}')">열기 →</button></td>
     </tr>`;
   }).join('');
