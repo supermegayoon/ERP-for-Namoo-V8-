@@ -200,6 +200,20 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   .print-only{display:block}
 }
 
+
+/* ── ORDER LOOKUP / SEASON SETTLEMENT ── */
+.order-lookup-toolbar{display:grid;grid-template-columns:1.2fr 1.2fr repeat(4,minmax(130px,.7fr));gap:9px;align-items:end}
+.order-lookup-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-top:12px}
+.lookup-table{min-width:1450px}
+.season-settlement-filter{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:9px;align-items:end}
+.season-settlement-kpis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;margin-top:12px}
+.season-settlement-table{min-width:1400px}
+.empty-result{text-align:center;color:var(--muted);padding:24px!important}
+@media(max-width:1100px){
+  .order-lookup-toolbar,.season-settlement-filter{grid-template-columns:repeat(2,1fr)}
+  .order-lookup-kpis,.season-settlement-kpis{grid-template-columns:repeat(2,1fr)}
+}
+
 .hidden{display:none!important}
 .positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
 @media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis,.metric-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}.style-grid{grid-template-columns:1fr}.cost-top,.stage-grid{grid-template-columns:1fr}.ai-panel{width:100%}}
@@ -295,21 +309,57 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
 
 <!-- ===== ORDER ===== -->
 <div id="order" class="page">
-  <div class="panel searchbar">
-    <label>대표 Style 검색<input id="orderSearch" placeholder="Style No., Buyer, Item 검색" oninput="renderStyleCards()"></label>
-    <button class="btn primary" onclick="newStyle()">+ 신규 스타일 등록</button>
-    <button class="btn danger" onclick="deleteStyle()">삭제</button>
+  <div class="panel">
+    <div class="head">
+      <div><h2>수주 조회 및 Style 선택</h2><p>Style을 직접 선택하거나 Season, Status, 등록기간으로 조회합니다.</p></div>
+      <div class="actions">
+        <button class="btn primary" onclick="newStyle()">+ 신규 스타일 등록</button>
+        <button class="btn danger" onclick="deleteStyle()">삭제</button>
+      </div>
+    </div>
+    <div class="order-lookup-toolbar">
+      <label>전체 Style
+        <select id="orderStyleSelect" onchange="selectOrderStyle(this.value)"></select>
+      </label>
+      <label>검색
+        <input id="orderSearch" placeholder="Style No., Buyer, Item, Factory, 담당자" oninput="renderOrderLookup()">
+      </label>
+      <label>Season
+        <select id="orderSeasonFilter" onchange="renderOrderLookup()"><option value="">전체 Season</option></select>
+      </label>
+      <label>Status
+        <select id="orderStatusFilter" onchange="renderOrderLookup()">
+          <option value="">전체 Status</option><option>수주등록</option><option>원가진행</option><option>발주진행</option><option>생산확정</option>
+        </select>
+      </label>
+      <label>등록일 From<input id="orderDateFrom" type="date" onchange="renderOrderLookup()"></label>
+      <label>등록일 To<input id="orderDateTo" type="date" onchange="renderOrderLookup()"></label>
+    </div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn" onclick="resetOrderFilters()">조회 초기화</button>
+      <button class="btn" onclick="exportOrderLookup()">조회 결과 Excel</button>
+    </div>
+    <div id="orderLookupKpis" class="order-lookup-kpis"></div>
   </div>
   <div class="tabs">
-    <button class="tab active" data-tab="registry">등록 스타일</button>
+    <button class="tab active" data-tab="registry">수주 조회</button>
     <button class="tab" data-tab="basic">기본정보</button>
     <button class="tab" data-tab="qty">Color/Size Qty</button>
     <button class="tab" data-tab="tna">T&A 관리</button>
     <button class="tab" data-tab="bom">BOM</button>
   </div>
   <div id="tab-registry" class="tab-panel panel">
-    <div class="head"><div><h2>등록 스타일</h2><p>대표 Style No.를 선택하면 모든 정보가 로드됩니다.</p></div></div>
-    <div id="styleGrid" class="style-grid"></div>
+    <div class="head"><div><h2>수주 조회 결과</h2><p>조회 결과에서 Style을 열면 기본정보와 연동 데이터가 로드됩니다.</p></div></div>
+    <div class="table-wrap">
+      <table class="lookup-table">
+        <thead><tr>
+          <th>★</th><th>Style No.</th><th>Season</th><th>Buyer</th><th>Item</th><th>Factory</th>
+          <th>Qty</th><th>FOB</th><th>Order USD</th><th>Order KRW</th><th>영업</th><th>TNF 담당</th>
+          <th>Delivery</th><th>Status</th><th>T&A</th><th>등록일</th><th>열기</th>
+        </tr></thead>
+        <tbody id="orderLookupBody"></tbody>
+      </table>
+    </div>
   </div>
   <div id="tab-basic" class="tab-panel panel order-grid hidden">
     <div class="sketch" id="sketchBox">
@@ -572,11 +622,34 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
     <div class="head">
       <div><h2>✅ 사후정산</h2><p>수주금액, 최종 출고수량, 실제 매입, 결제 데이터를 연결해 최종 잔액과 Margin을 계산합니다.</p></div>
     </div>
-    <div class="page-toolbar">
-      <label>대표 Style 선택<select id="settlementStyle" onchange="renderSettlementPage()"></select></label>
+    <div class="tabs">
+      <button class="tab active" data-settlement-tab="style" onclick="openSettlementTab('style')">Style별 정산</button>
+      <button class="tab" data-settlement-tab="season" onclick="openSettlementTab('season')">Season / 기간별 정산</button>
     </div>
-    <div id="settlementSummary" class="settlement-summary"></div>
-    <div id="settlementDetail" class="settlement-detail"></div>
+    <div id="settlementStylePane">
+      <div class="page-toolbar">
+        <label>대표 Style 선택<select id="settlementStyle" onchange="renderSettlementPage()"></select></label>
+      </div>
+      <div id="settlementSummary" class="settlement-summary"></div>
+      <div id="settlementDetail" class="settlement-detail"></div>
+    </div>
+    <div id="settlementSeasonPane" class="hidden">
+      <div class="season-settlement-filter">
+        <label>Season<select id="settlementSeasonFilter" onchange="renderSeasonSettlement()"><option value="">전체 Season</option></select></label>
+        <label>등록일 From<input id="settlementDateFrom" type="date" onchange="renderSeasonSettlement()"></label>
+        <label>등록일 To<input id="settlementDateTo" type="date" onchange="renderSeasonSettlement()"></label>
+        <label>Status<select id="settlementStatusFilter" onchange="renderSeasonSettlement()"><option value="">전체 Status</option><option>수주등록</option><option>원가진행</option><option>발주진행</option><option>생산확정</option></select></label>
+        <button class="btn" onclick="resetSettlementFilters()">초기화</button>
+      </div>
+      <div class="actions" style="margin-top:10px"><button class="btn" onclick="exportSeasonSettlement()">정산 결과 Excel</button></div>
+      <div id="seasonSettlementKpis" class="season-settlement-kpis"></div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table class="season-settlement-table">
+          <thead><tr><th>Season</th><th>Style</th><th>Item</th><th>Qty</th><th>정산출고</th><th>FOB</th><th>매출 USD</th><th>실제매입 USD</th><th>결제완료 USD</th><th>미결제 USD</th><th>최종이익 USD</th><th>Margin</th><th>Status</th></tr></thead>
+          <tbody id="seasonSettlementBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -816,15 +889,20 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
   document.getElementById(btn.dataset.page).classList.remove('hidden');
   document.getElementById('pageTitle').textContent=(btn.dataset.page==='cost'||btn.dataset.page==='sales')?'💰 원가·매출수익':btn.textContent.trim();
   if(btn.dataset.page==='dashboard') renderDashboard();
+  if(btn.dataset.page==='order'){populateOrderLookupFilters();renderOrderLookup();}
   if(btn.dataset.page==='packing') renderPackingPage();
   if(btn.dataset.page==='shipping') renderShippingPage();
   if(btn.dataset.page==='actual') renderActualPage();
   if(btn.dataset.page==='payment') renderPaymentPage();
-  if(btn.dataset.page==='settlement') renderSettlementPage();
+  if(btn.dataset.page==='settlement'){if(settlementMode==='season')renderSeasonSettlement();else renderSettlementPage();}
   if(btn.dataset.page==='cost'){
     populateIntegratedStyleSelectors();
   populatePurchaseStyleSelectors();
   renderRecentFavorite();
+  populateOrderLookupFilters();
+  renderOrderLookup();
+  populateSettlementSeasonFilter();
+  if(settlementMode==='season')renderSeasonSettlement();
     const s=state.styles.find(x=>x.id===document.getElementById('costStyleSelect')?.value)||cs();
     if(s){document.getElementById('costSearch').value=s.styleNo||'';renderCost(s);}
   }
@@ -1054,6 +1132,100 @@ function printCostSheet(styleNo){
   window.print();
 }
 
+
+/* ── ORDER LOOKUP ── */
+let currentOrderLookupRows=[];
+
+function populateOrderLookupFilters(){
+  const styleSel=document.getElementById('orderStyleSelect');
+  if(styleSel){
+    const old=styleSel.value;
+    styleSel.innerHTML=state.styles.map(s=>`<option value="${s.id}">${styleDisplayText(s)}</option>`).join('');
+    styleSel.value=old&&state.styles.some(s=>s.id===old)?old:(state.currentStyleId||state.styles[0]?.id||'');
+  }
+  const seasonSel=document.getElementById('orderSeasonFilter');
+  if(seasonSel){
+    const old=seasonSel.value;
+    const seasons=[...new Set(state.styles.map(s=>String(s.season||'').trim()).filter(Boolean))].sort();
+    seasonSel.innerHTML='<option value="">전체 Season</option>'+seasons.map(v=>`<option>${v}</option>`).join('');
+    seasonSel.value=seasons.includes(old)?old:'';
+  }
+}
+function selectOrderStyle(id){
+  const s=state.styles.find(x=>x.id===id);if(!s)return;
+  state.currentStyleId=s.id;touchRecentStyle(s.id);persist();renderAll();openTab('basic');
+}
+function orderLookupRows(){
+  const q=String(document.getElementById('orderSearch')?.value||'').trim().toLowerCase();
+  const season=document.getElementById('orderSeasonFilter')?.value||'';
+  const status=document.getElementById('orderStatusFilter')?.value||'';
+  const from=document.getElementById('orderDateFrom')?.value||'';
+  const to=document.getElementById('orderDateTo')?.value||'';
+  return state.styles.filter(s=>{
+    if(season&&s.season!==season)return false;
+    if(status&&s.status!==status)return false;
+    const d=String(s.createdDate||'');
+    if(from&&d&&d<from)return false;
+    if(to&&d&&d>to)return false;
+    if(q&&!([s.styleNo,s.buyer,s.item,s.factory,s.salesOwner,s.tnfOwner,s.season,s.status].some(v=>String(v||'').toLowerCase().includes(q))))return false;
+    return true;
+  });
+}
+function renderOrderLookup(){
+  populateOrderLookupFilters();
+  const rows=orderLookupRows();
+  currentOrderLookupRows=rows;
+  const qty=rows.reduce((a,s)=>a+n(s.qty),0);
+  const usdTotal=rows.reduce((a,s)=>a+n(s.qty)*n(s.garmentPrice),0);
+  const krwTotal=rows.reduce((a,s)=>a+n(s.qty)*n(s.garmentPrice)*n(s.exchangeRate||state.rates.usdKrw),0);
+  const tna=rows.reduce((a,s)=>a+tnaIssueCount(s),0);
+  const shipped=rows.reduce((a,s)=>a+packingTotal(s),0);
+  const profit=rows.reduce((a,s)=>{
+    const fob=n(state.sales[s.styleNo]?.sellingFob)||n(s.garmentPrice);
+    return a+(fob-stageTotal(s.styleNo,'final').total)*n(s.qty);
+  },0);
+  const k=document.getElementById('orderLookupKpis');
+  if(k)k.innerHTML=`
+    <div class="kpi"><span>조회 Style</span><strong>${rows.length}</strong></div>
+    <div class="kpi"><span>수주수량</span><strong>${fmtQty(qty)}</strong></div>
+    <div class="kpi"><span>수주금액 USD</span><strong>${usd(usdTotal)}</strong></div>
+    <div class="kpi"><span>수주금액 KRW</span><strong>${krwFmt(krwTotal)}</strong></div>
+    <div class="kpi"><span>패킹수량</span><strong>${fmtQty(shipped)}</strong></div>
+    <div class="kpi"><span>예상 이익</span><strong class="${profit<0?'negative':'positive'}">${usd(profit)}</strong></div>`;
+  const b=document.getElementById('orderLookupBody');if(!b)return;
+  b.innerHTML=rows.length?rows.map(s=>{
+    const totalUsd=n(s.qty)*n(s.garmentPrice);
+    const totalKrw=totalUsd*n(s.exchangeRate||state.rates.usdKrw);
+    const progress=tnaProgress(s);
+    return `<tr>
+      <td><button class="favorite-btn" onclick="toggleFavorite('${s.id}')">${s.favorite?'★':'☆'}</button></td>
+      <td><strong>${s.styleNo||'-'}</strong></td><td>${s.season||'-'}</td><td>${s.buyer||'-'}</td><td>${s.item||'-'}</td><td>${s.factory||'-'}</td>
+      <td class="num">${fmtQty(s.qty)}</td><td class="num">${usd(s.garmentPrice)}</td><td class="num">${usd(totalUsd)}</td><td class="num">${krwFmt(totalKrw)}</td>
+      <td>${s.salesOwner||'-'}</td><td>${s.tnfOwner||'-'}</td><td>${s.delivery||'-'}</td><td>${s.status||'-'}</td>
+      <td><div>${pct(progress)}</div><div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div></td>
+      <td>${s.createdDate||'-'}</td><td><button class="btn goto-btn" onclick="selectOrderStyle('${s.id}')">열기 →</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="17" class="empty-result">조회 결과가 없습니다.</td></tr>';
+}
+function resetOrderFilters(){
+  ['orderSearch','orderDateFrom','orderDateTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['orderSeasonFilter','orderStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderOrderLookup();
+}
+function exportOrderLookup(){
+  const rows=currentOrderLookupRows.map(s=>({
+    StyleNo:s.styleNo,Season:s.season,Buyer:s.buyer,Item:s.item,Factory:s.factory,
+    Qty:n(s.qty),FOB:n(s.garmentPrice),OrderUSD:n(s.qty)*n(s.garmentPrice),
+    ExchangeRate:n(s.exchangeRate||state.rates.usdKrw),
+    OrderKRW:n(s.qty)*n(s.garmentPrice)*n(s.exchangeRate||state.rates.usdKrw),
+    SalesOwner:s.salesOwner,TNFOwner:s.tnfOwner,Delivery:s.delivery,Status:s.status,
+    TNAProgressPct:tnaProgress(s),CreatedDate:s.createdDate
+  }));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'OrderLookup');
+  XLSX.writeFile(wb,'Order_Lookup_'+TODAY+'.xlsx');
+}
+
 /* ── STYLE CRUD ── */
 function newStyle(){
   const s=makeEmptyStyle();
@@ -1085,23 +1257,8 @@ function bindInputs(){
   });
 }
 function renderStyleCards(){
-  const q=(document.getElementById('orderSearch')?.value||'').toLowerCase();
-  const grid=document.getElementById('styleGrid'); if(!grid)return;
-  const filtered=state.styles.filter(s=>[s.styleNo,s.buyer,s.item].join(' ').toLowerCase().includes(q));
-  grid.innerHTML=filtered.map(s=>`
-    <div class="style-card ${s.id===state.currentStyleId?'active':''}" onclick="selectStyle('${s.id}')">
-      <div class="style-img">${s.sketch?`<img src="${s.sketch}">`:'🖼️'}</div>
-      <div class="style-body">
-        <div style="display:flex;justify-content:space-between;gap:8px"><strong>${s.styleNo||'신규 스타일'}</strong><button class="favorite-btn" onclick="event.stopPropagation();toggleFavorite('${s.id}')">${s.favorite?'★':'☆'}</button></div>
-        <span>${s.item||'품명 미정'}</span>
-        <span>${s.buyer||'-'} · ${s.season||'-'} · ${n(s.qty).toLocaleString()} PCS</span>
-        <span>FOB: ${usd(s.garmentPrice||0)} · Order: ${usd(n(s.qty)*n(s.garmentPrice))}</span>
-        <span>TNF: ${s.tnfOwner||'-'} · T&A: ${tnaIssueCount(s)} Issue</span>
-        <span style="margin-top:4px"><b>${s.status||''}</b></span>
-      </div>
-    </div>`).join('') || '<div style="color:var(--muted);padding:16px">검색 결과 없음</div>';
+  renderOrderLookup();
 }
-
 /* ── SKETCH ── */
 async function getSignedSketchUrl(path){if(!path)return '';const {data,error}=await supabaseClient.storage.from('sketches').createSignedUrl(path,60*60*24);if(error){console.error(error);return ''}return data?.signedUrl||'';}
 async function refreshAllSketchUrls(){await Promise.all(state.styles.map(async s=>{if(s.sketchPath)s.sketch=await getSignedSketchUrl(s.sketchPath);}));renderSketch();renderStyleCards();}
@@ -1735,6 +1892,95 @@ function renderPaymentPage(){
       <td><button onclick="styleFromSelect('paymentStyle').payments.splice(${i},1);persist();renderPaymentPage()">×</button></td>
     </tr>`;
   }).join('');
+}
+
+
+let settlementMode='style';
+let currentSeasonSettlementRows=[];
+
+function openSettlementTab(mode){
+  settlementMode=mode;
+  document.querySelectorAll('[data-settlement-tab]').forEach(b=>b.classList.toggle('active',b.dataset.settlementTab===mode));
+  document.getElementById('settlementStylePane').classList.toggle('hidden',mode!=='style');
+  document.getElementById('settlementSeasonPane').classList.toggle('hidden',mode!=='season');
+  if(mode==='style')renderSettlementPage();else renderSeasonSettlement();
+}
+function populateSettlementSeasonFilter(){
+  const e=document.getElementById('settlementSeasonFilter');if(!e)return;
+  const old=e.value;
+  const seasons=[...new Set(state.styles.map(s=>String(s.season||'').trim()).filter(Boolean))].sort();
+  e.innerHTML='<option value="">전체 Season</option>'+seasons.map(v=>`<option>${v}</option>`).join('');
+  e.value=seasons.includes(old)?old:'';
+}
+function seasonSettlementRows(){
+  const season=document.getElementById('settlementSeasonFilter')?.value||'';
+  const from=document.getElementById('settlementDateFrom')?.value||'';
+  const to=document.getElementById('settlementDateTo')?.value||'';
+  const status=document.getElementById('settlementStatusFilter')?.value||'';
+  return state.styles.filter(s=>{
+    if(season&&s.season!==season)return false;
+    if(status&&s.status!==status)return false;
+    const d=String(s.createdDate||'');
+    if(from&&d&&d<from)return false;
+    if(to&&d&&d>to)return false;
+    return true;
+  }).map(s=>{
+    const shipped=packingTotal(s)||n(s.qty);
+    const fob=n(state.sales[s.styleNo]?.sellingFob)||n(s.garmentPrice);
+    const revenue=shipped*fob;
+    const actual=actualTotalUsd(s);
+    const paid=paidTotalUsd(s);
+    const unpaid=Math.max(0,actual-paid);
+    const profit=revenue-actual;
+    const margin=revenue?profit/revenue*100:0;
+    return {style:s,shipped,fob,revenue,actual,paid,unpaid,profit,margin};
+  });
+}
+function renderSeasonSettlement(){
+  populateSettlementSeasonFilter();
+  const rows=seasonSettlementRows();
+  currentSeasonSettlementRows=rows;
+  const qty=rows.reduce((a,r)=>a+n(r.style.qty),0);
+  const shipped=rows.reduce((a,r)=>a+r.shipped,0);
+  const revenue=rows.reduce((a,r)=>a+r.revenue,0);
+  const actual=rows.reduce((a,r)=>a+r.actual,0);
+  const paid=rows.reduce((a,r)=>a+r.paid,0);
+  const unpaid=rows.reduce((a,r)=>a+r.unpaid,0);
+  const profit=revenue-actual;
+  const margin=revenue?profit/revenue*100:0;
+  const k=document.getElementById('seasonSettlementKpis');
+  if(k)k.innerHTML=`
+    <div class="kpi"><span>조회 Style</span><strong>${rows.length}</strong></div>
+    <div class="kpi"><span>수주수량</span><strong>${fmtQty(qty)}</strong></div>
+    <div class="kpi"><span>정산출고</span><strong>${fmtQty(shipped)}</strong></div>
+    <div class="kpi"><span>총매출 USD</span><strong>${usd(revenue)}</strong></div>
+    <div class="kpi"><span>실제매입 USD</span><strong>${usd(actual)}</strong></div>
+    <div class="kpi"><span>미결제 USD</span><strong>${usd(unpaid)}</strong></div>
+    <div class="kpi"><span>최종이익 / Margin</span><strong class="${marginClass(margin)}">${usd(profit)} · ${pct(margin)}</strong></div>`;
+  const b=document.getElementById('seasonSettlementBody');if(!b)return;
+  b.innerHTML=rows.length?rows.map(r=>`<tr>
+    <td>${r.style.season||'-'}</td><td><strong>${r.style.styleNo||'-'}</strong></td><td>${r.style.item||'-'}</td>
+    <td class="num">${fmtQty(r.style.qty)}</td><td class="num">${fmtQty(r.shipped)}</td><td class="num">${usd(r.fob)}</td>
+    <td class="num">${usd(r.revenue)}</td><td class="num">${usd(r.actual)}</td><td class="num">${usd(r.paid)}</td>
+    <td class="num">${usd(r.unpaid)}</td><td class="num ${r.profit<0?'negative':'positive'}">${usd(r.profit)}</td>
+    <td class="${marginClass(r.margin)}">${pct(r.margin)}</td><td>${r.style.status||'-'}</td>
+  </tr>`).join(''):'<tr><td colspan="13" class="empty-result">정산 결과가 없습니다.</td></tr>';
+}
+function resetSettlementFilters(){
+  ['settlementDateFrom','settlementDateTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['settlementSeasonFilter','settlementStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderSeasonSettlement();
+}
+function exportSeasonSettlement(){
+  const rows=currentSeasonSettlementRows.map(r=>({
+    Season:r.style.season,StyleNo:r.style.styleNo,Item:r.style.item,OrderQty:n(r.style.qty),
+    SettlementShipmentQty:r.shipped,FOB:r.fob,RevenueUSD:r.revenue,ActualCostUSD:r.actual,
+    PaidUSD:r.paid,UnpaidUSD:r.unpaid,FinalProfitUSD:r.profit,MarginPct:r.margin,
+    Status:r.style.status
+  }));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'SeasonSettlement');
+  XLSX.writeFile(wb,'Season_Settlement_'+TODAY+'.xlsx');
 }
 
 /* Settlement */
