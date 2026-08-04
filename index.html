@@ -50,7 +50,7 @@ textarea{height:80px;padding-top:8px}
 table{border-collapse:collapse;width:100%;font-size:12px}
 th,td{border:1px solid var(--line);padding:8px;white-space:nowrap}
 th{background:var(--card2);color:var(--muted);font-size:11px;text-align:center}
-td input,td select{height:29px;margin:0;min-width:70px}.wide{min-width:1700px}
+td input,td select{height:29px;margin:0;min-width:70px} td input[type=number]{text-align:right;font-variant-numeric:tabular-nums}.wide{min-width:1700px}
 .style-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .style-card{border:1px solid var(--line);border-radius:13px;background:var(--card2);overflow:hidden;cursor:pointer;transition:.15s}
 .style-card:hover{border-color:var(--accent)}
@@ -71,7 +71,7 @@ td input,td select{height:29px;margin:0;min-width:70px}.wide{min-width:1700px}
 .summary-card h3{margin:0 0 10px;font-size:15px}
 .line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
 .line.final{background:var(--accent2);padding:10px;border-radius:8px;margin-top:8px;border:none;font-weight:800}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
 .kpi,.metric{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px}
 .kpi span,.metric span{color:var(--muted);font-size:11px}.kpi strong,.metric strong{display:block;font-size:20px;margin-top:6px}
 .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -174,6 +174,32 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   .style-info-grid,.cost-summary-band,.profit-band{grid-template-columns:repeat(2,1fr)}
 }
 
+
+/* ── ERP UX ENHANCEMENTS ── */
+.num{text-align:right!important;font-variant-numeric:tabular-nums}
+.num.negative{color:#fca5a5!important}
+.fob-highlight{background:rgba(59,130,246,.15)!important;border-color:#3b82f6!important}
+.total-highlight{font-weight:900!important;background:var(--accent2)!important}
+.margin-good{color:#86efac!important}.margin-mid{color:#fde68a!important}.margin-bad{color:#fca5a5!important}
+.favorite-btn{border:0;background:transparent;color:#fbbf24;font-size:18px;cursor:pointer;padding:0}
+.recent-strip{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.recent-chip{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:6px 9px;border-radius:999px;cursor:pointer;font-size:11px}
+.recent-chip:hover{border-color:var(--accent)}
+.audit-list{display:grid;gap:7px;max-height:300px;overflow:auto}
+.audit-item{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:9px;font-size:11px}
+.version-row{display:flex;gap:7px;align-items:end;flex-wrap:wrap}
+.progress-bar{height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green)}
+.alert-box{border:1px solid #92400e;background:rgba(146,64,14,.15);border-radius:10px;padding:10px}
+.print-only{display:none}
+@media print{
+  .sidebar,.topbar,.searchbar,.actions,.btn,.ai-fab,.ai-panel{display:none!important}
+  .app{display:block}.main{width:100%}.content{padding:0}
+  body{background:white;color:black}
+  .panel,.cost-row,.summary-card,.metric,.info-cell,.cost-summary-box{background:white!important;color:black!important;border-color:#bbb!important;box-shadow:none!important}
+  .print-only{display:block}
+}
+
 .hidden{display:none!important}
 .positive{color:#86efac}.warning{color:#fde68a}.negative{color:#fca5a5}
 @media(max-width:1100px){.app{grid-template-columns:1fr}.order-grid{grid-template-columns:1fr}.form-grid,.kpis,.metric-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}.style-grid{grid-template-columns:1fr}.cost-top,.stage-grid{grid-template-columns:1fr}.ai-panel{width:100%}}
@@ -242,6 +268,11 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
     </div>
     <div class="dash-result-note" id="dashNote"></div>
   </div>
+  <div class="panel">
+    <div class="head"><div><h2>즐겨찾기 / 최근 작업</h2><p>최근 열어본 Style 10개와 즐겨찾기를 빠르게 엽니다.</p></div></div>
+    <div><strong style="font-size:12px">즐겨찾기</strong><div id="favoriteStyles" class="recent-strip"></div></div>
+    <div style="margin-top:10px"><strong style="font-size:12px">최근 작업</strong><div id="recentStyles" class="recent-strip"></div></div>
+  </div>
   <!-- KPI -->
   <div class="kpis">
     <div class="kpi"><span>등록 Style (필터)</span><strong id="kpiStyles">0</strong></div>
@@ -249,12 +280,14 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
     <div class="kpi"><span>원가 진행</span><strong id="kpiCost">0</strong></div>
     <div class="kpi"><span>발주 건수</span><strong id="kpiPO">0</strong></div>
     <div class="kpi"><span>T&A 이슈</span><strong id="kpiTna">0</strong></div>
+    <div class="kpi"><span>이번 달 예상 이익</span><strong id="kpiMonthProfit">$0.000</strong></div>
+    <div class="kpi"><span>입고 지연 경고</span><strong id="kpiDelayWarnings">0</strong></div>
   </div>
   <!-- 테이블 -->
   <div class="panel dash-table-wrap">
     <div class="head"><div><h2>수주 현황</h2></div></div>
     <div class="table-wrap">
-      <table><thead><tr><th>Style No.</th><th>Buyer</th><th>Item</th><th>Season</th><th>Qty</th><th>FOB</th><th>Order USD</th><th>Order KRW</th><th>TNF 담당</th><th>T&A</th><th>Factory</th><th>Status</th><th>바로가기</th></tr></thead>
+      <table><thead><tr><th>Style No.</th><th>Buyer</th><th>Item</th><th>Season</th><th>Qty</th><th>FOB</th><th>Order USD</th><th>Order KRW</th><th>★</th><th>TNF 담당</th><th>T&A 진행률</th><th>입고경고</th><th>Factory</th><th>Status</th><th>바로가기</th></tr></thead>
       <tbody id="dashBody"></tbody></table>
     </div>
   </div>
@@ -333,7 +366,14 @@ mark{background:rgba(109,93,252,.25);color:inherit;border-radius:3px;padding:0 2
   </div>
 
   <div id="tab-bom" class="tab-panel panel hidden">
-    <div class="head"><div><h2>BOM</h2><p>대표 Style No. 기준으로 발주와 원가에 연결됩니다.</p></div><button class="btn" onclick="addBomRow()">+ BOM 행 추가</button></div>
+    <div class="head">
+      <div><h2>BOM</h2><p>대표 Style No. 기준으로 발주와 원가에 연결됩니다.</p></div>
+      <div class="actions">
+        <button class="btn" onclick="addBomRow()">+ BOM 행 추가</button>
+        <button class="btn" onclick="showBomAudit()">변경 이력</button>
+      </div>
+    </div>
+    <div id="bomAuditPanel" class="panel hidden"><div class="head"><div><h3>BOM 변경 이력</h3></div><button class="btn" onclick="document.getElementById('bomAuditPanel').classList.add('hidden')">닫기</button></div><div id="bomAuditList" class="audit-list"></div></div>
     <div class="table-wrap"><table class="wide"><thead><tr><th>Style No.</th><th>Position</th><th>Sub Position</th><th>Garment Color</th><th>Garment Size</th><th>Item Description</th><th>Width / Size</th><th>Color</th><th>Qty</th><th>Net</th><th>Loss %</th><th>Cons.</th><th>Required Qty</th><th>Unit</th><th>Supplier</th><th>삭제</th></tr></thead><tbody id="bomBody"></tbody></table></div>
   </div>
 </div>
@@ -578,6 +618,7 @@ const TNF_SEED_STYLES = [{"id": "STYLE-01", "no": 1, "division": "OD", "styleNo"
 const DEFAULT_STATE = {currentStyleId:'S1',styles:[{id:'S1',buyer:'THE NORTH FACE',season:'F26',styleNo:'NJ5JS53JK',item:'COMFY TRAINING ZIP UP',qty:4800,garmentPrice:0,factory:'',brand:'THE NORTH FACE',department:'OUTER',status:'수주등록',createdDate:TODAY,remark:'',sketch:'',sketchPath:'',colors:[{color:'BLK',s:240,m:800,l:950,xl:740,xxl:270}],bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58\"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]}],costs:{},sales:{},purchases:[],rates:{usdKrw:1470,usdVnd:26200,krwVnd:17.82,date:TODAY}};
 let state=JSON.parse(JSON.stringify(DEFAULT_STATE));
 let erpVersion=0,saveTimer=null,realtimeChannel=null,applyingRemote=false;
+let recentStyleIds=JSON.parse(localStorage.getItem('erp_recent_styles')||'[]');
 function setDbStatus(type,text){const el=document.getElementById('dbStatus'),tx=document.getElementById('dbStatusText');if(!el||!tx)return;el.className='db-status '+(type||'');tx.textContent=text;}
 function normalizeState(input){const next=input&&typeof input==='object'?input:JSON.parse(JSON.stringify(DEFAULT_STATE));next.styles=Array.isArray(next.styles)?next.styles:[];next.costs=next.costs||{};next.sales=next.sales||{};next.purchases=Array.isArray(next.purchases)?next.purchases:[];next.rates=next.rates||JSON.parse(JSON.stringify(DEFAULT_STATE.rates));next.styles.forEach(s=>{
   if(s.garmentPrice==null)s.garmentPrice=0;
@@ -589,6 +630,9 @@ function normalizeState(input){const next=input&&typeof input==='object'?input:J
   if(!Array.isArray(s.materialMovements))s.materialMovements=[];
   if(!Array.isArray(s.actualCosts))s.actualCosts=[];
   if(!Array.isArray(s.payments))s.payments=[];
+  if(!Array.isArray(s.bomAudit))s.bomAudit=[];
+  if(!Array.isArray(s.costVersions))s.costVersions=[];
+  if(typeof s.favorite!=='boolean')s.favorite=false;
   if(!s.packingType)s.packingType='SOLID';
   if(!s.tna||typeof s.tna!=='object')s.tna={};
   if(s.sketchPath===undefined)s.sketchPath='';
@@ -716,6 +760,9 @@ function makeEmptyStyle(){
     materialMovements:[],
     actualCosts:[],
     payments:[],
+    bomAudit:[],
+    costVersions:[],
+    favorite:false,
     tna:{},
     status:'수주등록',
     createdDate:TODAY,
@@ -747,8 +794,12 @@ function ensureCurrentStyle(){
 
 function cs(){ return ensureCurrentStyle(); }
 function n(v){ const x=Number(v); return Number.isFinite(x)?x:0; }
-function usd(v){ return '$'+n(v).toFixed(2); }
+function fmt3(v){return n(v).toLocaleString(undefined,{minimumFractionDigits:3,maximumFractionDigits:3});}
+function fmtQty(v){return Math.round(n(v)).toLocaleString();}
+function usd(v){ return '$'+fmt3(v); }
 function krwFmt(v){ return '₩'+Math.round(n(v)).toLocaleString(); }
+function pct(v){return fmt3(v)+'%';}
+function marginClass(v){return n(v)<0?'margin-bad':n(v)<10?'margin-mid':'margin-good';}
 function uid(p){ return p+'-'+Date.now()+'-'+Math.random().toString(16).slice(2,8); }
 
 /* ── NAV ── */
@@ -773,6 +824,7 @@ document.querySelectorAll('.nav-item').forEach(btn=>btn.onclick=()=>{
   if(btn.dataset.page==='cost'){
     populateIntegratedStyleSelectors();
   populatePurchaseStyleSelectors();
+  renderRecentFavorite();
     const s=state.styles.find(x=>x.id===document.getElementById('costStyleSelect')?.value)||cs();
     if(s){document.getElementById('costSearch').value=s.styleNo||'';renderCost(s);}
   }
@@ -938,6 +990,70 @@ function renderAssort(){
   }).join('');
 }
 
+
+function touchRecentStyle(id){
+  recentStyleIds=[id,...recentStyleIds.filter(x=>x!==id)].slice(0,10);
+  localStorage.setItem('erp_recent_styles',JSON.stringify(recentStyleIds));
+}
+function toggleFavorite(id){
+  const s=state.styles.find(x=>x.id===id);if(!s)return;
+  s.favorite=!s.favorite;persist();renderDashboard();renderStyleCards();
+}
+function renderRecentFavorite(){
+  const fav=document.getElementById('favoriteStyles'),rec=document.getElementById('recentStyles');
+  if(fav)fav.innerHTML=state.styles.filter(s=>s.favorite).map(s=>`<button class="recent-chip" onclick="jumpStyle('${s.id}')">★ ${s.styleNo}</button>`).join('')||'<span style="color:var(--muted);font-size:11px">없음</span>';
+  if(rec)rec.innerHTML=recentStyleIds.map(id=>state.styles.find(s=>s.id===id)).filter(Boolean).map(s=>`<button class="recent-chip" onclick="jumpStyle('${s.id}')">${s.styleNo}</button>`).join('')||'<span style="color:var(--muted);font-size:11px">없음</span>';
+}
+function tnaProgress(style){
+  const keys=Object.keys(TNA_FIELDS);
+  if(!keys.length)return 0;
+  const done=keys.filter(k=>['완료','해당없음'].includes(style.tna?.[k]?.status)).length;
+  return done/keys.length*100;
+}
+function materialDelayCount(style){
+  return (style.materialMovements||[]).filter(r=>{
+    const status=String(r.status||'');
+    return ['입고대기','부분입고'].includes(status)&&n(r.inQty)<n(r.poQty);
+  }).length;
+}
+function logBomChange(action,detail){
+  const s=cs();
+  s.bomAudit=s.bomAudit||[];
+  s.bomAudit.unshift({time:new Date().toISOString(),action,detail});
+  s.bomAudit=s.bomAudit.slice(0,200);
+}
+function showBomAudit(){
+  const p=document.getElementById('bomAuditPanel'),l=document.getElementById('bomAuditList');if(!p||!l)return;
+  p.classList.remove('hidden');
+  l.innerHTML=(cs().bomAudit||[]).map(x=>`<div class="audit-item"><b>${x.action}</b><br>${x.detail||''}<br><span style="color:var(--muted)">${new Date(x.time).toLocaleString()}</span></div>`).join('')||'<div style="color:var(--muted)">변경 이력 없음</div>';
+}
+function saveCostVersion(styleNo){
+  const s=state.styles.find(x=>x.styleNo===styleNo);if(!s)return;
+  s.costVersions=s.costVersions||[];
+  const version={id:uid('VER'),name:'V'+(s.costVersions.length+1),savedAt:new Date().toISOString(),cost:JSON.parse(JSON.stringify(state.costs[styleNo]||{})),sales:JSON.parse(JSON.stringify(state.sales[styleNo]||{}))};
+  s.costVersions.unshift(version);
+  persist();renderCost(s);alert(version.name+' 저장 완료');
+}
+function loadCostVersion(styleNo,id){
+  if(!id)return;
+  const s=state.styles.find(x=>x.styleNo===styleNo);const v=s?.costVersions?.find(x=>x.id===id);if(!v)return;
+  if(!confirm(v.name+' 원가로 복원할까요?'))return;
+  state.costs[styleNo]=JSON.parse(JSON.stringify(v.cost));
+  state.sales[styleNo]=JSON.parse(JSON.stringify(v.sales));
+  persist();renderCost(s);
+}
+function renderCostVersions(style){
+  const sel=document.getElementById('costVersionSelect'),note=document.getElementById('costVersionNote');if(!sel)return;
+  const vs=style.costVersions||[];
+  sel.innerHTML='<option value="">현재 작업본</option>'+vs.map(v=>`<option value="${v.id}">${v.name} · ${new Date(v.savedAt).toLocaleString()}</option>`).join('');
+  if(note)note.textContent=vs.length?`${vs.length}개 Version 저장됨`:'저장된 Version 없음';
+}
+function printCostSheet(styleNo){
+  const s=state.styles.find(x=>x.styleNo===styleNo);if(!s)return;
+  document.title=`${styleNo}_Costing`;
+  window.print();
+}
+
 /* ── STYLE CRUD ── */
 function newStyle(){
   const s=makeEmptyStyle();
@@ -954,7 +1070,7 @@ function deleteStyle(){
   state.currentStyleId=state.styles[0].id;
   persist(); renderAll();
 }
-function selectStyle(id){ state.currentStyleId=id; persist(); renderAll(); openTab('basic'); }
+function selectStyle(id){ state.currentStyleId=id; touchRecentStyle(id); persist(); renderAll(); openTab('basic'); }
 function bindInputs(){
   const s=cs();
   ['buyer','season','styleNo','item','qty','garmentPrice','exchangeRate','factory','brand','division','gender','category','department','salesOwner','tnfOwner','delivery','status','createdDate','remark'].forEach(k=>{
@@ -976,7 +1092,7 @@ function renderStyleCards(){
     <div class="style-card ${s.id===state.currentStyleId?'active':''}" onclick="selectStyle('${s.id}')">
       <div class="style-img">${s.sketch?`<img src="${s.sketch}">`:'🖼️'}</div>
       <div class="style-body">
-        <strong>${s.styleNo||'신규 스타일'}</strong>
+        <div style="display:flex;justify-content:space-between;gap:8px"><strong>${s.styleNo||'신규 스타일'}</strong><button class="favorite-btn" onclick="event.stopPropagation();toggleFavorite('${s.id}')">${s.favorite?'★':'☆'}</button></div>
         <span>${s.item||'품명 미정'}</span>
         <span>${s.buyer||'-'} · ${s.season||'-'} · ${n(s.qty).toLocaleString()} PCS</span>
         <span>FOB: ${usd(s.garmentPrice||0)} · Order: ${usd(n(s.qty)*n(s.garmentPrice))}</span>
@@ -1012,11 +1128,11 @@ function renderBom(){
   const s=cs(); const b=document.getElementById('bomBody'); if(!b)return;
   s.bom.forEach(r=>{r.cons=n(r.net)*(1+n(r.loss)/100);r.requiredQty=n(r.cons)*n(r.qty);});
   b.innerHTML=s.bom.map((r,i)=>`<tr>
-    ${BCOLS.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${k==='cons'?n(r[k]).toFixed(4):k==='requiredQty'?Math.ceil(n(r[k])):r[k]??''}" onchange="cs().bom[${i}].${k}=this.value;persist();renderBom()"></td>`).join('')}
-    <td><button onclick="cs().bom.splice(${i},1);persist();renderBom()">×</button></td>
+    ${BCOLS.map(k=>`<td><input ${['cons','requiredQty'].includes(k)?'readonly':''} value="${k==='cons'?n(r[k]).toFixed(4):k==='requiredQty'?Math.ceil(n(r[k])):r[k]??''}" onchange="const old=cs().bom[${i}].${k};cs().bom[${i}].${k}=this.value;logBomChange('BOM 수정','${k}: '+old+' → '+this.value);persist();renderBom()"></td>`).join('')}
+    <td><button onclick="logBomChange('BOM 삭제',cs().bom[${i}].description||cs().bom[${i}].position);cs().bom.splice(${i},1);persist();renderBom()">×</button></td>
   </tr>`).join('');
 }
-function addBomRow(){ const r=Object.fromEntries(BCOLS.map(k=>[k,''])); r.styleNo=cs().styleNo; cs().bom.push(r); persist(); renderBom(); }
+function addBomRow(){ const r=Object.fromEntries(BCOLS.map(k=>[k,''])); r.styleNo=cs().styleNo; cs().bom.push(r); logBomChange('BOM 추가',r.styleNo); persist(); renderBom(); }
 
 /* ── COST ── */
 function ensureCost(styleNo){
@@ -1065,6 +1181,7 @@ function selectCostStyle(id){
   const s=state.styles.find(x=>x.id===id);
   if(!s)return;
   state.currentStyleId=s.id;
+  touchRecentStyle(s.id);
   document.getElementById('costSearch').value=s.styleNo||'';
   persist();
   renderCost(s);
@@ -1152,10 +1269,16 @@ function renderCost(style){
         <div><h2>${style.styleNo} · 목표원가 계산서</h2><p>원가관리와 매출·수익을 한 화면에서 관리합니다.</p></div>
         <div class="actions">
           <button class="btn" onclick="addCostRow('${style.styleNo}')">+ 원가 항목 추가</button>
+          <button class="btn" onclick="saveCostVersion('${style.styleNo}')">원가 Version 저장</button>
+          <button class="btn" onclick="printCostSheet('${style.styleNo}')">Buyer용 PDF/인쇄</button>
           <button class="btn primary" onclick="saveToSupabase(true)">공용 저장</button>
         </div>
       </div>
 
+      <div class="version-row" style="margin-bottom:12px">
+        <label>원가 Version<select id="costVersionSelect" onchange="loadCostVersion('${style.styleNo}',this.value)"></select></label>
+        <span id="costVersionNote" style="color:var(--muted);font-size:11px"></span>
+      </div>
       <div class="costing-header">
         <div class="style-info-grid">
           ${costInfoCell('Buyer',style.buyer)}
@@ -1229,15 +1352,15 @@ function renderCost(style){
         <table class="cost-percent-table">
           <thead><tr><th>원자재</th><th>부자재</th><th>완제품</th><th>제조경비</th><th>통합관리비</th><th>판매비</th><th>공임</th><th>총 제조원가</th><th>매출이익</th></tr></thead>
           <tbody><tr>
-            <td>${percent(catSummary.원자재).toFixed(2)}%</td>
-            <td>${percent(catSummary.부자재).toFixed(2)}%</td>
-            <td>${percent(catSummary.완제품).toFixed(2)}%</td>
-            <td>${percent(catSummary.제조경비).toFixed(2)}%</td>
-            <td>${percent(catSummary.통합관리비).toFixed(2)}%</td>
-            <td>${percent(catSummary.판매비).toFixed(2)}%</td>
-            <td>${percent(final.sewing).toFixed(2)}%</td>
-            <td><b>${percent(final.total).toFixed(2)}%</b></td>
-            <td class="${unitProfit<0?'negative':'positive'}"><b>${margin.toFixed(2)}%</b></td>
+            <td>${percent(catSummary.원자재).toFixed(3)}%</td>
+            <td>${percent(catSummary.부자재).toFixed(3)}%</td>
+            <td>${percent(catSummary.완제품).toFixed(3)}%</td>
+            <td>${percent(catSummary.제조경비).toFixed(3)}%</td>
+            <td>${percent(catSummary.통합관리비).toFixed(3)}%</td>
+            <td>${percent(catSummary.판매비).toFixed(3)}%</td>
+            <td>${percent(final.sewing).toFixed(3)}%</td>
+            <td><b>${percent(final.total).toFixed(3)}%</b></td>
+            <td class="${unitProfit<0?'negative':'positive'}"><b>${margin.toFixed(3)}%</b></td>
           </tr></tbody>
         </table>
       </div>
@@ -1249,8 +1372,8 @@ function renderCost(style){
         <div class="metric"><span>Selling FOB</span><strong>${usd(sellingFob)}</strong></div>
         <div class="metric"><span>총 제조원가</span><strong>${usd(final.total)}</strong></div>
         <div class="metric"><span>Unit Profit</span><strong class="${unitProfit<0?'negative':'positive'}">${usd(unitProfit)}</strong></div>
-        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(2)}%</strong></div>
-        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(2)}%</strong></div>
+        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(3)}%</strong></div>
+        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(3)}%</strong></div>
         <div class="metric"><span>총 예상이익</span><strong class="${totalProfit<0?'negative':'positive'}">${usd(totalProfit)}</strong></div>
       </div>
       <div style="margin-top:12px;max-width:280px">
@@ -1277,13 +1400,15 @@ function renderCost(style){
       </div>
     </div>
   </div>`;
+  renderCostVersions(style);
 }
 
 function costInfoCell(label,value){
   return `<div class="info-cell"><span>${label}</span><strong>${value||'-'}</strong></div>`;
 }
 function summaryBox(label,value,highlight=false){
-  return `<div class="cost-summary-box" ${highlight?'style="background:var(--accent2)"':''}><span>${label}</span><strong>${usd(value)}</strong></div>`;
+  const cls=label==='Selling FOB'?' fob-highlight':highlight?' total-highlight':'';
+  return `<div class="cost-summary-box${cls}"><span>${label}</span><strong class="num ${n(value)<0?'negative':''}">${usd(value)}</strong></div>`;
 }
 function stageAmount(row,key){
   return n(row[key].usage)*n(row[key].unitPrice)/(row[key].currency==='KRW'?n(state.rates.usdKrw)||1:1);
@@ -1681,6 +1806,15 @@ function renderDashboard(){
   document.getElementById('kpiPO').textContent=state.purchases.length;
   const totalIssues=filtered.reduce((a,s)=>a+tnaIssueCount(s),0);
   const kpiTna=document.getElementById('kpiTna');if(kpiTna)kpiTna.textContent=totalIssues;
+  const monthProfit=filtered.reduce((a,s)=>{
+    const finalCost=stageTotal(s.styleNo,'final').total;
+    const fob=n(state.sales[s.styleNo]?.sellingFob)||n(s.garmentPrice);
+    return a+(fob-finalCost)*n(s.qty);
+  },0);
+  const monthEl=document.getElementById('kpiMonthProfit');if(monthEl)monthEl.textContent=usd(monthProfit);
+  const delays=filtered.reduce((a,s)=>a+materialDelayCount(s),0);
+  const delayEl=document.getElementById('kpiDelayWarnings');if(delayEl)delayEl.textContent=delays;
+  renderRecentFavorite();
   const note=document.getElementById('dashNote');
   if(note)note.textContent=(kw||dashFilterStatus!=='all')?`${filtered.length}개 스타일 검색됨`:'';
   const b=document.getElementById('dashBody');if(!b)return;
@@ -1699,8 +1833,10 @@ function renderDashboard(){
       <td>${usd(s.garmentPrice||0)}</td>
       <td>${usd(totalUsd)}</td>
       <td>${krwFmt(totalKrw)}</td>
+      <td><button class="favorite-btn" onclick="toggleFavorite('${s.id}')">${s.favorite?'★':'☆'}</button></td>
       <td>${hl(s.tnfOwner||'-',kw)}</td>
-      <td><span class="${issues?'negative':'positive'}">${issues} Issue</span></td>
+      <td><div>${pct(tnaProgress(s))}</div><div class="progress-bar"><div class="progress-fill" style="width:${tnaProgress(s)}%"></div></div></td>
+      <td>${materialDelayCount(s)?`<span class="negative">${materialDelayCount(s)}건</span>`:'0'}</td>
       <td>${hl(s.factory,kw)}</td>
       <td class="${sc}">${s.status||'-'}</td>
       <td><button class="btn goto-btn" onclick="jumpStyle('${s.id}')">열기 →</button></td>
@@ -1708,7 +1844,7 @@ function renderDashboard(){
   }).join('');
 }
 function jumpStyle(id){
-  state.currentStyleId=id; persist();
+  state.currentStyleId=id; touchRecentStyle(id); persist();
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
   document.querySelector('[data-page="order"]').classList.add('active');
   document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
