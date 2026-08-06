@@ -421,6 +421,158 @@ body:not(.light) select,body:not(.light) input,body:not(.light) textarea{
 .copy-options label{display:flex;align-items:center;gap:6px;color:var(--text)}
 @media(max-width:760px){.copy-style-grid{grid-template-columns:1fr}}
 
+
+/* ── V14.2 COMPACT TARGET COST SHEET ── */
+.target-cost-sheet{display:grid;gap:10px}
+.target-cost-top{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:10px}
+.target-cost-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.target-cost-info .cell{display:grid;grid-template-columns:92px 1fr;min-height:34px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.target-cost-info .cell .label{background:var(--card2);padding:8px;font-size:10px;font-weight:900;color:var(--muted)}
+.target-cost-info .cell .value{padding:8px;font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis}
+.target-cost-sketch{border:1px solid var(--line);border-radius:10px;background:white;min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.target-cost-sketch img{width:100%;height:100%;max-height:260px;object-fit:contain}
+.target-section{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.target-section-title{display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:8px 10px;border-bottom:1px solid var(--line)}
+.target-section-title h3{margin:0;font-size:13px}
+.target-compact-table{width:100%;border-collapse:collapse;font-size:10px}
+.target-compact-table th,.target-compact-table td{padding:5px 6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap}
+.target-compact-table th{background:var(--card2);font-size:9px}
+.target-compact-table input,.target-compact-table select{height:27px;padding:3px 5px;font-size:10px;min-width:72px}
+.target-summary-row{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.target-summary-row .box{padding:8px;border-right:1px solid var(--line);background:var(--card)}
+.target-summary-row .box:last-child{border-right:0}
+.target-summary-row span{display:block;font-size:9px;color:var(--muted)}
+.target-summary-row strong{display:block;margin-top:4px;font-size:12px}
+.target-percent-row{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.target-percent-row .box{padding:7px;text-align:center;border-right:1px solid var(--line);background:var(--card2)}
+.target-percent-row .box:last-child{border-right:0}
+.target-percent-row span{display:block;font-size:9px;color:var(--muted)}
+.target-percent-row strong{display:block;margin-top:3px;font-size:11px}
+.target-profit-band{display:grid;grid-template-columns:1.25fr repeat(5,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.target-profit-band .box{padding:10px;border-right:1px solid var(--line);text-align:center}
+.target-profit-band .box:last-child{border-right:0}
+.target-profit-band span{display:block;font-size:9px;color:var(--muted)}
+.target-profit-band strong{display:block;margin-top:4px;font-size:14px}
+.target-detail-toggle{margin-left:auto}
+.target-detail-area{margin-top:8px}
+@media(max-width:1100px){
+  .target-cost-top{grid-template-columns:1fr}
+  .target-cost-info{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .target-summary-row,.target-percent-row,.target-profit-band{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* ── V14.3 COMPACT COST SKETCH ── */
+.target-cost-top{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 160px;
+  gap:10px;
+  align-items:start;
+}
+.target-cost-info{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.target-cost-sketch{
+  width:160px;
+  height:160px;
+  min-height:160px;
+  max-height:160px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  cursor:zoom-in;
+  position:relative;
+  justify-self:end;
+}
+.target-cost-sketch img{
+  width:100%;
+  height:100%;
+  max-height:160px;
+  object-fit:contain;
+  image-rendering:auto;
+}
+.target-cost-sketch:after{
+  content:"클릭하여 크게 보기";
+  position:absolute;
+  left:5px;right:5px;bottom:5px;
+  padding:4px 5px;
+  border-radius:5px;
+  background:rgba(0,0,0,.62);
+  color:#fff;
+  font-size:8px;
+  text-align:center;
+  opacity:0;
+  transition:.15s;
+}
+.target-cost-sketch:hover:after{opacity:1}
+.cost-sketch-modal{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(0,0,0,.72);
+}
+.cost-sketch-modal-card{
+  position:relative;
+  width:min(720px,92vw);
+  max-height:88vh;
+  border-radius:14px;
+  background:#fff;
+  padding:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
+.cost-sketch-modal-card img{
+  display:block;
+  width:100%;
+  max-height:78vh;
+  object-fit:contain;
+}
+.cost-sketch-modal-close{
+  position:absolute;
+  top:8px;
+  right:8px;
+  border:0;
+  border-radius:999px;
+  width:34px;
+  height:34px;
+  background:rgba(0,0,0,.75);
+  color:white;
+  cursor:pointer;
+  font-size:18px;
+}
+@media(max-width:900px){
+  .target-cost-top{grid-template-columns:1fr}
+  .target-cost-sketch{
+    width:130px;
+    height:130px;
+    min-height:130px;
+    max-height:130px;
+    justify-self:start;
+  }
+  .target-cost-sketch img{max-height:130px}
+}
+
+
+.target-cost-info .cell{
+  grid-template-columns:82px 1fr;
+  min-height:31px;
+}
+.target-cost-info .cell .label{
+  padding:6px 7px;
+  font-size:9px;
+}
+.target-cost-info .cell .value{
+  padding:6px 7px;
+  font-size:10px;
+}
+
 .hidden{display:none!important}
 .sidebar-foot{
   position:sticky;
@@ -1034,7 +1186,7 @@ const TODAY = new Date().toISOString().slice(0,10);
 const SUPABASE_URL = 'https://rscblpdfonzhamtnbeql.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_0ApgnQX_9fIsigxzQcXWcg_rWCOpYpX';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-const TNF_RECAP_SEED_VERSION = "TNF-F26-ORDER-RECAP-2026-07-24-V12-STYLE-COPY";
+const TNF_RECAP_SEED_VERSION = "TNF-F26-ORDER-RECAP-2026-07-24-V14-SMALL-COST-SKETCH";
 const TNF_SEED_STYLES = [{"id":"REC-NT7ZT87ABC-1","sourceNo":1,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NT7ZT87ABC","item":"W’S ESSENTIAL S/S DRESS","qty":12000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"손민/김종명","tnfOwner":"황지연 / 이동건","delivery":"SUMMER","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-30","status":"완료","issue":""},"detail_sample":{"value":"X","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 완료","status":"완료","issue":""},"consumption":{"value":"2026-02-03","status":"완료","issue":""},"costing":{"value":"2026-01-22","status":"완료","issue":""},"fabric_po":{"value":"원더 C&T 2/2 / REGEN COTTON / 1*1 RIB","status":"진행중","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"2026-03-13","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 O / 가격택 O / RFID O / 아소트 O / 직배송 O","status":"진행중","issue":""},"interlining":{"value":"X","status":"해당없음","issue":""},"artwork":{"value":"OK","status":"완료","issue":""},"sewing":{"value":"3/19 OK","status":"완료","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"JMC / 2026-02-05","status":"진행중","issue":""},"ap2":{"value":"OK","status":"완료","issue":""},"fpp":{"value":"OK","status":"완료","issue":""},"material_card_buyer":{"value":"3/26 제출","status":"완료","issue":""},"material_card_factory":{"value":"2026-03-17","status":"완료","issue":""},"production_top":{"value":"2026-04-06","status":"완료","issue":""},"wash_sample":{"value":"2026-04-06 / 2026-04-20","status":"완료","issue":""},"shipping":{"value":"2026-04-20","status":"완료","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"BLK (A)","orderQty":8400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"CHC (B)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"DBE (C )","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3LS39LQR-2","sourceNo":2,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ3LS39LQR","item":"W'S OLEMA LT JACKET","qty":1400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"","delivery":"QR","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"QR","status":"해당없음","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"QR","status":"해당없음","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"2026-03-26","status":"완료","issue":""},"fabric_po":{"value":"원창 2/26","status":"진행중","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"케어 O / 가격택 O / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"X","status":"해당없음","issue":""},"artwork":{"value":"QR","status":"해당없음","issue":""},"sewing":{"value":"QR","status":"해당없음","issue":""},"proto":{"value":"QR","status":"해당없음","issue":""},"ap1":{"value":"QR","status":"해당없음","issue":""},"ap2":{"value":"QR","status":"해당없음","issue":""},"fpp":{"value":"QR","status":"해당없음","issue":""},"material_card_buyer":{"value":"QR","status":"해당없음","issue":""},"material_card_factory":{"value":"QR","status":"해당없음","issue":""},"production_top":{"value":"2026-04-17","status":"완료","issue":""},"wash_sample":{"value":"2026-04-17","status":"완료","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"PAP (J)","orderQty":1400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NH8LS50AB-3","sourceNo":3,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NH8LS50AB","item":"M'S FLANNEL SHIRTS","qty":2400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"KH","gender":"","category":"","department":"","salesOwner":"김진수/ 오종성","tnfOwner":"유선숙 / 황지연 / 김용수 / 김영수 / 이동건","delivery":"DELI2","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-23","status":"완료","issue":""},"detail_sample":{"value":"2026-05-03","status":"완료","issue":""},"detail_pattern":{"value":"X","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"의뢰예정","status":"진행중","issue":""},"consumption":{"value":"2026-01-29","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"CHIA HER 1/29 / RY0730-011 / 대경 M-130 3/26","status":"진행중","issue":""},"trim_po":{"value":"새한 단추 3/26","status":"진행중","issue":""},"shipment_material":{"value":"원단 선적 5/20","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"4/9 심지테스트 YKK","status":"진행중","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"재봉사 새마포","status":"진행중","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"3/13 제출 / 3/17 리뷰 / 3/26 RJECT","status":"완료","issue":""},"ap2":{"value":"2026-05-07 / FPP REQ","status":"완료","issue":""},"fpp":{"value":"6/16 접수","status":"완료","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"fpp","sketch":"","sketchPath":"","colors":[{"color":"MSL (A)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"CHC (B)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS62JKLQR-4","sourceNo":4,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ3BS62JKLQR","item":"NOVELTY OLEMA HOODIE","qty":10400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"최수련 / 임가빈 / 강혜숙 / 김용준","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-12","status":"완료","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"QR","status":"해당없음","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"2026-03-26","status":"완료","issue":""},"fabric_po":{"value":"해원 3/8 발주 / HWN-92839 PD WR WS FOIL C/T WASHING / YNL 3/20 발주 / FD 710 / SJ-2476","status":"완료","issue":""},"trim_po":{"value":"3/18 발주 / 4/8 신규컬러 전부 발주 완료","status":"완료","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"케어 O / 가격택 O / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"바이린 출고 OK","status":"완료","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"4/28 제출","status":"완료","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"2026-06-12","status":"완료","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"2026-06-01","status":"완료","issue":""},"wash_sample":{"value":"2026-06-01","status":"완료","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"BLK (J)","orderQty":6400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"CHG (K)","orderQty":2800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"MTB (L)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS91JKLQR-5","sourceNo":5,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ3BS91JKLQR","item":"W'S NOVELTY OLEMA HOODIE","qty":11800.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"최수련 / 임가빈 / 김용준","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-12","status":"완료","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"QR","status":"해당없음","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"2026-03-26","status":"완료","issue":""},"fabric_po":{"value":"해원 3/8 발주 / HWN-92839 PD WR WS FOIL C/T WASHING / YNL 3/20 발주 / FD 710","status":"완료","issue":""},"trim_po":{"value":"4/8 신규컬러 전부 발주 완료","status":"완료","issue":""},"shipment_material":{"value":"4/10 재고 출고","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 O / 가격택 O / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"바이린 출고 OK","status":"완료","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"2026-04-07 / 4/22 OK","status":"완료","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"2026-05-06 / FPP","status":"완료","issue":""},"material_card_buyer":{"value":"2026-06-12","status":"완료","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"2026-05-20","status":"완료","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"BLK (J)","orderQty":5400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"CHG (K)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"GRJ (L)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"WIN (M)","orderQty":2800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS92JQR-6","sourceNo":6,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ3BS92JQR","item":"W'S NOVELTY OLEMA EX HOODIE","qty":1200.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"최수련 / 임가빈 / 김용준","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-12","status":"완료","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"QR","status":"해당없음","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"2026-03-26","status":"완료","issue":""},"fabric_po":{"value":"해원 3/8 발주 / HWN-92839 PD WR WS FOIL C/T WASHING / YNL 3/20 발주 / FD 710","status":"완료","issue":""},"trim_po":{"value":"4/8 신규컬러 전부 발주 완료","status":"완료","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"케어 O / 가격택 O / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"바이린 출고 OK","status":"완료","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"91과 동일","status":"진행중","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"2026-05-06 / FPP","status":"완료","issue":""},"material_card_buyer":{"value":"2026-06-12","status":"완료","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"GRB (J)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS52ST-7","sourceNo":7,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"KD","styleNo":"NJ3BS52ST","item":"G'S OLEMA JACKET","qty":4800.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김구성","tnfOwner":"김수영 / 최수련 / 임가빈 / 강혜숙 / 이인후","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-29","status":"완료","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"QR","status":"해당없음","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"해원 2/24 / HWN-92839WS DULL / YNL 3/11 발주 / FD 710","status":"완료","issue":""},"trim_po":{"value":"YKK 4/17","status":"진행중","issue":""},"shipment_material":{"value":"4/24 원단선적 / 태림 가격택","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"4/2 RJECT / 4/28 제출","status":"완료","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"비엣궁","sketch":"","sketchPath":"","colors":[{"color":"BLK (S)","orderQty":3600.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"MIB (T)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS55ST-8","sourceNo":8,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"KD","styleNo":"NJ3BS55ST","item":"K'S OLEMA HOODIE","qty":6000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김구성","tnfOwner":"육보라 / 이인후","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-04-01","status":"완료","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"해원 4/9 / HWN-92839WS / YNL 4/13 / FD 710","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17","status":"진행중","issue":""},"shipment_material":{"value":"태림 가격택","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"2026-04-16","status":"완료","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"BLK (S)","orderQty":3600.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"WIN (T)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NM5MS52ABC-9","sourceNo":9,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NM5MS52ABC","item":"M'S FLEECE CREWNECK","qty":6000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김진수/ 오종성","tnfOwner":"유선숙 / 황지연 / 김용수 / 김영수 / 이동건","delivery":"DELI4","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-29","status":"완료","issue":""},"detail_sample":{"value":"2026-05-04","status":"완료","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 완료","status":"완료","issue":""},"consumption":{"value":"2026-02-23","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"삼운 2/23 / SW-25119R / SW-25035R(30%)_YOC","status":"진행중","issue":""},"trim_po":{"value":"부자재 4/16 발주 OK","status":"완료","issue":""},"shipment_material":{"value":"2026-04-10","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 4/27 발주 / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"완료","issue":""},"interlining":{"value":"X","status":"해당없음","issue":""},"artwork":{"value":"재봉사, 자수 목업 JMC 의뢰 4/3","status":"진행중","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"3/10 제출 / 3/17 리뷰 / 3/23 AP OK","status":"완료","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"4/3 JMC 목업의뢰.목업 후 FPP 제작해야함 / FPP","status":"진행중","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"목업 진행 중 / smpl / 2nd fpp > RJT","sketch":"","sketchPath":"","colors":[{"color":"DTA (A)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"VAN (B)","orderQty":2000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"NAV (C )","orderQty":1600.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ5JS81JKL-10","sourceNo":10,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ5JS81JKL","item":"W'S SIGNATURE HOOD ZIP UP","qty":6000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"박선영","tnfOwner":"이한비 / 이연호 / 김용수 / 김정해 / 김해밀","delivery":"DELI3","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-23","status":"완료","issue":""},"detail_sample":{"value":"2026-01-29","status":"완료","issue":""},"detail_pattern":{"value":"2026-01-28","status":"완료","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰 / OK","status":"완료","issue":""},"consumption":{"value":"2026-03-03","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"원더 C&T 2/23 / CNT-40911 / 2*1 RIB / 30'S/SINGLE","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17 / 스토퍼, 스트링 발주 안함 / 후드 스트링 길이 확정","status":"완료","issue":""},"shipment_material":{"value":"2026-04-17 / 2026-04-30 / 경일 PTS-05 / 경일, 새한 / 범양, 위브택","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID X / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"메인라벨 4/27 OK","status":"완료","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/19 제출 / 3/24 리뷰","status":"완료","issue":""},"ap1":{"value":"4/10 의뢰완료 / 4/23 받음","status":"완료","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"6/15 접수","status":"완료","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"2026-06-12","status":"완료","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"라인 스케줄 / 추가","sketch":"","sketchPath":"","colors":[{"color":"MEG (J)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"BLK (K)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"GRJ (L)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NP6KS81JKL-11","sourceNo":11,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NP6KS81JKL","item":"W'S SIGNATURE SWEATPANTS","qty":6000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"박선영","tnfOwner":"이한비 / 이연호 / 임가빈 / 김정해 / 김해밀","delivery":"DELI3","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-23","status":"완료","issue":""},"detail_sample":{"value":"2026-01-29","status":"완료","issue":""},"detail_pattern":{"value":"2026-01-28","status":"완료","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰 / OK","status":"완료","issue":""},"consumption":{"value":"2026-03-03","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"원더 C&T 2/23 / CNT-40911 / 2*1 RIB / 30'S/SINGLE","status":"진행중","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"2026-04-17 / 2026-04-30 / 위브택, 새한","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID X / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"메인라벨 화이트로 변경 4/27","status":"진행중","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/19 제출 / 3/24 리뷰 / 4/6 REJECT","status":"지연","issue":""},"ap1":{"value":"4/10 의뢰완료 / RIB 4/24 발송","status":"완료","issue":""},"ap2":{"value":"6/15 접수","status":"완료","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"2026-06-12","status":"완료","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"샘플감 요청 4/6 / 루사장님 / 호치민 / 추가","sketch":"","sketchPath":"","colors":[{"color":"MEG (J)","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"BLK (K)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"GRJ (L)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ5JS53JK-12","sourceNo":12,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ5JS53JK","item":"COMFY TRAINING ZIP UP","qty":4800.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"권송이 / 이연호 / 임가빈 / 김정해 / 김해밀","delivery":"DELI3","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-02-05","status":"완료","issue":""},"detail_sample":{"value":"O","status":"진행중","issue":""},"detail_pattern":{"value":"2026-02-23","status":"완료","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-02-23","status":"완료","issue":""},"costing":{"value":"2026-03-26","status":"완료","issue":""},"fabric_po":{"value":"SOLTTEX 2/23 / ST-TH-3745","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17","status":"진행중","issue":""},"shipment_material":{"value":"2026-04-24","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"메인라벨 4/27 CFM OK","status":"완료","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"3/26 리뷰 예정 / REJECT","status":"지연","issue":""},"ap2":{"value":"2차 AP 패턴 4/14 의뢰 / 4/28 리뷰 예정","status":"진행중","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"2026-06-12","status":"완료","issue":""},"material_card_factory":{"value":"2026-06-12","status":"완료","issue":""},"production_top":{"value":"6/17 6/24 OK","status":"완료","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"하고읶음","sketch":"","sketchPath":"","colors":[{"color":"BLK (J)","orderQty":3000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"DSL (K)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NP6KS53JK-13","sourceNo":13,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NP6KS53JK","item":"COMFY TRAINING PANTS","qty":4800.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"권송이 / 이연호 / 임가빈 / 김정해 / 김해밀","delivery":"DELI3","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-02-05","status":"완료","issue":""},"detail_sample":{"value":"O","status":"진행중","issue":""},"detail_pattern":{"value":"2026-02-06","status":"완료","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-02-23","status":"완료","issue":""},"costing":{"value":"2026-03-26","status":"완료","issue":""},"fabric_po":{"value":"SOLTTEX 2/23 / ST-TH-3745 / YNL / SJ-2476-2 / 이관시킬것","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17","status":"진행중","issue":""},"shipment_material":{"value":"2026-04-24","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"메인라벨 4/27 CFM OK","status":"완료","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"3/26 리뷰 예정 / AP OK","status":"완료","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"4/28 리뷰 예정","status":"진행중","issue":""},"material_card_buyer":{"value":"2026-06-12","status":"완료","issue":""},"material_card_factory":{"value":"2026-06-12","status":"완료","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"하고읶음","sketch":"","sketchPath":"","colors":[{"color":"BLK (J)","orderQty":3000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"DSL (K)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NM5MS51STU-14","sourceNo":14,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"KD","styleNo":"NM5MS51STU","item":"K'S CAMPING GRAPHIC SWEATSHIRT S-P","qty":2400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"김구성","tnfOwner":"김수영 / 최수련 / 김가을 / 김영수 / 이인후","delivery":"DELI2","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-01-29","status":"완료","issue":""},"detail_sample":{"value":"O","status":"진행중","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-02-23","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"원더 C&T 2/23 / CNT-50912","status":"진행중","issue":""},"trim_po":{"value":"경일 넥테이프 발주 OK","status":"완료","issue":""},"shipment_material":{"value":"2026-04-17 / 2026-04-30 / 태림 가격택","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"X","status":"해당없음","issue":""},"ap1":{"value":"3/10 제출 / 3/17리뷰 / 4/6 OK","status":"완료","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"X","status":"해당없음","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"2026-06-12","status":"완료","issue":""},"production_top":{"value":"2026-06-17","status":"완료","issue":""},"wash_sample":{"value":"REJ 5/29","status":"지연","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"출고 홀딩 / 가격","sketch":"","sketchPath":"","colors":[{"color":"HGY (S)","orderQty":800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"IVO (T)","orderQty":800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"BEI (U )","orderQty":800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NT7US88AB-15","sourceNo":15,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NT7US88AB","item":"M'S TNF 60TH ANNIVERSARY S/S T EE","qty":6000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"김진수 / 오종성","tnfOwner":"신사은 / 이동건","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-02-27","status":"완료","issue":""},"detail_sample":{"value":"X","status":"해당없음","issue":""},"detail_pattern":{"value":"2026-03-09","status":"완료","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-03-04","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"원더 C&T 3/12 / ASKIN COTTON (RE)_YOC_YOC","status":"진행중","issue":""},"trim_po":{"value":"제이디 넥테이프 발주","status":"완료","issue":""},"shipment_material":{"value":"2026-04-17","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 4/27 발주 / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"완료","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/23 제출 / 4/3 리젝","status":"완료","issue":""},"ap1":{"value":"4/6 본사 패턴 받아서 그대로C&B 의뢰","status":"진행중","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"2026-05-26","status":"완료","issue":""},"material_card_factory":{"value":"2026-05-26","status":"완료","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"REJ 5/29 / OK","status":"지연","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"100장 잔량","sketch":"","sketchPath":"","colors":[{"color":"RED (A)","orderQty":3000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"YEL (B)","orderQty":3000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NT7US51ST-16","sourceNo":16,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"KD","styleNo":"NT7US51ST","item":"K'S TNF 60th Anniversary S/S TEE","qty":3600.0,"garmentPrice":0,"exchangeRate":1470,"factory":"C&B","gender":"","category":"","department":"","salesOwner":"김구성","tnfOwner":"최수련 / 이인후","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-06","status":"완료","issue":""},"detail_sample":{"value":"X","status":"해당없음","issue":""},"detail_pattern":{"value":"2026-03-10","status":"완료","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-03-12","status":"완료","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"원더 C&T 3/12 / ASKIN COTTON (RE)_YOC_YOC","status":"진행중","issue":""},"trim_po":{"value":"제이디 넥테이프 발주","status":"완료","issue":""},"shipment_material":{"value":"2026-04-17","status":"완료","issue":""},"label_ticket_rfid_assort":{"value":"케어 4/27 발주 / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"완료","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/23 제출","status":"완료","issue":""},"ap1":{"value":"4/14 OK","status":"완료","issue":""},"ap2":{"value":"X","status":"해당없음","issue":""},"fpp":{"value":"X","status":"해당없음","issue":""},"material_card_buyer":{"value":"2026-05-26","status":"완료","issue":""},"material_card_factory":{"value":"2026-05-26","status":"완료","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"REJ 5/29","status":"지연","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"끝","sketch":"","sketchPath":"","colors":[{"color":"RED (A)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"YEL (B)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ4FS81AB-17","sourceNo":17,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NJ4FS81AB","item":"W'S SHORT FUR JACKET","qty":2400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"B&B","gender":"","category":"","department":"","salesOwner":"","tnfOwner":"이명진 / 황지연 / 어수지 / 김영수 / 이동건","delivery":"DELI4","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-12","status":"완료","issue":""},"detail_sample":{"value":"O","status":"진행중","issue":""},"detail_pattern":{"value":"O","status":"진행중","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-03-17","status":"완료","issue":""},"costing":{"value":"2026-03-17","status":"완료","issue":""},"fabric_po":{"value":"덕성 인코 3/18 / HC-DC2601_YOC / 스웨이드 ?","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17","status":"진행중","issue":""},"shipment_material":{"value":"경일, 위브택","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/26 ok","status":"완료","issue":""},"ap1":{"value":"4/13 의뢰","status":"진행중","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"6/12 접수","status":"완료","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"IVO (A)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"SMG (B)","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ4FS83AB-18","sourceNo":18,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NJ4FS83AB","item":"W'S LONG FUR JACKET","qty":3600.0,"garmentPrice":0,"exchangeRate":1470,"factory":"B&B","gender":"","category":"","department":"","salesOwner":"김민주","tnfOwner":"이명진 / 이동건","delivery":"DELI4","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-12","status":"완료","issue":""},"detail_sample":{"value":"O","status":"진행중","issue":""},"detail_pattern":{"value":"O","status":"진행중","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-03-17","status":"완료","issue":""},"costing":{"value":"2026-03-17","status":"완료","issue":""},"fabric_po":{"value":"덕성 인코 3/18 / HC-DC2601_YOC / 주머니감","status":"진행중","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"위브택","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/26 ok","status":"완료","issue":""},"ap1":{"value":"4/13 의뢰","status":"진행중","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"하노이","sketch":"","sketchPath":"","colors":[{"color":"IVO (A)","orderQty":2000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"SMG (B)","orderQty":1600.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3NS84JK-19","sourceNo":19,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"NJ3NS84JK","item":"W'S FUR PADDING JACKET","qty":3600.0,"garmentPrice":0,"exchangeRate":1470,"factory":"B&B","gender":"","category":"","department":"","salesOwner":"박선영","tnfOwner":"권송이 / 이혜민 / 어수지 / 김영수 / 김해밀","delivery":"DELI4","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-03-26","status":"완료","issue":""},"detail_sample":{"value":"O","status":"진행중","issue":""},"detail_pattern":{"value":"O","status":"진행중","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"한도래 의뢰","status":"진행중","issue":""},"consumption":{"value":"2026-03-17","status":"완료","issue":""},"costing":{"value":"2026-03-17","status":"완료","issue":""},"fabric_po":{"value":"INSUNG / YY/251015-21 / M&M ?","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17 / 자재 재확인해야함","status":"진행중","issue":""},"shipment_material":{"value":"YNL, 덕성 / 새한, 경일 / 범양, 위브택","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID X / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"3/26 ok","status":"완료","issue":""},"ap1":{"value":"4/13 의뢰","status":"진행중","issue":""},"ap2":{"value":"6/16 접수","status":"완료","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"BLK (A)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"IVO (B)","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS52SQR-20","sourceNo":20,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"KD","styleNo":"NJ3BS52SQR","item":"G'S OLEMA JACKET","qty":2400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"JMC","gender":"","category":"","department":"","salesOwner":"김구성","tnfOwner":"김수영 / 최수련 / 임가빈 / 강혜숙 / 이인후","delivery":"EARLY","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"QR","status":"해당없음","issue":""},"detail_sample":{"value":"QR","status":"해당없음","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"OK","status":"완료","issue":""},"pattern":{"value":"QR","status":"해당없음","issue":""},"consumption":{"value":"QR","status":"해당없음","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"해원 2/24 / HWN-92839WS DULL / YNL 4/13 / FD 710","status":"진행중","issue":""},"trim_po":{"value":"YKK 4/17","status":"진행중","issue":""},"shipment_material":{"value":"태림 가격택","status":"진행중","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID O / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"QR","status":"해당없음","issue":""},"ap1":{"value":"QR","status":"해당없음","issue":""},"ap2":{"value":"QR","status":"해당없음","issue":""},"fpp":{"value":"QR","status":"해당없음","issue":""},"material_card_buyer":{"value":"QR","status":"해당없음","issue":""},"material_card_factory":{"value":"QR","status":"해당없음","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"BLK (S)","orderQty":1600.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"MIB (T)","orderQty":800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-LAT7PS201-23","sourceNo":23,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"LAT7PS201","item":"NA VAIDEN S/S POLO","qty":1400.0,"garmentPrice":0,"exchangeRate":1470,"factory":"","gender":"","category":"","department":"","salesOwner":"이연주","tnfOwner":"김가영","delivery":"2026-08-14","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-06-09","status":"완료","issue":""},"detail_sample":{"value":"X","status":"해당없음","issue":""},"detail_pattern":{"value":"X","status":"해당없음","issue":""},"bom":{"value":"2026-06-09","status":"완료","issue":""},"pattern":{"value":"X","status":"해당없음","issue":""},"consumption":{"value":"X","status":"해당없음","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"원더 6/10","status":"진행중","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID X / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"","status":"미시작","issue":""},"ap1":{"value":"2026-06-19","status":"완료","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"일정 지켜야 함","sketch":"","sketchPath":"","colors":[{"color":"LBL (A)","orderQty":1400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-WAJ1NS400-24","sourceNo":24,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"WL","styleNo":"WAJ1NS400","item":"(TBD) OLEMA FLASH JACKET","qty":3600.0,"garmentPrice":0,"exchangeRate":1470,"factory":"","gender":"","category":"","department":"","salesOwner":"김혜진/김기림","tnfOwner":"이연호 / 최민서 / 강혜숙 / 김해밀","delivery":"9월 3째주","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-06-26","status":"완료","issue":""},"detail_sample":{"value":"","status":"미시작","issue":""},"detail_pattern":{"value":"","status":"미시작","issue":""},"bom":{"value":"","status":"미시작","issue":""},"pattern":{"value":"","status":"미시작","issue":""},"consumption":{"value":"","status":"미시작","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"","status":"미시작","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"","status":"미시작","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"","status":"미시작","issue":""},"ap1":{"value":"","status":"미시작","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"0.03 / 0.12 / 0.15","sketch":"","sketchPath":"","colors":[{"color":"BLK","orderQty":2400.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"BRW","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ3BS52SU-25","sourceNo":25,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"KD","styleNo":"NJ3BS52SU","item":"K'S NOVELTY OLEMA JACKET","qty":3200.0,"garmentPrice":0,"exchangeRate":1470,"factory":"","gender":"","category":"","department":"","salesOwner":"김구성","tnfOwner":"김수영 / 최수련 / 이인후","delivery":"","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":false,"completedDate":"","tna":{"detail_work":{"value":"2026-06-29","status":"완료","issue":""},"detail_sample":{"value":"","status":"미시작","issue":""},"detail_pattern":{"value":"","status":"미시작","issue":""},"bom":{"value":"","status":"미시작","issue":""},"pattern":{"value":"","status":"미시작","issue":""},"consumption":{"value":"","status":"미시작","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"","status":"미시작","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"","status":"미시작","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"","status":"미시작","issue":""},"ap1":{"value":"","status":"미시작","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"qr","sketch":"","sketchPath":"","colors":[{"color":"BLK","orderQty":2000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"SIL","orderQty":1200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]},{"id":"REC-NJ4FS55A-130","sourceNo":null,"buyer":"THE NORTH FACE","brand":"THE NORTH FACE","season":"F26","division":"OD","styleNo":"NJ4FS55A","item":"M'S FLEECE ANORAK","qty":6000.0,"garmentPrice":0,"exchangeRate":1470,"factory":"","gender":"","category":"","department":"","salesOwner":"김민주/이다은","tnfOwner":"유선숙 / 황지연 / 어수지 / 김영수 / 이동건","delivery":"FA","packingType":"SOLID","assortPacks":[],"packingRows":[],"materialMovements":[],"actualCosts":[],"payments":[],"bomAudit":[],"costVersions":[],"favorite":false,"completed":true,"completedDate":"","tna":{"detail_work":{"value":"2026-01-29","status":"완료","issue":""},"detail_sample":{"value":"","status":"미시작","issue":""},"detail_pattern":{"value":"NM","status":"해당없음","issue":""},"bom":{"value":"","status":"미시작","issue":""},"pattern":{"value":"","status":"미시작","issue":""},"consumption":{"value":"","status":"미시작","issue":""},"costing":{"value":"","status":"미시작","issue":""},"fabric_po":{"value":"DROP","status":"진행중","issue":""},"trim_po":{"value":"","status":"미시작","issue":""},"shipment_material":{"value":"","status":"미시작","issue":""},"label_ticket_rfid_assort":{"value":"케어 X / 가격택 X / RFID X / 아소트 X / 직배송 X","status":"진행중","issue":""},"interlining":{"value":"","status":"미시작","issue":""},"artwork":{"value":"","status":"미시작","issue":""},"sewing":{"value":"","status":"미시작","issue":""},"proto":{"value":"","status":"미시작","issue":""},"ap1":{"value":"","status":"미시작","issue":""},"ap2":{"value":"","status":"미시작","issue":""},"fpp":{"value":"","status":"미시작","issue":""},"material_card_buyer":{"value":"","status":"미시작","issue":""},"material_card_factory":{"value":"","status":"미시작","issue":""},"production_top":{"value":"","status":"미시작","issue":""},"wash_sample":{"value":"","status":"미시작","issue":""},"shipping":{"value":"","status":"미시작","issue":""}},"status":"수주등록","createdDate":"2026-07-24","remark":"","sketch":"","sketchPath":"","colors":[{"color":"DTA (A)","orderQty":2200.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"VAN (B)","orderQty":2000.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0},{"color":"GYB (C )","orderQty":1800.0,"s":0,"m":0,"l":0,"xl":0,"xxl":0}],"bom":[]}];
 const DEFAULT_STATE = {currentStyleId:'S1',styles:[{id:'S1',buyer:'THE NORTH FACE',season:'F26',styleNo:'NJ5JS53JK',item:'COMFY TRAINING ZIP UP',qty:4800,garmentPrice:0,factory:'',brand:'THE NORTH FACE',department:'OUTER',status:'수주등록',createdDate:TODAY,remark:'',sketch:'',sketchPath:'',colors:[{color:'BLK',s:240,m:800,l:950,xl:740,xxl:270}],bom:[{styleNo:'NJ5JS53JK',position:'SHELL A',subPosition:'MAIN BODY',garmentColor:'BLK',garmentSize:'ALL',description:'ST-TH-3745_YOC',widthSize:'58\"',color:'BLACK',qty:3000,net:1.393,loss:3,cons:1.435,requiredQty:4305,unit:'YD',supplier:'SOLTTEX'}]}],costs:{},sales:{},purchases:[],rates:{usdKrw:1470,usdVnd:26200,krwVnd:17.82,date:TODAY}};
 let state=JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -2790,180 +2942,230 @@ function stageTotal(styleNo,k){
   const margin=sub*n(c.stage[k].margin)/100;
   return {material,trim,sewing,margin,total:sub+margin};
 }
+
+
+function openCostSketchModal(src){
+  if(!src)return;
+  const modal=document.getElementById('costSketchModal');
+  const image=document.getElementById('costSketchModalImage');
+  if(image)image.src=src;
+  modal?.classList.remove('hidden');
+}
+function closeCostSketchModal(event){
+  if(event&&event.target?.id!=='costSketchModal')return;
+  document.getElementById('costSketchModal')?.classList.add('hidden');
+}
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')document.getElementById('costSketchModal')?.classList.add('hidden');
+});
+
+function costRowAmountKrw(row,stageKey='final'){
+  const stage=row?.[stageKey]||{};
+  const usage=n(stage.usage);
+  const unitPrice=n(stage.unitPrice);
+  const currency=stage.currency||'KRW';
+  const rate=n(state.rates.usdKrw)||1;
+  if(currency==='USD')return usage*unitPrice*rate;
+  if(currency==='VND')return usage*unitPrice/(n(state.rates.krwVnd)||1);
+  return usage*unitPrice;
+}
+function compactCostCategory(style,category){
+  const c=syncCostFromBom(style);
+  return c.rows.filter(r=>{
+    if(category==='공임')return r.category==='공임'||r.category==='완제품'||/CM|SEW|PRINT|WASH|EMBROIDERY/i.test(`${r.item||''} ${r.description||''}`);
+    return r.category===category;
+  });
+}
+function compactCostTableRows(style,category){
+  const rows=compactCostCategory(style,category);
+  if(!rows.length)return `<tr><td colspan="8" style="text-align:center;color:var(--muted)">등록된 ${category} 항목이 없습니다.</td></tr>`;
+  return rows.map((r,i)=>{
+    const cost=ensureCost(style.styleNo);
+    const realIndex=cost.rows.indexOf(r);
+    const st=r.final||{};
+    const amount=costRowAmountKrw(r,'final');
+    return `<tr>
+      <td>${r.item||r.position||'-'}</td>
+      <td title="${r.description||''}">${r.description||'-'}</td>
+      <td>${r.supplier||'-'}</td>
+      <td>${r.unit||'-'}</td>
+      <td><input type="number" step="0.01" value="${fmt2(st.usage)}" onchange="updateCostStage('${style.styleNo}',${realIndex},'final','usage',this.value)"></td>
+      <td><input type="number" step="0.01" value="${fmt2(st.unitPrice)}" onchange="updateCostStage('${style.styleNo}',${realIndex},'final','unitPrice',this.value)"></td>
+      <td><select onchange="updateCostStage('${style.styleNo}',${realIndex},'final','currency',this.value)">
+        ${['KRW','USD','VND'].map(c=>`<option ${st.currency===c?'selected':''}>${c}</option>`).join('')}
+      </select></td>
+      <td class="num">${krwFmt(amount)}</td>
+    </tr>`;
+  }).join('');
+}
+function toggleTargetCostDetails(){
+  document.getElementById('targetCostDetails')?.classList.toggle('hidden');
+}
+
 function renderCost(style){
   const c=syncCostFromBom(style);
   if(!state.sales[style.styleNo])state.sales[style.styleNo]={sellingFob:n(style.garmentPrice)||0};
   const sale=state.sales[style.styleNo];
-  if(!n(sale.sellingFob)&&n(style.garmentPrice))sale.sellingFob=n(style.garmentPrice);
 
-  const quote=stageTotal(style.styleNo,'quote');
-  const nego=stageTotal(style.styleNo,'nego1');
+  const rate=n(style.exchangeRate||state.rates.usdKrw)||1;
+  const dtdWon=n(style.garmentPrice);
+  sale.sellingFob=dtdWon;
+
+  const qty=n(style.qty);
+  const totalOrderKrw=qty*dtdWon;
+  const usdEquivalent=totalOrderKrw/rate;
+
+  const materialRows=compactCostCategory(style,'원자재');
+  const trimRows=compactCostCategory(style,'부자재');
+  const cmRows=compactCostCategory(style,'공임');
+
+  const materialKrw=materialRows.reduce((s,r)=>s+costRowAmountKrw(r),0);
+  const trimKrw=trimRows.reduce((s,r)=>s+costRowAmountKrw(r),0);
+  const cmKrw=cmRows.reduce((s,r)=>s+costRowAmountKrw(r),0);
+
   const final=stageTotal(style.styleNo,'final');
-  const sellingFob=n(sale.sellingFob)||n(style.garmentPrice);
-  const unitProfit=sellingFob-final.total;
-  const margin=sellingFob?unitProfit/sellingFob*100:0;
-  const markup=final.total?unitProfit/final.total*100:0;
-  const totalSales=sellingFob*n(style.qty);
-  const totalProfit=unitProfit*n(style.qty);
-  const totalOrderKrw=totalSales*n(style.exchangeRate||state.rates.usdKrw);
-  const actualUsd=actualTotalUsd(style);
-  const shipped=packingTotal(style)||n(style.qty);
-  const realizedSales=sellingFob*shipped;
-  const realizedProfit=realizedSales-actualUsd;
+  const finalRate=rate;
+  const finalMarginKrw=n(final.margin)*finalRate;
+  const otherKrw=(c.rows.filter(r=>!materialRows.includes(r)&&!trimRows.includes(r)&&!cmRows.includes(r))
+    .reduce((s,r)=>s+costRowAmountKrw(r),0))+finalMarginKrw;
 
-  const catSummary={원자재:0,부자재:0,완제품:0,제조경비:0,통합관리비:0,판매비:0,기타비용:0};
-  c.rows.forEach(r=>{
-    const amount=n(r.final.usage)*n(r.final.unitPrice)/(r.final.currency==='KRW'?n(state.rates.usdKrw)||1:1);
-    const cat=catSummary.hasOwnProperty(r.category)?r.category:'기타비용';
-    catSummary[cat]+=amount;
-  });
+  const manufacturingKrw=materialKrw+trimKrw+cmKrw+otherKrw;
+  const unitProfitKrw=dtdWon-manufacturingKrw;
+  const salesMarginPct=dtdWon?unitProfitKrw/dtdWon*100:0;
+  const operatingMarginPct=salesMarginPct;
+  const managementMarginPct=salesMarginPct;
+  const totalExpectedProfit=unitProfitKrw*qty;
 
-  const percent=(v)=>sellingFob?v/sellingFob*100:0;
+  const percent=v=>dtdWon?v/dtdWon*100:0;
   const sketch=style.sketch
-    ? `<img src="${style.sketch}">`
-    : `<div style="color:#777;text-align:center">No Sketch</div>`;
+    ? `<img src="${style.sketch}" alt="${style.styleNo||'Sketch'}">`
+    : `<div style="color:#777;text-align:center;font-size:11px">No Sketch</div>`;
 
   document.getElementById('costArea').innerHTML=`
-  <div class="costing-sheet">
+  <div class="target-cost-sheet">
     <div class="panel">
       <div class="head">
-        <div><h2>${style.styleNo} · 목표원가 계산서</h2><p>원가관리와 매출·수익을 한 화면에서 관리합니다.</p></div>
+        <div><h2>${style.styleNo} · 목표원가 계산서</h2><p>원자재·부자재·공임 BOM과 원가를 한 페이지에서 확인합니다.</p></div>
         <div class="actions">
-          <button class="btn" onclick="addCostRow('${style.styleNo}')">+ 원가 항목 추가</button>
-          <button class="btn" onclick="saveCostVersion('${style.styleNo}')">원가 Version 저장</button>
-          <button class="btn" onclick="printCostSheet('${style.styleNo}')">Buyer용 PDF/인쇄</button>
+          <button class="btn" onclick="toggleTargetCostDetails()">상세 편집 열기/닫기</button>
+          <button class="btn" onclick="saveCostVersion('${style.styleNo}')">Version 저장</button>
+          <button class="btn" onclick="printCostSheet('${style.styleNo}')">인쇄/PDF</button>
           <button class="btn primary" onclick="saveToSupabase(true)">공용 저장</button>
         </div>
       </div>
 
-      <div class="version-row" style="margin-bottom:12px">
-        <label>원가 Version<select id="costVersionSelect" onchange="loadCostVersion('${style.styleNo}',this.value)"></select></label>
-        <span id="costVersionNote" style="color:var(--muted);font-size:11px"></span>
-      </div>
-      <div class="costing-header">
-        <div class="style-info-grid">
+      <div class="target-cost-top">
+        <div class="target-cost-info">
           ${costInfoCell('Buyer',style.buyer)}
           ${costInfoCell('Brand',style.brand)}
           ${costInfoCell('Division / Gender',[style.division,style.gender].filter(Boolean).join(' / '))}
           ${costInfoCell('Season',style.season)}
           ${costInfoCell('Style No.',style.styleNo)}
           ${costInfoCell('Delivery',style.delivery)}
-          ${costInfoCell('Quantity',n(style.qty).toLocaleString()+' PCS')}
-          ${costInfoCell('DTD Won',krwFmt(style.garmentPrice))}
-          ${costInfoCell('Total Total Order Amount (KRW) (KRW) (KRW)',krwFmt(n(style.qty)*n(style.garmentPrice)))}
-          ${costInfoCell('USD Equivalent',usd((n(style.exchangeRate)||n(state.rates.usdKrw))?n(style.qty)*n(style.garmentPrice)/(n(style.exchangeRate)||n(state.rates.usdKrw)):0))}
+          ${costInfoCell('Quantity',fmtQty(qty)+' PCS')}
+          ${costInfoCell('DTD Won',krwFmt(dtdWon))}
+          ${costInfoCell('Total Order KRW',krwFmt(totalOrderKrw))}
+          ${costInfoCell('USD Equivalent',usd(usdEquivalent))}
           ${costInfoCell('Factory',style.factory)}
-          ${costInfoCell('기타 담당',style.tnfOwner||'-')}
           ${costInfoCell('TNF 생산 담당',style.salesOwner||'-')}
-          ${costInfoCell('Category',style.category||style.department||'-')}
-          ${costInfoCell('Exchange Rate',n(style.exchangeRate||state.rates.usdKrw).toLocaleString())}
+          ${costInfoCell('기타 담당',style.tnfOwner||'-')}
+          ${costInfoCell('Exchange Rate',fmt2(rate))}
           ${costInfoCell('Status',style.status)}
+          ${costInfoCell('Remark',style.remark||'-')}
         </div>
-        <div class="cost-sketch">${sketch}</div>
+        <div class="target-cost-sketch" onclick="openCostSketchModal(${JSON.stringify(style.sketch||'')})">${sketch}</div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="cost-group-title">
-        <h3>Fabric / Trim / Process / Expense Information</h3>
-        <span style="color:var(--muted);font-size:11px">Unit: USD / PCS</span>
-      </div>
-      <div class="table-wrap">
-        <table class="cost-table">
-          <thead>
-            <tr>
-              <th rowspan="2">Category</th><th rowspan="2">Item</th><th rowspan="2">Description</th><th rowspan="2">Supplier</th><th rowspan="2">Unit</th>
-              <th colspan="3">견적</th><th colspan="3">협상</th><th colspan="3">최종확정</th><th rowspan="2">삭제</th>
-            </tr>
-            <tr><th>Usage</th><th>Unit Price</th><th>Amount</th><th>Usage</th><th>Unit Price</th><th>Amount</th><th>Usage</th><th>Unit Price</th><th>Amount</th></tr>
-          </thead>
-          <tbody>
-            ${c.rows.map((r,i)=>integratedCostRowHtml(style.styleNo,r,i)).join('')}
-            <tr class="cost-total-row">
-              <td colspan="5">TOTAL MATERIAL / EXPENSE</td>
-              <td colspan="3">${usd(quote.material+quote.trim)}</td>
-              <td colspan="3">${usd(nego.material+nego.trim)}</td>
-              <td colspan="3">${usd(final.material+final.trim)}</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="target-section">
+      <div class="target-section-title"><h3>원자재 Information</h3><span>Unit: KRW / PCS</span></div>
+      <div class="table-wrap"><table class="target-compact-table">
+        <thead><tr><th>Item</th><th>Description</th><th>Supplier</th><th>Unit</th><th>Usage</th><th>Unit Price</th><th>Currency</th><th>Amount/PCS</th></tr></thead>
+        <tbody>${compactCostTableRows(style,'원자재')}</tbody>
+        <tfoot><tr><th colspan="7">원자재 Total</th><th>${krwFmt(materialKrw)}</th></tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="target-section">
+      <div class="target-section-title"><h3>부자재 Information</h3><span>Unit: KRW / PCS</span></div>
+      <div class="table-wrap"><table class="target-compact-table">
+        <thead><tr><th>Item</th><th>Description</th><th>Supplier</th><th>Unit</th><th>Usage</th><th>Unit Price</th><th>Currency</th><th>Amount/PCS</th></tr></thead>
+        <tbody>${compactCostTableRows(style,'부자재')}</tbody>
+        <tfoot><tr><th colspan="7">부자재 Total</th><th>${krwFmt(trimKrw)}</th></tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="target-section">
+      <div class="target-section-title"><h3>공임 / 가공 Information</h3><span>Unit: KRW / PCS</span></div>
+      <div class="table-wrap"><table class="target-compact-table">
+        <thead><tr><th>Item</th><th>Description</th><th>Factory</th><th>Unit</th><th>Usage</th><th>Unit Price</th><th>Currency</th><th>Amount/PCS</th></tr></thead>
+        <tbody>${compactCostTableRows(style,'공임')}</tbody>
+        <tfoot><tr><th colspan="7">공임 Total</th><th>${krwFmt(cmKrw)}</th></tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="target-section">
+      <div class="target-section-title"><h3>제조원가 (PCS)</h3><span>Unit: KRW</span></div>
+      <div class="target-summary-row">
+        <div class="box"><span>원자재</span><strong>${krwFmt(materialKrw)}</strong></div>
+        <div class="box"><span>부자재</span><strong>${krwFmt(trimKrw)}</strong></div>
+        <div class="box"><span>공임</span><strong>${krwFmt(cmKrw)}</strong></div>
+        <div class="box"><span>기타비용</span><strong>${krwFmt(otherKrw)}</strong></div>
+        <div class="box"><span>총 제조원가</span><strong>${krwFmt(manufacturingKrw)}</strong></div>
+        <div class="box"><span>DTD Won</span><strong>${krwFmt(dtdWon)}</strong></div>
+        <div class="box"><span>Unit Profit</span><strong class="${unitProfitKrw<0?'negative':'positive'}">${krwFmt(unitProfitKrw)}</strong></div>
+        <div class="box"><span>총 예상이익</span><strong class="${totalExpectedProfit<0?'negative':'positive'}">${krwFmt(totalExpectedProfit)}</strong></div>
+        <div class="box"><span>Margin</span><strong class="${salesMarginPct<0?'negative':'positive'}">${fmt2(salesMarginPct)}%</strong></div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="cost-group-title"><h3>제조원가 (PCS)</h3><span style="color:var(--muted);font-size:11px">Unit: USD</span></div>
-      <div class="cost-summary-band">
-        ${summaryBox('원자재',catSummary.원자재)}
-        ${summaryBox('부자재',catSummary.부자재)}
-        ${summaryBox('완제품 가공',catSummary.완제품)}
-        ${summaryBox('제조경비',catSummary.제조경비)}
-        ${summaryBox('통합관리비',catSummary.통합관리비)}
-        ${summaryBox('판매비',catSummary.판매비)}
-        ${summaryBox('순수봉제비',final.sewing)}
-        ${summaryBox('마진/기타',final.margin+catSummary.기타비용)}
-        ${summaryBox('총 제조원가',final.total,true)}
-        ${summaryBox('Selling FOB',sellingFob,true)}
+    <div class="target-section">
+      <div class="target-section-title"><h3>DTD Won Vs. 제조원가 비율</h3><span>Unit: %</span></div>
+      <div class="target-percent-row">
+        <div class="box"><span>원자재</span><strong>${fmt2(percent(materialKrw))}%</strong></div>
+        <div class="box"><span>부자재</span><strong>${fmt2(percent(trimKrw))}%</strong></div>
+        <div class="box"><span>공임</span><strong>${fmt2(percent(cmKrw))}%</strong></div>
+        <div class="box"><span>기타비용</span><strong>${fmt2(percent(otherKrw))}%</strong></div>
+        <div class="box"><span>총 제조원가</span><strong>${fmt2(percent(manufacturingKrw))}%</strong></div>
+        <div class="box"><span>매출이익</span><strong>${fmt2(salesMarginPct)}%</strong></div>
+        <div class="box"><span>영업이익</span><strong>${fmt2(operatingMarginPct)}%</strong></div>
+        <div class="box"><span>관리손익</span><strong>${fmt2(managementMarginPct)}%</strong></div>
+        <div class="box"><span>원가율</span><strong>${fmt2(percent(manufacturingKrw))}%</strong></div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="cost-group-title"><h3>FOB Vs. 제조원가 비율</h3><span style="color:var(--muted);font-size:11px">Unit: %</span></div>
-      <div class="table-wrap">
-        <table class="cost-percent-table">
-          <thead><tr><th>원자재</th><th>부자재</th><th>완제품</th><th>제조경비</th><th>통합관리비</th><th>판매비</th><th>공임</th><th>총 제조원가</th><th>매출이익</th></tr></thead>
-          <tbody><tr>
-            <td>${percent(catSummary.원자재).toFixed(2)}%</td>
-            <td>${percent(catSummary.부자재).toFixed(2)}%</td>
-            <td>${percent(catSummary.완제품).toFixed(2)}%</td>
-            <td>${percent(catSummary.제조경비).toFixed(2)}%</td>
-            <td>${percent(catSummary.통합관리비).toFixed(2)}%</td>
-            <td>${percent(catSummary.판매비).toFixed(2)}%</td>
-            <td>${percent(final.sewing).toFixed(2)}%</td>
-            <td><b>${percent(final.total).toFixed(2)}%</b></td>
-            <td class="${unitProfit<0?'negative':'positive'}"><b>${margin.toFixed(2)}%</b></td>
-          </tr></tbody>
-        </table>
-      </div>
+    <div class="target-profit-band">
+      <div class="box"><span>총 제조원가</span><strong>${krwFmt(manufacturingKrw)}</strong></div>
+      <div class="box"><span>판매비(영업)</span><strong>${krwFmt(0)}</strong></div>
+      <div class="box"><span>판매비(공통)</span><strong>${krwFmt(0)}</strong></div>
+      <div class="box"><span>금융관리비용</span><strong>${krwFmt(0)}</strong></div>
+      <div class="box"><span>매출이익</span><strong>${fmt2(salesMarginPct)}%</strong></div>
+      <div class="box"><span>관리손익</span><strong>${fmt2(managementMarginPct)}%</strong></div>
     </div>
 
-    <div class="panel">
-      <div class="head"><div><h3>비용 합계 및 이익</h3></div></div>
-      <div class="profit-band">
-        <div class="metric"><span>Selling DTD Won</span><strong>${usd(sellingFob)}</strong></div>
-        <div class="metric"><span>총 제조원가</span><strong>${usd(final.total)}</strong></div>
-        <div class="metric"><span>Unit Profit</span><strong class="${unitProfit<0?'negative':'positive'}">${usd(unitProfit)}</strong></div>
-        <div class="metric"><span>Margin %</span><strong class="${margin<0?'negative':'positive'}">${margin.toFixed(2)}%</strong></div>
-        <div class="metric"><span>Markup %</span><strong>${markup.toFixed(2)}%</strong></div>
-        <div class="metric"><span>총 예상이익</span><strong class="${totalProfit<0?'negative':'positive'}">${usd(totalProfit)}</strong></div>
-      </div>
-      <div style="margin-top:12px;max-width:280px">
-        <label>Selling FOB 수정
-          <input type="number" step="0.01" value="${sellingFob}" onchange="state.sales['${style.styleNo}'].sellingFob=n(this.value);cs().garmentPrice=n(this.value);persist();renderCost(state.styles.find(x=>x.styleNo==='${style.styleNo}'))">
-        </label>
-      </div>
-    </div>
-
-    <div class="cost-comparison">
+    <div id="targetCostDetails" class="target-detail-area hidden">
       <div class="panel">
-        <h3>예상 원가 단계 비교</h3>
-        <div class="reconcile-line"><span>견적 제조원가</span><b>${usd(quote.total)}</b></div>
-        <div class="reconcile-line"><span>협상 제조원가</span><b>${usd(nego.total)}</b></div>
-        <div class="reconcile-line"><span>최종 제조원가</span><b>${usd(final.total)}</b></div>
-        <div class="reconcile-line total"><span>최종 Unit Profit</span><b>${usd(unitProfit)}</b></div>
-      </div>
-      <div class="panel">
-        <h3>실제 출고·매입 비교</h3>
-        <div class="reconcile-line"><span>최종 출고수량</span><b>${shipped.toLocaleString()} PCS</b></div>
-        <div class="reconcile-line"><span>실제 매출</span><b>${usd(realizedSales)}</b></div>
-        <div class="reconcile-line"><span>실제 매입</span><b>${usd(actualUsd)}</b></div>
-        <div class="reconcile-line total"><span>실제 잔액 / 이익</span><b class="${realizedProfit<0?'negative':'positive'}">${usd(realizedProfit)}</b></div>
+        <div class="head">
+          <div><h3>상세 원가 편집</h3><p>견적·협상·최종확정 단계별 상세 수치를 수정합니다.</p></div>
+          <button class="btn" onclick="addCostRow('${style.styleNo}')">+ 원가 항목 추가</button>
+        </div>
+        <div class="table-wrap">
+          <table class="cost-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Category</th><th rowspan="2">Item</th><th rowspan="2">Description</th><th rowspan="2">Supplier</th><th rowspan="2">Unit</th>
+                <th colspan="3">견적</th><th colspan="3">협상</th><th colspan="3">최종확정</th><th rowspan="2">삭제</th>
+              </tr>
+              <tr><th>Usage</th><th>Unit Price</th><th>Amount</th><th>Usage</th><th>Unit Price</th><th>Amount</th><th>Usage</th><th>Unit Price</th><th>Amount</th></tr>
+            </thead>
+            <tbody>${c.rows.map((r,i)=>integratedCostRowHtml(style.styleNo,r,i)).join('')}</tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>`;
   renderCostVersions(style);
 }
-
 function costInfoCell(label,value){
   return `<div class="info-cell"><span>${label}</span><strong>${value||'-'}</strong></div>`;
 }
@@ -4356,6 +4558,14 @@ initSupabaseApp();
       <button class="btn" onclick="closeStyleCopyModal()">취소</button>
       <button class="btn primary" onclick="createCopiedStyle()">새 Style 생성</button>
     </div>
+  </div>
+</div>
+
+
+<div id="costSketchModal" class="cost-sketch-modal hidden" onclick="closeCostSketchModal(event)">
+  <div class="cost-sketch-modal-card" onclick="event.stopPropagation()">
+    <button class="cost-sketch-modal-close" onclick="closeCostSketchModal()">×</button>
+    <img id="costSketchModalImage" alt="Costing Sketch Preview">
   </div>
 </div>
 
